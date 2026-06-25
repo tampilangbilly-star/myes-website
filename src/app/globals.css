@@ -2650,20 +2650,4 @@ ul {
     padding: 0 10px !important;
     gap: 5px !important;
   }
-
-  /* 2. Sembunyikan teks deskripsi logo agar tidak memakan tempat */
-  .nav-logo-text small {
-    display: none !important;
-  }
-
-  /* 3. Perkecil sedikit ukuran teks logo utama */
-  .nav-logo-text {
-    font-size: 0.9rem !important;
-  }
-
-  /* 4. Pastikan hamburger dan lang-toggle tidak menyusut */
-  .hamburger,
-  .lang-toggle {
-    flex-shrink: 0;
-  }
 }
