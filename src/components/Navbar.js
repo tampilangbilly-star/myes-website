@@ -81,7 +81,10 @@ export default function Navbar({ lang = "en" }) {
             </button>
           </div>
 
-          <button className="hamburger" onClick={() => setOpen(!open)}>
+          <button
+            className={`hamburger ${open ? "open" : ""}`}
+            onClick={() => setOpen(!open)}
+          >
             <span />
             <span />
             <span />

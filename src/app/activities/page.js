@@ -303,7 +303,7 @@ export default async function ActivitiesPage() {
             {/* Bagian Kiri: Google Maps iframe */}
             <div className="map-container">
               <iframe
-                src="https://maps.google.com/maps?q=1.4492049,124.8081769&hl=id&z=16&output=embed"
+                src="https://maps.google.com/maps?q=Jalan%20Sea%20Malalayang%201%20Barat,%20Manado&t=&z=15&ie=UTF8&iwloc=&output=embed"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
@@ -366,7 +366,7 @@ export default async function ActivitiesPage() {
               </p>
 
               <a
-                href="https://maps.google.com/?q=1.4492049,124.8081769"
+                href="https://maps.google.com/?q=Lorong+Tuminting+1+A,+Jalan+Sea+Malalayang+1+Barat,+Manado"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="maps-btn"

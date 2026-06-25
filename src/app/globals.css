@@ -2569,3 +2569,54 @@ ul {
     border-bottom-color: #3b82f6;
   }
 }
+/* =========================================
+   PERBAIKAN RESPONSIVITAS NAVBAR HP
+   ========================================= */
+@media (max-width: 900px) {
+  /* 1. Menyembunyikan menu teks bawaan dan menyulapnya jadi dropdown */
+  .nav-links {
+    position: absolute;
+    top: 72px; /* Tepat di bawah navbar */
+    left: 0;
+    right: 0;
+    background: rgba(10, 19, 36, 0.98);
+    backdrop-filter: blur(16px);
+    flex-direction: column;
+    padding: 2rem;
+    gap: 1.5rem;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+
+    /* State awal: ditarik ke atas, disembunyikan, dan dimatikan sentuhannya */
+    transform: translateY(-150%);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: -1;
+  }
+
+  /* 2. Saat Hamburger diklik (kelas 'open' aktif), menu meluncur ke bawah */
+  .nav-links.open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* 3. Merapikan teks menu di HP agar ke tengah dan mudah di-tap */
+  .nav-links a {
+    font-size: 1.15rem;
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+  }
+
+  /* 4. Animasi sulap tombol Hamburger berubah menjadi silang (X) */
+  .hamburger.open span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+  .hamburger.open span:nth-child(2) {
+    opacity: 0;
+  }
+  .hamburger.open span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+}

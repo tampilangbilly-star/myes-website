@@ -8,6 +8,7 @@ import GuestSpeakerSlider from "@/components/GuestSpeakerSlider";
 import NewsHomeSlider from "@/components/NewsHomeSlider";
 import VirtualGreeter from "@/components/VirtualGreeter";
 import HolySpiritAmbient from "@/components/HolySpiritAmbient";
+
 async function getData() {
   const [
     slides,
@@ -153,6 +154,34 @@ export default async function Home() {
           60% { transform: translateX(5px); }
         }
 
+        /* --- KELAS CSS RESPONSIF BARU --- */
+        .responsive-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+          gap: 4rem;
+          align-items: center;
+        }
+        
+        .news-title {
+          font-size: 2.8rem;
+          color: #fff;
+          font-weight: 800;
+          margin: 0.5rem 0 1.5rem 0;
+          line-height: 1.2;
+        }
+        
+        .location-title {
+          font-size: 2.2rem;
+          margin-bottom: 0.5rem;
+          color: #fff;
+          font-weight: bold;
+        }
+        
+        .section-padding {
+          padding-top: 6rem;
+          padding-bottom: 6rem;
+        }
+
         @media (max-width: 992px) {
           .guest-speaker-overlay {
             position: relative;
@@ -166,12 +195,30 @@ export default async function Home() {
             z-index: 40;
           }
         }
+        
+        @media (max-width: 768px) {
+          .responsive-grid {
+            gap: 2.5rem; /* Jarak antar elemen dikurangi di HP */
+          }
+          .news-title {
+            font-size: 2rem; /* Ukuran huruf dikecilkan di HP */
+          }
+          .location-title {
+            font-size: 1.8rem; /* Ukuran huruf dikecilkan di HP */
+          }
+          .section-padding {
+            padding-top: 4rem;
+            padding-bottom: 4rem;
+          }
+          .map-container {
+            height: 300px !important; /* Peta tidak terlalu panjang di HP */
+          }
+        }
       `,
         }}
       />
 
       <div className="hero-wrapper">
-        {/* Tambahkan baris ini di sini */}
         <HolySpiritAmbient />
 
         <HeroSlider slides={slides} socials={socials} lang={lang} />
@@ -350,13 +397,11 @@ export default async function Home() {
       {/* ======================================================== */}
       {news.length > 0 && (
         <section
-          className="section section-alt"
+          className="section section-alt section-padding"
           style={{
-            position: "relative" /* Kunci untuk elemen absolute di dalamnya */,
-            overflow: "hidden" /* Mencegah glow melewati batas seksi */,
+            position: "relative",
+            overflow: "hidden",
             backgroundColor: "#080e17",
-            paddingTop: "6rem",
-            paddingBottom: "6rem",
             borderTop: "1px solid rgba(255,255,255,0.02)",
             borderBottom: "1px solid rgba(255,255,255,0.02)",
           }}
@@ -398,14 +443,7 @@ export default async function Home() {
               margin: "0 auto",
             }}
           >
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-                gap: "4rem",
-                alignItems: "center",
-              }}
-            >
+            <div className="responsive-grid">
               <div style={{ textAlign: "left" }}>
                 <div
                   className="overline"
@@ -418,15 +456,7 @@ export default async function Home() {
                 >
                   {lang === "id" ? "Warta Mingguan" : "Weekly Update"}
                 </div>
-                <h2
-                  style={{
-                    fontSize: "2.8rem",
-                    color: "#fff",
-                    fontWeight: "800",
-                    margin: "0.5rem 0 1.5rem 0",
-                    lineHeight: "1.2",
-                  }}
-                >
+                <h2 className="news-title">
                   {lang === "id"
                     ? "Berita & Flyer Kegiatan"
                     : "Latest Event Flyers"}
@@ -461,10 +491,8 @@ export default async function Home() {
       )}
 
       <section
-        className="section"
+        className="section section-padding"
         style={{
-          paddingBottom: "8rem",
-          paddingTop: "6rem",
           backgroundImage: `linear-gradient(rgba(5, 11, 20, 0.85), rgba(5, 11, 20, 0.95)), url('/uploads/home.png')`,
           backgroundSize: "cover",
           backgroundPosition: "center",
@@ -483,14 +511,7 @@ export default async function Home() {
             <h2>{lang === "id" ? "Lokasi Kami" : "Our Location"}</h2>
           </div>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-              gap: "4rem",
-              alignItems: "center",
-            }}
-          >
+          <div className="responsive-grid">
             <div
               className="map-container"
               style={{
@@ -514,16 +535,7 @@ export default async function Home() {
             </div>
 
             <div className="location-info">
-              <h3
-                style={{
-                  fontSize: "2.2rem",
-                  marginBottom: "0.5rem",
-                  color: "#fff",
-                  fontWeight: "bold",
-                }}
-              >
-                M-YES Basecamp
-              </h3>
+              <h3 className="location-title">M-YES Basecamp</h3>
               <div
                 style={{
                   width: "60px",
