@@ -71,8 +71,8 @@ async function main() {
     },
     {
       key: "contact_phone",
-      valueEn: "+62 xxx-xxxx-xxxx",
-      valueId: "+62 xxx-xxxx-xxxx",
+      valueEn: "+62 822-9065-8336",
+      valueId: "+62 822-9065-8336",
       group: "contact",
     },
     {
