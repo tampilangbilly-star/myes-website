@@ -3,7 +3,6 @@ import { useState, useEffect, useCallback } from "react";
 
 export default function HeroSlider({ slides, socials, lang = "en" }) {
   const [current, setCurrent] = useState(0);
-  // 1. KUNCI UTAMA: Kita tambahkan pelacak untuk slide sebelumnya
   const [prevIndex, setPrevIndex] = useState(0);
   const total = slides.length;
 
@@ -15,12 +14,12 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
   };
 
   const next = useCallback(() => {
-    setPrevIndex(current); // Ingat slide saat ini sebelum diganti
+    setPrevIndex(current);
     setCurrent((c) => (c + 1) % total);
   }, [current, total]);
 
   const prev = () => {
-    setPrevIndex(current); // Ingat slide saat ini sebelum diganti
+    setPrevIndex(current);
     setCurrent((c) => (c - 1 + total) % total);
   };
 
@@ -83,15 +82,13 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
             style={{
               position: "absolute",
               inset: 0,
-              // 2. LOGIKA TUMPUKAN: Active di posisi paling atas (2), Prev di tengah (1)
               zIndex: isActive ? 2 : isPrev ? 1 : 0,
-              // 3. LOGIKA TRANSPARANSI: Active dan Prev SAMA-SAMA TEBAL (opacity: 1)
               opacity: isActive || isPrev ? 1 : 0,
               transition: "opacity 1.2s ease-in-out",
               pointerEvents: isActive ? "auto" : "none",
             }}
           >
-            {/* 1. BACKGROUND IMAGE (Full Screen di belakang) */}
+            {/* BACKGROUND IMAGE */}
             {slide.backgroundImage ? (
               <div
                 style={{
@@ -116,7 +113,7 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
               />
             )}
 
-            {/* 2. CINEMATIC BLUE OVERLAY (Kaca gelap agar teks terbaca) */}
+            {/* CINEMATIC OVERLAY */}
             <div
               style={{
                 position: "absolute",
@@ -127,7 +124,7 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
               }}
             />
 
-            {/* 3. KONTEN UTAMA (Teks di Kiri, Slide Image di Kanan) */}
+            {/* KONTEN UTAMA */}
             <div
               style={{
                 position: "relative",
@@ -142,8 +139,8 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
                 gap: "4rem",
               }}
             >
-              {/* Bagian Teks (Kiri) */}
-              <div style={{ flex: 1, maxWidth: "600px" }}>
+              {/* Bagian Teks (Kiri) - DITAMBAHKAN PADDINGTOP UNTUK MOBILE */}
+              <div style={{ flex: 1, maxWidth: "600px", paddingTop: "80px" }}>
                 {t(slide, "overline") && (
                   <div
                     style={{
@@ -226,8 +223,7 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
                       borderRadius: "16px",
                       boxShadow: "0 25px 60px rgba(0,0,0,0.8)",
                       border: "1px solid rgba(255,255,255,0.1)",
-                      transform:
-                        "rotate(-2deg)" /* Sedikit miring agar lebih dinamis */,
+                      transform: "rotate(-2deg)",
                     }}
                     alt={slide.titleEn}
                   />
@@ -247,7 +243,7 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
                 key={i}
                 className={`dot ${i === current ? "active" : ""}`}
                 onClick={() => {
-                  setPrevIndex(current); // Ingat saat titik diklik
+                  setPrevIndex(current);
                   setCurrent(i);
                 }}
               />

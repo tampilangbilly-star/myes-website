@@ -2612,11 +2612,31 @@ ul {
   /* 4. Animasi sulap tombol Hamburger berubah menjadi silang (X) */
   .hamburger.open span:nth-child(1) {
     transform: translateY(7px) rotate(45deg);
+    -webkit-transform: translateY(7px) rotate(45deg);
+    -moz-transform: translateY(7px) rotate(45deg);
+    -ms-transform: translateY(7px) rotate(45deg);
+    -o-transform: translateY(7px) rotate(45deg);
   }
   .hamburger.open span:nth-child(2) {
     opacity: 0;
   }
   .hamburger.open span:nth-child(3) {
     transform: translateY(-7px) rotate(-45deg);
+  }
+}
+@media (max-width: 900px) {
+  /* Memberi ruang lebih di atas agar teks tidak tertutup navbar */
+  .hero-slider {
+    padding-top: 100px !important;
+  }
+
+  /* Mengecilkan ukuran Virtual Buddy agar tidak menutupi layar */
+  .splash-modal-card {
+    padding: 20px !important;
+    max-width: 90% !important;
+  }
+
+  .splash-modal-title {
+    font-size: 1.5rem !important;
   }
 }
