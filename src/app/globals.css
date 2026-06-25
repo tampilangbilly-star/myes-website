@@ -2598,3 +2598,31 @@ ul {
     min-height: 60vh !important;
   }
 }
+/* =========================================
+   RESPONSIF BACKGROUND SLIDER UNTUK ANDROID / HP
+   ========================================= */
+@media (max-width: 768px) {
+  /* 1. Menyesuaikan tinggi slider agar tidak terlalu memanjang ke bawah */
+  .hero-slider {
+    min-height: 65svh !important; /* svh lebih baik dari vh untuk HP modern */
+    height: auto;
+    padding-bottom: 2rem;
+  }
+
+  /* 2. Memaksa posisi gambar selalu di tengah dan mencegah bug di Android */
+  .slide-bg {
+    background-position: center center !important;
+    background-size: cover !important;
+    /* Mencegah bug visual (flicker/patah-patah) di browser bawaan Android */
+    background-attachment: scroll !important;
+  }
+
+  /* 3. Menyesuaikan efek gelap (overlay) agar teks tetap terbaca di HP */
+  .slide-overlay {
+    background: linear-gradient(
+      to bottom,
+      rgba(5, 10, 20, 0.85) 0%,
+      rgba(5, 10, 20, 0.5) 100%
+    ) !important;
+  }
+}
