@@ -524,7 +524,7 @@ export default async function Home() {
               }}
             >
               <iframe
-                src="https://maps.google.com/maps?q=1.4492049,124.8081769&hl=id&z=16&output=embed"
+                src="https://maps.google.com/?q=Lorong+Tuminting+1+A,+Jalan+Sea+Malalayang+1+Barat,+Manado"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
