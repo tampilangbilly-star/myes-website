@@ -2644,10 +2644,3 @@ ul {
     font-size: 1.5rem !important;
   }
 }
-@media (max-width: 450px) {
-  /* 1. Perkecil padding navbar agar tombol tidak terdorong keluar */
-  .nav-inner {
-    padding: 0 10px !important;
-    gap: 5px !important;
-  }
-}
