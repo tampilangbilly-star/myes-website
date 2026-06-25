@@ -1,22 +1,44 @@
-import { NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
+import { NextResponse } from "next/server";
+import { writeFile, mkdir } from "fs/promises";
+import path from "path";
 
 export async function POST(req) {
-  const formData = await req.formData();
-  const file = formData.get('file');
-  const folder = formData.get('folder') || 'uploads';
+  try {
+    const formData = await req.formData();
+    const file = formData.get("file");
+    const folder = formData.get("folder") || ""; // Folder opsional dari form
 
-  if (!file) return NextResponse.json({ error: 'No file' }, { status: 400 });
+    if (!file || typeof file === "string") {
+      return NextResponse.json(
+        { error: "Tidak ada file yang diunggah" },
+        { status: 400 },
+      );
+    }
 
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-  const ext = file.name.split('.').pop();
-  const filename = `${folder}/${Date.now()}_${Math.random().toString(36).substr(2,9)}.${ext}`;
-  const uploadDir = path.join(process.cwd(), 'public', 'uploads', folder);
+    const buffer = Buffer.from(await file.arrayBuffer());
 
-  await mkdir(uploadDir, { recursive: true });
-  await writeFile(path.join(process.cwd(), 'public', 'uploads', filename), buffer);
+    // 1. Buat nama file unik
+    const filename = Date.now() + "-" + file.name.replace(/\s+/g, "-");
 
-  return NextResponse.json({ path: filename });
+    // 2. Tentukan folder tujuan (public/uploads atau sub-foldernya)
+    const uploadDir = path.join(process.cwd(), "public", "uploads", folder);
+
+    // 3. Buat foldernya secara otomatis jika belum ada
+    await mkdir(uploadDir, { recursive: true });
+
+    // 4. Simpan fisik file ke server
+    const filepath = path.join(uploadDir, filename);
+    await writeFile(filepath, buffer);
+
+    // 5. Kembalikan jalur file-nya ke AdminForm / SlideForm
+    const returnedPath = folder ? `${folder}/${filename}` : filename;
+
+    return NextResponse.json({ path: returnedPath });
+  } catch (error) {
+    console.error("Upload Error:", error);
+    return NextResponse.json(
+      { error: "Gagal mengunggah file" },
+      { status: 500 },
+    );
+  }
 }
