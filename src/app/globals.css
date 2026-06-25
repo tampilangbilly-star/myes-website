@@ -2590,3 +2590,11 @@ ul {
     font-size: 1.5rem !important;
   }
 }
+/* Responsif untuk background slider di HP */
+@media (max-width: 900px) {
+  .hero-slider {
+    /* Mengurangi tinggi di HP agar gambar tidak terlalu "gepeng" atau terpotong */
+    height: 60vh !important;
+    min-height: 60vh !important;
+  }
+}

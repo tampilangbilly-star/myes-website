@@ -3,3 +3,5 @@ node_modules
 .env
 public/uploads/*
 !public/uploads/.gitkeep
+.env.example
+test
