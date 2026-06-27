@@ -2436,3 +2436,245 @@ ul {
     padding-top: 40px !important;
   }
 }
+/* ========================================================
+   OPTIMIZED RESPONSIVE ARCHITECTURE & FLUID LAYOUT
+   ======================================================== */
+
+/* 1. FLUID CONTAINERS & SECTIONS */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 clamp(1rem, 5vw, 2rem);
+}
+
+.section {
+  /* Dynamic padding: 88px on desktop, scaling down to 48px on mobile */
+  padding: clamp(3rem, 8vw, 5.5rem) 0;
+  position: relative;
+  contain: content; /* Performance boost: isolates rendering */
+}
+
+/* 2. OPTIMIZED GRIDS (Auto-Fit for perfect scaling without empty spaces) */
+.about-grid,
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
+  gap: clamp(1.5rem, 4vw, 4rem);
+}
+
+.personnel-grid,
+.program-grid,
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+/* 3. HARDWARE ACCELERATED ANIMATIONS (Fix for mobile lag) */
+.slide-bg,
+.news-img img,
+.members-bg,
+.social-fab {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* 4. TOUCH-OPTIMIZED COMPONENTS */
+.btn-submit,
+.slide-btn,
+.tab-btn,
+.social-btn {
+  /* Minimum height 44px for standard touch accessibility */
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation; /* Prevents double-tap zoom delay on mobile */
+}
+
+/* ========================================================
+   MASTER MEDIA QUERIES (Mobile & Tablet Perfection)
+   Ganti baris [2017-2161] pada kode Anda dengan ini
+   ======================================================== */
+
+/* TABLET LANDSCAPE & SMALL LAPTOPS (Max 1200px) */
+@media (max-width: 1200px) {
+  .members-showcase {
+    height: clamp(320px, 40vw, 440px);
+  }
+
+  .slide-content {
+    gap: 2rem;
+  }
+}
+
+/* TABLET PORTRAIT & MOBILE MENU (Max 900px) */
+@media (max-width: 900px) {
+  /* Navbar & Hamburger */
+  .hamburger {
+    display: flex;
+    z-index: 1001; /* Ensure hamburger is above the menu */
+  }
+
+  .nav-links {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(5, 10, 20, 0.98);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    flex-direction: column;
+    justify-content: center;
+    padding: 2rem;
+    gap: 2rem;
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.4s ease;
+    z-index: 1000;
+  }
+
+  .nav-links.open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .nav-links a {
+    font-size: 1.5rem;
+    padding: 15px;
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Hamburger Animation */
+  .hamburger.open span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+  .hamburger.open span:nth-child(2) {
+    opacity: 0;
+  }
+  .hamburger.open span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  /* Hero Section Restructure */
+  .slide-content {
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+    padding-top: 100px; /* Offset for fixed header */
+  }
+
+  .slide-text,
+  .slide-image {
+    max-width: 100%;
+    flex: none;
+  }
+
+  .slide-image img {
+    max-height: 350px;
+    margin: 0 auto;
+  }
+
+  .slide-desc {
+    margin: 0 auto 2rem auto;
+  }
+
+  .slide-socials {
+    justify-content: center;
+  }
+
+  .slider-arrow {
+    display: none; /* Rely on swipe/dots on smaller screens */
+  }
+}
+
+/* SMARTPHONES (Max 768px) */
+@media (max-width: 768px) {
+  .hero-slider {
+    min-height: 100svh; /* Uses dynamic viewport height for mobile browsers */
+  }
+
+  /* Fix Android background attachment jumpiness */
+  .slide-bg {
+    background-attachment: scroll !important;
+  }
+
+  .slide-overlay {
+    background: linear-gradient(
+      to bottom,
+      rgba(5, 10, 20, 0.9) 0%,
+      rgba(5, 10, 20, 0.6) 100%
+    ) !important;
+  }
+
+  /* Admin Dashboard Mobile Fix */
+  .admin-layout {
+    flex-direction: column;
+  }
+
+  .admin-sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.15);
+  }
+
+  .admin-main {
+    margin-left: 0;
+  }
+
+  .admin-topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+}
+
+/* SMALL SMARTPHONES (Max 480px) */
+@media (max-width: 480px) {
+  .activities-tabs {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .tab-btn {
+    text-align: center;
+    width: 100%;
+  }
+
+  .social-bar {
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px 1rem;
+  }
+
+  /* Increased touch target for social buttons on tiny screens */
+  .social-bar-btn {
+    padding: 10px 16px;
+    font-size: 0.85rem;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .nav-logo-text small {
+    display: none; /* Clean up header on tiny screens */
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .cancel-btn,
+  .btn-submit {
+    width: 100%;
+  }
+}
