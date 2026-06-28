@@ -1,5 +1,6 @@
 "use client";
 import AdminCrud from "@/components/AdminCrud";
+
 export default function AdminNews() {
   return (
     <AdminCrud
@@ -12,7 +13,16 @@ export default function AdminNews() {
           label: "Img",
           render: (i) => (
             <div className="table-img">
-              {i.image ? <img src={`/uploads/${i.image}`} alt="" /> : "📰"}
+              {i.image ? (
+                <img
+                  src={
+                    i.image?.startsWith("/") ? i.image : `/uploads/${i.image}`
+                  }
+                  alt=""
+                />
+              ) : (
+                "📰"
+              )}
             </div>
           ),
         },

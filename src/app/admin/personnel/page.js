@@ -1,5 +1,6 @@
 "use client";
 import AdminCrud from "@/components/AdminCrud";
+
 export default function AdminPersonnel() {
   return (
     <AdminCrud
@@ -12,7 +13,16 @@ export default function AdminPersonnel() {
           label: "Photo",
           render: (i) => (
             <div className="table-img">
-              {i.photo ? <img src={`/uploads/${i.photo}`} alt="" /> : "👤"}
+              {i.photo ? (
+                <img
+                  src={
+                    i.photo?.startsWith("/") ? i.photo : `/uploads/${i.photo}`
+                  }
+                  alt=""
+                />
+              ) : (
+                "👤"
+              )}
             </div>
           ),
         },

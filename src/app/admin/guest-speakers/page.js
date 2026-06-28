@@ -207,8 +207,15 @@ export default function GuestSpeakersAdmin() {
             }}
           >
             <img
-              src={`/uploads/${speaker.image}`}
+              src={
+                speaker.image?.startsWith("/")
+                  ? speaker.image
+                  : `/uploads/${speaker.image}`
+              }
               alt={speaker.name}
+              onError={(e) => {
+                e.target.src = "https://via.placeholder.com/250?text=No+Image";
+              }}
               style={{ width: "100%", height: "250px", objectFit: "cover" }}
             />
             <div style={{ padding: "1.5rem" }}>
