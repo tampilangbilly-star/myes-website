@@ -28,14 +28,19 @@ export default function AdminForm({
     fd.append("file", file);
     fd.append("folder", folder);
     const res = await fetch("/api/upload", { method: "POST", body: fd });
-    if (!res.ok) throw new Error("Upload gagal");
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || "Upload gagal");
+    }
     const result = await res.json();
+    if (!result.path) throw new Error("Server tidak mengembalikan path file.");
     return result.path;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
     try {
       const data = { ...form };
       if (data.sortOrder !== undefined && data.sortOrder !== "")
@@ -62,7 +67,10 @@ export default function AdminForm({
         body: JSON.stringify(data),
       });
 
-      if (!res.ok) throw new Error("Gagal menyimpan data.");
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Gagal menyimpan data.");
+      }
       router.push(redirectUrl);
       router.refresh();
     } catch (err) {
@@ -75,29 +83,116 @@ export default function AdminForm({
   return (
     <div className="form-card">
       <h2 style={{ color: "#fff" }}>{title}</h2>
+      {error && (
+        <p
+          style={{
+            color: "#f87171",
+            background: "#450a0a",
+            border: "1px solid #f87171",
+            borderRadius: 8,
+            padding: "0.75rem 1rem",
+            marginBottom: "1rem",
+          }}
+        >
+          ❌ {error}
+        </p>
+      )}
       <form onSubmit={handleSubmit}>
-        {/* ... (Fields rendering tetap sama) ... */}
-        {fields
-          .filter((f) => f.type === "file")
-          .map((f) => (
-            <div key={f.name} className="admin-field">
-              <label>{f.label}</label>
-              {form[f.name] && (
-                <img
-                  src={form[f.name]}
-                  style={{ maxHeight: 100 }}
-                  alt="Preview"
-                />
-              )}
+        {fields.map((f) => (
+          <div key={f.name} className="admin-field">
+            <label>{f.label}</label>
+
+            {/* TEXT / NUMBER / DATE / DEFAULT */}
+            {(!f.type ||
+              f.type === "text" ||
+              f.type === "number" ||
+              f.type === "date") && (
               <input
-                type="file"
-                onChange={(e) =>
-                  setImageFiles({ ...imageFiles, [f.name]: e.target.files[0] })
-                }
+                type={f.type || "text"}
+                value={form[f.name] ?? ""}
+                onChange={(e) => set(f.name, e.target.value)}
+                required={f.required}
+                placeholder={f.placeholder || ""}
               />
-            </div>
-          ))}
-        <button type="submit" disabled={isSubmitting}>
+            )}
+
+            {/* TEXTAREA */}
+            {f.type === "textarea" && (
+              <textarea
+                value={form[f.name] ?? ""}
+                onChange={(e) => set(f.name, e.target.value)}
+                rows={4}
+                required={f.required}
+                placeholder={f.placeholder || ""}
+              />
+            )}
+
+            {/* SELECT */}
+            {f.type === "select" && (
+              <select
+                value={form[f.name] ?? ""}
+                onChange={(e) => set(f.name, e.target.value)}
+              >
+                {f.options?.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            {/* CHECKBOX */}
+            {f.type === "checkbox" && (
+              <input
+                type="checkbox"
+                checked={!!form[f.name]}
+                onChange={(e) => set(f.name, e.target.checked)}
+              />
+            )}
+
+            {/* FILE */}
+            {f.type === "file" && (
+              <>
+                {form[f.name] && !imageFiles[f.name] && (
+                  <img
+                    src={form[f.name]}
+                    style={{
+                      maxHeight: 100,
+                      display: "block",
+                      marginBottom: 8,
+                      borderRadius: 6,
+                    }}
+                    alt="Preview"
+                  />
+                )}
+                {imageFiles[f.name] && (
+                  <img
+                    src={URL.createObjectURL(imageFiles[f.name])}
+                    style={{
+                      maxHeight: 100,
+                      display: "block",
+                      marginBottom: 8,
+                      borderRadius: 6,
+                    }}
+                    alt="Preview baru"
+                  />
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    setImageFiles({
+                      ...imageFiles,
+                      [f.name]: e.target.files[0],
+                    })
+                  }
+                />
+              </>
+            )}
+          </div>
+        ))}
+
+        <button type="submit" disabled={isSubmitting} className="save-btn">
           {isSubmitting ? "⏳ Menyimpan..." : "💾 Save"}
         </button>
       </form>
