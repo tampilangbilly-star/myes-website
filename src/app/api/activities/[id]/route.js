@@ -1,51 +1,40 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { writeFile } from "fs/promises";
-import path from "path";
 
-export async function GET() {
-  const items = await prisma.activity.findMany({
-    orderBy: { sortOrder: "asc" },
-  });
-  return NextResponse.json(items);
-}
+// PERBAIKAN: File asli memiliki handler GET dan POST yang salah tempat di sini.
+// GET dan POST seharusnya ada di route.js induk (/api/activities/route.js).
+// File [id] ini seharusnya hanya menangani operasi pada satu record: PUT dan DELETE.
 
-export async function POST(req) {
+export async function PUT(req, { params }) {
   try {
-    const formData = await req.formData();
-    const data = {};
+    const data = await req.json();
 
-    // Ambil data teks
-    for (const [key, value] of formData.entries()) {
-      if (key !== "image" && key !== "photo") {
-        data[key] = value;
-      }
-    }
+    if (data.sortOrder !== undefined && data.sortOrder !== "")
+      data.sortOrder = parseInt(data.sortOrder) || 0;
+    if (data.isActive !== undefined) data.isActive = Boolean(data.isActive);
 
-    // Konversi tipe data jika diperlukan
-    if (data.sortOrder) data.sortOrder = parseInt(data.sortOrder);
-    if (data.isActive !== undefined) data.isActive = data.isActive === "true";
-
-    // Tangani Gambar (Bisa membaca nama field 'image' atau 'photo')
-    const file = formData.get("image") || formData.get("photo");
-    if (file && typeof file !== "string") {
-      const buffer = Buffer.from(await file.arrayBuffer());
-      const filename = Date.now() + "-" + file.name.replace(/\s+/g, "-");
-      await writeFile(
-        path.join(process.cwd(), "public/uploads", filename),
-        buffer,
-      );
-
-      // Sesuaikan dengan nama kolom di database Anda (biasanya 'image' atau 'photo')
-      data.image = filename;
-    }
-
-    const item = await prisma.activity.create({ data });
+    const item = await prisma.activity.update({
+      where: { id: parseInt(params.id) },
+      data,
+    });
     return NextResponse.json(item);
   } catch (error) {
-    console.error("Error saving activity:", error);
+    console.error("Error updating activity:", error);
     return NextResponse.json(
-      { error: "Gagal menyimpan activity" },
+      { error: "Gagal mengupdate activity" },
+      { status: 500 },
+    );
+  }
+}
+
+export async function DELETE(req, { params }) {
+  try {
+    await prisma.activity.delete({ where: { id: parseInt(params.id) } });
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Error deleting activity:", error);
+    return NextResponse.json(
+      { error: "Gagal menghapus activity" },
       { status: 500 },
     );
   }

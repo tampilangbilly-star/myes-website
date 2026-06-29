@@ -16,8 +16,11 @@ export default function AdminForm({
   fields.forEach((f) => {
     defaults[f.name] = "";
   });
+
   const [form, setForm] = useState(initialData || defaults);
   const [imageFiles, setImageFiles] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
 
   const set = (k, v) => setForm({ ...form, [k]: v });
 
@@ -25,39 +28,67 @@ export default function AdminForm({
     const fd = new FormData();
     fd.append("file", file);
     fd.append("folder", folder);
+
     const res = await fetch("/api/upload", { method: "POST", body: fd });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || `Upload gagal (status ${res.status})`);
+    }
+
     const result = await res.json();
-    return result.path; // Mengambil URL publik dari Supabase
+
+    if (!result.path) {
+      throw new Error("Server tidak mengembalikan path file.");
+    }
+
+    return result.path;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const data = { ...form };
-    if (data.sortOrder) data.sortOrder = parseInt(data.sortOrder) || 0;
-    if (data.isActive !== undefined) data.isActive = !!data.isActive;
+    setIsSubmitting(true);
+    setError(null);
 
-    // Proses upload gambar dan update objek data dengan URL dari Supabase
-    for (const [key, file] of Object.entries(imageFiles)) {
-      if (file) {
-        data[key] = await uploadFile(
-          file,
-          key === "photo"
-            ? "personnel"
-            : key === "backgroundImage"
-              ? "slides/backgrounds"
-              : "uploads",
-        );
+    try {
+      const data = { ...form };
+      if (data.sortOrder !== undefined && data.sortOrder !== "")
+        data.sortOrder = parseInt(data.sortOrder) || 0;
+      if (data.isActive !== undefined) data.isActive = !!data.isActive;
+
+      for (const [key, file] of Object.entries(imageFiles)) {
+        if (file) {
+          data[key] = await uploadFile(
+            file,
+            key === "photo"
+              ? "personnel"
+              : key === "backgroundImage"
+                ? "slides/backgrounds"
+                : "uploads",
+          );
+        }
       }
-    }
 
-    const url = isEdit ? `${apiUrl}/${initialData.id}` : apiUrl;
-    await fetch(url, {
-      method: isEdit ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    router.push(redirectUrl);
-    router.refresh();
+      const url = isEdit ? `${apiUrl}/${initialData.id}` : apiUrl;
+      const res = await fetch(url, {
+        method: isEdit ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Gagal menyimpan data ke server.");
+      }
+
+      router.push(redirectUrl);
+      router.refresh();
+    } catch (err) {
+      console.error("Submit error:", err);
+      setError(err.message || "Terjadi kesalahan yang tidak diketahui.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -106,10 +137,11 @@ export default function AdminForm({
           .map((f) => (
             <div key={f.name} className="admin-field">
               <label>{f.label}</label>
-              {form[f.name] && (
+              {/* PERBAIKAN: Cek imageFiles[f.name] untuk preview file baru yang dipilih,
+                  atau form[f.name] untuk gambar yang sudah tersimpan di DB */}
+              {imageFiles[f.name] ? (
                 <img
-                  // Menampilkan gambar langsung dari URL Supabase tanpa awalan /uploads/
-                  src={form[f.name]}
+                  src={URL.createObjectURL(imageFiles[f.name])}
                   style={{
                     maxHeight: 100,
                     borderRadius: 8,
@@ -118,7 +150,21 @@ export default function AdminForm({
                   }}
                   alt="Preview"
                 />
-              )}
+              ) : form[f.name] ? (
+                <img
+                  src={`/uploads/${form[f.name]}`}
+                  style={{
+                    maxHeight: 100,
+                    borderRadius: 8,
+                    marginBottom: 8,
+                    display: "block",
+                  }}
+                  alt="Gambar saat ini"
+                  onError={(e) => {
+                    e.target.style.display = "none";
+                  }}
+                />
+              ) : null}
               <input
                 type="file"
                 accept="image/*"
@@ -144,16 +190,33 @@ export default function AdminForm({
             </div>
           ))}
 
+        {error && (
+          <p
+            style={{
+              color: "#f87171",
+              background: "#450a0a",
+              border: "1px solid #f87171",
+              borderRadius: 8,
+              padding: "0.75rem 1rem",
+              marginTop: "1rem",
+              fontSize: "0.9rem",
+            }}
+          >
+            ❌ {error}
+          </p>
+        )}
+
         <div className="form-actions">
           <button
             type="button"
             className="cancel-btn"
             onClick={() => router.push(redirectUrl)}
+            disabled={isSubmitting}
           >
             Cancel
           </button>
-          <button type="submit" className="save-btn">
-            💾 Save
+          <button type="submit" className="save-btn" disabled={isSubmitting}>
+            {isSubmitting ? "⏳ Menyimpan..." : "💾 Save"}
           </button>
         </div>
       </form>

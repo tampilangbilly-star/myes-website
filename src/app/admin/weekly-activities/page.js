@@ -1,20 +1,18 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 
 export default function AdminWeeklyActivities() {
-  const router = useRouter();
   const [galleries, setGalleries] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState("");
 
-  // State Form
   const [titleEn, setTitleEn] = useState("");
   const [titleId, setTitleId] = useState("");
   const [activityDate, setActivityDate] = useState("");
   const [isActive, setIsActive] = useState(true);
   const [selectedPhotos, setSelectedPhotos] = useState([]);
 
-  // Ambil data galeri yang sudah ada saat halaman dimuat
   useEffect(() => {
     fetchGalleries();
   }, []);
@@ -23,62 +21,104 @@ export default function AdminWeeklyActivities() {
     try {
       const res = await fetch("/api/weekly-activities");
       const data = await res.json();
-      if (Array.isArray(data)) {
-        setGalleries(data);
-      }
-    } catch (error) {
-      console.error("Gagal mengambil data galeri:", error);
+      if (Array.isArray(data)) setGalleries(data);
+    } catch (err) {
+      console.error("Gagal mengambil data galeri:", err);
     }
   };
 
-  // Menangani perubahan saat memilih banyak foto
   const handlePhotoChange = (e) => {
-    if (e.target.files) {
-      setSelectedPhotos(Array.from(e.target.files));
-    }
+    if (e.target.files) setSelectedPhotos(Array.from(e.target.files));
   };
 
-  // Menangani pengiriman form (Submit)
+  // PERBAIKAN: Dulu submit langsung kirim FormData ke /api/weekly-activities yang melakukan
+  // writeFile sendiri untuk setiap foto. Ini tidak konsisten dengan sistem upload terpusat.
+  // Sekarang dipisah:
+  //   1. Upload setiap foto ke /api/upload satu per satu → kumpulkan array of paths
+  //   2. Kirim JSON { titleEn, titleId, activityDate, isActive, photos: [...paths] }
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
-    // Menggunakan FormData karena mengirimkan berkas fisik (file)
-    const formData = new FormData();
-    formData.append("titleEn", titleEn);
-    formData.append("titleId", titleId);
-    formData.append("activityDate", activityDate);
-    formData.append("isActive", isActive);
-
-    // Memasukkan seluruh foto yang dipilih ke dalam FormData
-    selectedPhotos.forEach((photo) => {
-      formData.append("photos", photo);
-    });
+    setError(null);
 
     try {
+      // Langkah 1: Upload semua foto
+      const photoPaths = [];
+
+      for (let i = 0; i < selectedPhotos.length; i++) {
+        const photo = selectedPhotos[i];
+        setUploadProgress(
+          `Mengupload foto ${i + 1} dari ${selectedPhotos.length}...`,
+        );
+
+        const fd = new FormData();
+        fd.append("file", photo);
+        fd.append("folder", "weekly-activities");
+
+        const uploadRes = await fetch("/api/upload", {
+          method: "POST",
+          body: fd,
+        });
+
+        if (!uploadRes.ok) {
+          const err = await uploadRes.json().catch(() => ({}));
+          throw new Error(
+            `Gagal upload foto "${photo.name}": ${err.error || "Unknown error"}`,
+          );
+        }
+
+        const uploadResult = await uploadRes.json();
+        if (!uploadResult.path)
+          throw new Error(
+            `Server tidak mengembalikan path untuk foto "${photo.name}"`,
+          );
+        photoPaths.push(uploadResult.path);
+      }
+
+      setUploadProgress("Menyimpan data ke database...");
+
+      // Langkah 2: Simpan data galeri + array paths ke database
       const res = await fetch("/api/weekly-activities", {
         method: "POST",
-        body: formData, // Jangan set Content-Type header jika menggunakan FormData
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          titleEn,
+          titleId,
+          activityDate,
+          isActive,
+          photos: photoPaths,
+        }),
       });
 
-      if (res.ok) {
-        alert("Galeri kegiatan mingguan berhasil ditambahkan! 🎉");
-        // Reset Form
-        setTitleEn("");
-        setTitleId("");
-        setActivityDate("");
-        setSelectedPhotos([]);
-        // Perbarui list di bawah
-        fetchGalleries();
-      } else {
-        const errData = await res.json();
-        alert(`Gagal: ${errData.error}`);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Gagal menyimpan galeri ke database");
       }
-    } catch (error) {
-      alert("Terjadi kesalahan saat mengunggah data.");
+
+      // Reset form
+      setTitleEn("");
+      setTitleId("");
+      setActivityDate("");
+      setIsActive(true);
+      setSelectedPhotos([]);
+      setUploadProgress("");
+      fetchGalleries();
+    } catch (err) {
+      console.error("Submit error:", err);
+      setError(err.message);
+      setUploadProgress("");
     } finally {
       setLoading(false);
     }
+  };
+
+  const inputStyle = {
+    width: "100%",
+    padding: "0.75rem",
+    borderRadius: "8px",
+    backgroundColor: "#1e293b",
+    border: "1px solid #334155",
+    color: "#fff",
   };
 
   return (
@@ -96,7 +136,7 @@ export default function AdminWeeklyActivities() {
         Manage Weekly Activities Gallery
       </h1>
 
-      {/* FORM INPUT ADMIN */}
+      {/* FORM INPUT */}
       <div
         style={{
           backgroundColor: "#0f172a",
@@ -130,21 +170,14 @@ export default function AdminWeeklyActivities() {
           >
             <div>
               <label style={{ display: "block", marginBottom: "0.5rem" }}>
-                Event Title (EN)
+                Event Title (EN) *
               </label>
               <input
                 type="text"
                 value={titleEn}
                 onChange={(e) => setTitleEn(e.target.value)}
                 required
-                style={{
-                  width: "100%",
-                  padding: "0.75rem",
-                  borderRadius: "8px",
-                  backgroundColor: "#1e293b",
-                  border: "1px solid #334155",
-                  color: "#fff",
-                }}
+                style={inputStyle}
               />
             </div>
             <div>
@@ -155,14 +188,7 @@ export default function AdminWeeklyActivities() {
                 type="text"
                 value={titleId}
                 onChange={(e) => setTitleId(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.75rem",
-                  borderRadius: "8px",
-                  backgroundColor: "#1e293b",
-                  border: "1px solid #334155",
-                  color: "#fff",
-                }}
+                style={inputStyle}
               />
             </div>
           </div>
@@ -176,41 +202,26 @@ export default function AdminWeeklyActivities() {
           >
             <div>
               <label style={{ display: "block", marginBottom: "0.5rem" }}>
-                Activity Date
+                Activity Date *
               </label>
               <input
                 type="date"
                 value={activityDate}
                 onChange={(e) => setActivityDate(e.target.value)}
                 required
-                style={{
-                  width: "100%",
-                  padding: "0.75rem",
-                  borderRadius: "8px",
-                  backgroundColor: "#1e293b",
-                  border: "1px solid #334155",
-                  color: "#fff",
-                }}
+                style={inputStyle}
               />
             </div>
             <div>
               <label style={{ display: "block", marginBottom: "0.5rem" }}>
-                Select Photos (Bisa pilih banyak sekaligus)
+                Select Photos (bisa pilih banyak sekaligus)
               </label>
               <input
                 type="file"
-                multiple // KUNCI UTAMA: Mengizinkan memilih lebih dari 1 file
+                multiple
                 accept="image/*"
                 onChange={handlePhotoChange}
-                required
-                style={{
-                  width: "100%",
-                  padding: "0.6rem",
-                  borderRadius: "8px",
-                  backgroundColor: "#1e293b",
-                  border: "1px solid #334155",
-                  color: "#fff",
-                }}
+                style={inputStyle}
               />
               <small
                 style={{
@@ -221,7 +232,7 @@ export default function AdminWeeklyActivities() {
               >
                 {selectedPhotos.length > 0
                   ? `${selectedPhotos.length} foto terpilih.`
-                  : "Tahan tombol Ctrl / Shift untuk memilih beberapa foto sekaligus."}
+                  : "Tahan Ctrl / Shift untuk memilih beberapa foto sekaligus."}
               </small>
             </div>
           </div>
@@ -239,28 +250,46 @@ export default function AdminWeeklyActivities() {
             </label>
           </div>
 
+          {uploadProgress && (
+            <p style={{ color: "#60a5fa", fontSize: "0.9rem" }}>
+              ⏳ {uploadProgress}
+            </p>
+          )}
+
+          {error && (
+            <p
+              style={{
+                color: "#f87171",
+                background: "#450a0a",
+                border: "1px solid #f87171",
+                borderRadius: 8,
+                padding: "0.75rem 1rem",
+                fontSize: "0.9rem",
+              }}
+            >
+              ❌ {error}
+            </p>
+          )}
+
           <button
             type="submit"
             disabled={loading}
             style={{
               padding: "1rem",
               borderRadius: "8px",
-              backgroundColor: "#3b82f6",
+              backgroundColor: loading ? "#475569" : "#3b82f6",
               color: "#fff",
               fontWeight: "bold",
               border: "none",
-              cursor: "pointer",
-              transition: "background-color 0.2s",
+              cursor: loading ? "not-allowed" : "pointer",
             }}
-            onMouseOver={(e) => (e.target.style.backgroundColor = "#2563eb")}
-            onMouseOut={(e) => (e.target.style.backgroundColor = "#3b82f6")}
           >
-            {loading ? "Uploading & Saving..." : "Save Gallery Event"}
+            {loading ? "⏳ Uploading & Saving..." : "💾 Save Gallery Event"}
           </button>
         </form>
       </div>
 
-      {/* LIST PREVIEW DATA YANG SUDAH DIUPLOAD */}
+      {/* LIST DATA YANG SUDAH DIUPLOAD */}
       <div>
         <h3 style={{ fontSize: "1.5rem", marginBottom: "1rem" }}>
           Existing Galleries
@@ -283,7 +312,8 @@ export default function AdminWeeklyActivities() {
                 <h4
                   style={{ fontWeight: "bold", fontSize: "1.1rem", margin: 0 }}
                 >
-                  {g.titleEn} / {g.titleId}
+                  {g.titleEn}
+                  {g.titleId ? ` / ${g.titleId}` : ""}
                 </h4>
                 <span style={{ fontSize: "0.85rem", color: "#94a3b8" }}>
                   📅{" "}

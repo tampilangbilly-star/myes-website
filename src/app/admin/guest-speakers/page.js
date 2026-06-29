@@ -4,13 +4,21 @@ import { useState, useEffect } from "react";
 export default function GuestSpeakersAdmin() {
   const [speakers, setSpeakers] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // Fungsi mengambil data
+  // State form dikontrol manual agar bisa di-reset dengan benar
+  const [name, setName] = useState("");
+  const [origin, setOrigin] = useState("");
+  const [dateServed, setDateServed] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+
   const fetchSpeakers = async () => {
-    const res = await fetch("/api/guest-speakers");
-    if (res.ok) {
-      const data = await res.json();
-      setSpeakers(data);
+    try {
+      const res = await fetch("/api/guest-speakers");
+      if (res.ok) setSpeakers(await res.json());
+    } catch (err) {
+      console.error("Gagal fetch speakers:", err);
     }
   };
 
@@ -18,42 +26,96 @@ export default function GuestSpeakersAdmin() {
     fetchSpeakers();
   }, []);
 
-  // Fungsi menambah data
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
+  // PERBAIKAN: Dulu submit langsung kirim FormData ke /api/guest-speakers yang melakukan
+  // writeFile sendiri. Sekarang dipisah:
+  //   1. Upload foto ke /api/upload → dapat path
+  //   2. Kirim JSON ke /api/guest-speakers
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsUploading(true);
+    setError(null);
 
-    const formData = new FormData(e.target);
-    const res = await fetch("/api/guest-speakers", {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      let imagePath = null;
 
-    if (res.ok) {
-      alert("✅ Pembicara berhasil ditambahkan!");
-      e.target.reset();
-      fetchSpeakers(); // Refresh daftar
-    } else {
-      alert("❌ Gagal menambahkan pembicara. Pastikan semua kolom terisi.");
+      // Langkah 1: Upload foto jika ada
+      if (imageFile) {
+        const fd = new FormData();
+        fd.append("file", imageFile);
+        fd.append("folder", "guest-speakers");
+
+        const uploadRes = await fetch("/api/upload", {
+          method: "POST",
+          body: fd,
+        });
+
+        if (!uploadRes.ok) {
+          const err = await uploadRes.json().catch(() => ({}));
+          throw new Error(err.error || "Gagal upload foto");
+        }
+
+        const uploadResult = await uploadRes.json();
+        if (!uploadResult.path)
+          throw new Error("Server tidak mengembalikan path foto");
+        imagePath = uploadResult.path;
+      }
+
+      // Langkah 2: Simpan data ke database via JSON
+      const res = await fetch("/api/guest-speakers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, origin, dateServed, image: imagePath }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Gagal menyimpan data pembicara");
+      }
+
+      // Reset form
+      setName("");
+      setOrigin("");
+      setDateServed("");
+      setImageFile(null);
+      setImagePreview(null);
+      fetchSpeakers();
+    } catch (err) {
+      console.error("Submit error:", err);
+      setError(err.message);
+    } finally {
+      setIsUploading(false);
     }
-    setIsUploading(false);
   };
 
-  // Fungsi menghapus data
   const handleDelete = async (id) => {
     if (!confirm("Apakah Anda yakin ingin menghapus data pembicara ini?"))
       return;
 
-    const res = await fetch(`/api/guest-speakers?id=${id}`, {
-      method: "DELETE",
-    });
-
-    if (res.ok) {
-      alert("✅ Data terhapus!");
+    try {
+      const res = await fetch(`/api/guest-speakers?id=${id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Gagal menghapus");
       fetchSpeakers();
-    } else {
-      alert("❌ Gagal menghapus data.");
+    } catch (err) {
+      alert("❌ " + err.message);
     }
+  };
+
+  const inputStyle = {
+    width: "100%",
+    padding: "0.75rem",
+    borderRadius: "8px",
+    backgroundColor: "#0f172a",
+    border: "1px solid #334155",
+    color: "#fff",
   };
 
   return (
@@ -85,21 +147,15 @@ export default function GuestSpeakersAdmin() {
           >
             <div>
               <label style={{ display: "block", marginBottom: "0.5rem" }}>
-                Nama Pembicara
+                Nama Pembicara *
               </label>
               <input
                 type="text"
-                name="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 required
                 placeholder="Cth: Pdt. Billy Tampilang"
-                style={{
-                  width: "100%",
-                  padding: "0.75rem",
-                  borderRadius: "8px",
-                  backgroundColor: "#0f172a",
-                  border: "1px solid #334155",
-                  color: "#fff",
-                }}
+                style={inputStyle}
               />
             </div>
             <div>
@@ -108,16 +164,10 @@ export default function GuestSpeakersAdmin() {
               </label>
               <input
                 type="text"
-                name="origin"
-                placeholder="Cth: Gembala Sidang GSJA, atau Dosen ITS"
-                style={{
-                  width: "100%",
-                  padding: "0.75rem",
-                  borderRadius: "8px",
-                  backgroundColor: "#0f172a",
-                  border: "1px solid #334155",
-                  color: "#fff",
-                }}
+                value={origin}
+                onChange={(e) => setOrigin(e.target.value)}
+                placeholder="Cth: Gembala Sidang GSJA"
+                style={inputStyle}
               />
             </div>
           </div>
@@ -131,42 +181,55 @@ export default function GuestSpeakersAdmin() {
           >
             <div>
               <label style={{ display: "block", marginBottom: "0.5rem" }}>
-                Tanggal Melayani
+                Tanggal Melayani *
               </label>
               <input
                 type="date"
-                name="dateServed"
+                value={dateServed}
+                onChange={(e) => setDateServed(e.target.value)}
                 required
-                style={{
-                  width: "100%",
-                  padding: "0.75rem",
-                  borderRadius: "8px",
-                  backgroundColor: "#0f172a",
-                  border: "1px solid #334155",
-                  color: "#fff",
-                }}
+                style={inputStyle}
               />
             </div>
             <div>
               <label style={{ display: "block", marginBottom: "0.5rem" }}>
-                Foto Pembicara (Rekomendasi: Portrait/Kotak)
+                Foto Pembicara
               </label>
+              {imagePreview && (
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  style={{
+                    maxHeight: 80,
+                    borderRadius: 8,
+                    marginBottom: 8,
+                    display: "block",
+                  }}
+                />
+              )}
               <input
                 type="file"
-                name="image"
                 accept="image/*"
-                required
-                style={{
-                  width: "100%",
-                  padding: "0.75rem",
-                  borderRadius: "8px",
-                  backgroundColor: "#0f172a",
-                  border: "1px solid #334155",
-                  color: "#fff",
-                }}
+                onChange={handleImageChange}
+                style={inputStyle}
               />
             </div>
           </div>
+
+          {error && (
+            <p
+              style={{
+                color: "#f87171",
+                background: "#450a0a",
+                border: "1px solid #f87171",
+                borderRadius: 8,
+                padding: "0.75rem 1rem",
+                fontSize: "0.9rem",
+              }}
+            >
+              ❌ {error}
+            </p>
+          )}
 
           <button
             type="submit"
@@ -179,10 +242,10 @@ export default function GuestSpeakersAdmin() {
               borderRadius: "8px",
               cursor: isUploading ? "not-allowed" : "pointer",
               fontWeight: "bold",
-              marginTop: "1rem",
+              marginTop: "0.5rem",
             }}
           >
-            {isUploading ? "Uploading & Saving..." : "Save Guest Speaker"}
+            {isUploading ? "⏳ Uploading & Saving..." : "💾 Save Guest Speaker"}
           </button>
         </form>
       </div>
@@ -208,9 +271,9 @@ export default function GuestSpeakersAdmin() {
           >
             <img
               src={
-                speaker.image?.startsWith("/")
-                  ? speaker.image
-                  : `/uploads/${speaker.image}`
+                speaker.image
+                  ? `/uploads/${speaker.image}`
+                  : "https://via.placeholder.com/250?text=No+Image"
               }
               alt={speaker.name}
               onError={(e) => {
@@ -258,7 +321,7 @@ export default function GuestSpeakersAdmin() {
                   cursor: "pointer",
                 }}
               >
-                Hapus
+                🗑️ Hapus
               </button>
             </div>
           </div>
