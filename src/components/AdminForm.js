@@ -10,8 +10,6 @@ export default function AdminForm({
   initialData = null,
 }) {
   const router = useRouter();
-
-  // BAGIAN YANG DIPERBAIKI: Mengecek secara spesifik apakah data memiliki ID
   const isEdit = Boolean(initialData?.id);
 
   const defaults = {};
@@ -28,7 +26,8 @@ export default function AdminForm({
     fd.append("file", file);
     fd.append("folder", folder);
     const res = await fetch("/api/upload", { method: "POST", body: fd });
-    return (await res.json()).path;
+    const result = await res.json();
+    return result.path; // Mengambil URL publik dari Supabase
   };
 
   const handleSubmit = async (e) => {
@@ -37,8 +36,9 @@ export default function AdminForm({
     if (data.sortOrder) data.sortOrder = parseInt(data.sortOrder) || 0;
     if (data.isActive !== undefined) data.isActive = !!data.isActive;
 
+    // Proses upload gambar dan update objek data dengan URL dari Supabase
     for (const [key, file] of Object.entries(imageFiles)) {
-      if (file)
+      if (file) {
         data[key] = await uploadFile(
           file,
           key === "photo"
@@ -47,6 +47,7 @@ export default function AdminForm({
               ? "slides/backgrounds"
               : "uploads",
         );
+      }
     }
 
     const url = isEdit ? `${apiUrl}/${initialData.id}` : apiUrl;
@@ -99,6 +100,7 @@ export default function AdminForm({
               </div>
             ))}
         </div>
+
         {fields
           .filter((f) => f.type === "file")
           .map((f) => (
@@ -106,14 +108,15 @@ export default function AdminForm({
               <label>{f.label}</label>
               {form[f.name] && (
                 <img
-                  src={`/uploads/${form[f.name]}`}
+                  // Menampilkan gambar langsung dari URL Supabase tanpa awalan /uploads/
+                  src={form[f.name]}
                   style={{
                     maxHeight: 100,
                     borderRadius: 8,
                     marginBottom: 8,
                     display: "block",
                   }}
-                  alt=""
+                  alt="Preview"
                 />
               )}
               <input
@@ -125,6 +128,7 @@ export default function AdminForm({
               />
             </div>
           ))}
+
         {fields
           .filter((f) => f.type === "checkbox")
           .map((f) => (
@@ -139,6 +143,7 @@ export default function AdminForm({
               </label>
             </div>
           ))}
+
         <div className="form-actions">
           <button
             type="button"
