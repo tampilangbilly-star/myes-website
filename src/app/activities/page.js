@@ -232,11 +232,7 @@ export default async function ActivitiesPage() {
             }}
           >
             <div className="schedule-card">
-              <img
-                src="/uploads/learn-img.jpeg"
-                className="card-bg-img"
-                alt=""
-              />
+              <img src="learn-img.jpeg" className="card-bg-img" alt="" />
               <div className="schedule-overlay" />
               <div className="schedule-content">
                 <h2
@@ -265,11 +261,7 @@ export default async function ActivitiesPage() {
             </div>
 
             <div className="schedule-card">
-              <img
-                src="/uploads/worship-img.jpeg"
-                className="card-bg-img"
-                alt=""
-              />
+              <img src="worship-img.jpeg" className="card-bg-img" alt="" />
               <div className="schedule-overlay" />
               <div className="schedule-content">
                 <h2

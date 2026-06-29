@@ -50,10 +50,7 @@ export default function WeeklyGallery({ galleries, lang }) {
                   className="gallery-img-wrapper"
                   onClick={() => setSelectedImage(photo.image)} // Buka modal saat diklik
                 >
-                  <img
-                    src={`/uploads/${photo.image}`}
-                    alt={`Moment ${index + 1}`}
-                  />
+                  <img src={`${photo.image}`} alt={`Moment ${index + 1}`} />
                   {/* Efek kaca pembesar saat di-hover */}
                   <div className="zoom-overlay">
                     <span>🔍</span>
@@ -118,7 +115,7 @@ export default function WeeklyGallery({ galleries, lang }) {
 
           {/* Menampilkan Gambar Ukuran Asli */}
           <img
-            src={`/uploads/${selectedImage}`}
+            src={`${selectedImage}`}
             alt="Full size"
             style={{
               maxWidth: "95%",
@@ -132,7 +129,7 @@ export default function WeeklyGallery({ galleries, lang }) {
 
           {/* Tombol Download */}
           <a
-            href={`/uploads/${selectedImage}`}
+            href={`${selectedImage}`}
             download // Atribut HTML bawaan untuk memaksa unduhan file
             onClick={(e) => e.stopPropagation()}
             style={{

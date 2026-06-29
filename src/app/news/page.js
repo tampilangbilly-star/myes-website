@@ -165,7 +165,7 @@ export default async function NewsPage() {
                   {/* Bounding Box Flyer dengan objectFit: contain */}
                   <div className="news-img-box">
                     {n.image ? (
-                      <img src={`/uploads/${n.image}`} alt={t(n, "title")} />
+                      <img src={`${n.image}`} alt={t(n, "title")} />
                     ) : (
                       <span style={{ fontSize: "4rem" }}>📰</span>
                     )}

@@ -15,9 +15,7 @@ export default function AdminPersonnel() {
             <div className="table-img">
               {i.photo ? (
                 <img
-                  src={
-                    i.photo?.startsWith("/") ? i.photo : `/uploads/${i.photo}`
-                  }
+                  src={i.photo?.startsWith("/") ? i.photo : `${i.photo}`}
                   alt=""
                 />
               ) : (

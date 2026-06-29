@@ -14,7 +14,7 @@ export default function Footer({ lang = "en" }) {
     <footer
       style={{
         /* KUNCI GRADASI HALUS (FADE TO BLACK) */
-        backgroundImage: `linear-gradient(to bottom, rgba(5, 11, 20, 0.4) 0%, rgba(5, 11, 20, 0.9) 55%, rgba(5, 11, 20, 1) 75%), url('/uploads/bg-s.jpeg')`,
+        backgroundImage: `linear-gradient(to bottom, rgba(5, 11, 20, 0.4) 0%, rgba(5, 11, 20, 0.9) 55%, rgba(5, 11, 20, 1) 75%), url('bg-s.jpeg')`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundAttachment: "fixed",

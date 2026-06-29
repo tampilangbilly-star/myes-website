@@ -104,7 +104,7 @@ export default async function ProgramPage() {
                 <div className="program-card-body">
                   {p.image ? (
                     <img
-                      src={`/uploads/${p.image}`}
+                      src={`${p.image}`}
                       style={{
                         width: "100%",
                         height: 140,

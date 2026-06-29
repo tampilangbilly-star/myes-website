@@ -134,7 +134,7 @@ export default function NewsHomeSlider({ items = [], lang = "en" }) {
               key={n.id}
               src={
                 n.image
-                  ? `/uploads/${n.image}`
+                  ? `${n.image}`
                   : "data:image/svg+xml;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
               }
               alt=""

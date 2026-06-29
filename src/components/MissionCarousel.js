@@ -32,7 +32,7 @@ export default function MissionCarousel({ images }) {
       {images.map((img, index) => (
         <img
           key={index}
-          src={`/uploads/${img}`}
+          src={`${img}`}
           alt={`Mission Trip ${index + 1}`}
           style={{
             position: "absolute",

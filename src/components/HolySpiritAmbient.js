@@ -105,11 +105,7 @@ export default function HolySpiritAmbient() {
       />
 
       <div className="real-dove-container">
-        <img
-          src="/uploads/dove.png"
-          alt="Holy Spirit Dove"
-          className="real-dove-img"
-        />
+        <img src="dove.png" alt="Holy Spirit Dove" className="real-dove-img" />
       </div>
     </div>
   );

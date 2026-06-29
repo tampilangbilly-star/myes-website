@@ -339,7 +339,7 @@ export default async function Home() {
         <section
           className="section"
           style={{
-            backgroundImage: `linear-gradient(rgba(5, 11, 20, 0.85), rgba(5, 11, 20, 0.95)), url('/uploads/bg-programs.jpeg')`,
+            backgroundImage: `linear-gradient(rgba(5, 11, 20, 0.85), rgba(5, 11, 20, 0.95)), url('bg-programs.jpeg')`,
             backgroundSize: "cover",
             backgroundPosition: "center",
             backgroundAttachment: "fixed",
@@ -369,7 +369,7 @@ export default async function Home() {
                   <div className="program-card-body">
                     {p.image ? (
                       <img
-                        src={`/uploads/${p.image}`}
+                        src={`${p.image}`}
                         style={{
                           width: "100%",
                           height: 140,
@@ -493,7 +493,7 @@ export default async function Home() {
       <section
         className="section section-padding"
         style={{
-          backgroundImage: `linear-gradient(rgba(5, 11, 20, 0.85), rgba(5, 11, 20, 0.95)), url('/uploads/home.png')`,
+          backgroundImage: `linear-gradient(rgba(5, 11, 20, 0.85), rgba(5, 11, 20, 0.95)), url('home.png')`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundAttachment: "fixed",

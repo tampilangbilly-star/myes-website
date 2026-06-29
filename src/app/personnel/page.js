@@ -247,7 +247,7 @@ export default async function PersonnelPage() {
           <div className="jesus-card">
             <div className="jesus-ring">
               <img
-                src="/uploads/jesus-christ.jpg"
+                src="jesus-christ.jpg"
                 alt="Jesus Christ"
                 className="jesus-img"
               />
@@ -280,7 +280,7 @@ export default async function PersonnelPage() {
                       <div className="avatar-rect">
                         {p.photo ? (
                           <img
-                            src={`/uploads/${p.photo}`}
+                            src={`${p.photo}`}
                             alt={p.fullName || p.name}
                             className="img-rect"
                           />
@@ -316,7 +316,7 @@ export default async function PersonnelPage() {
                       <div className="avatar-ring">
                         {p.photo ? (
                           <img
-                            src={`/uploads/${p.photo}`}
+                            src={`${p.photo}`}
                             alt={p.fullName || p.name}
                             className="img-circle"
                           />
@@ -360,7 +360,7 @@ export default async function PersonnelPage() {
                       <div className="avatar-rect">
                         {p.photo ? (
                           <img
-                            src={`/uploads/${p.photo}`}
+                            src={`${p.photo}`}
                             alt={p.fullName || p.name}
                             className="img-rect"
                           />
@@ -396,7 +396,7 @@ export default async function PersonnelPage() {
                       <div className="avatar-ring">
                         {p.photo ? (
                           <img
-                            src={`/uploads/${p.photo}`}
+                            src={`${p.photo}`}
                             alt={p.fullName || p.name}
                             className="img-circle"
                           />
@@ -437,7 +437,7 @@ export default async function PersonnelPage() {
                     <div className="avatar-ring">
                       {p.photo ? (
                         <img
-                          src={`/uploads/${p.photo}`}
+                          src={`${p.photo}`}
                           alt={p.fullName || p.name}
                           className="img-circle"
                         />

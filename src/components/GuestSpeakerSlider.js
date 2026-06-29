@@ -120,7 +120,7 @@ export default function GuestSpeakerSlider({ speakers, lang }) {
         }}
       >
         <img
-          src={`/uploads/${current.image}`}
+          src={`${current.image}`}
           alt={current.name}
           style={{
             width: "100%",

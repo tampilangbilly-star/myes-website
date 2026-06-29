@@ -272,7 +272,7 @@ export default function GuestSpeakersAdmin() {
             <img
               src={
                 speaker.image
-                  ? `/uploads/${speaker.image}`
+                  ? `${speaker.image}`
                   : "https://via.placeholder.com/250?text=No+Image"
               }
               alt={speaker.name}

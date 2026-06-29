@@ -333,7 +333,7 @@ export default function AdminSettings() {
               />
             ) : get("main_background", "en") ? (
               <img
-                src={`/uploads/${get("main_background", "en")}`}
+                src={`${get("main_background", "en")}`}
                 style={{
                   maxHeight: 150,
                   borderRadius: 10,

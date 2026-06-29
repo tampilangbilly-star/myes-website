@@ -15,9 +15,7 @@ export default function AdminNews() {
             <div className="table-img">
               {i.image ? (
                 <img
-                  src={
-                    i.image?.startsWith("/") ? i.image : `/uploads/${i.image}`
-                  }
+                  src={i.image?.startsWith("/") ? i.image : `${i.image}`}
                   alt=""
                 />
               ) : (

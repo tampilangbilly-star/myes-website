@@ -95,7 +95,7 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
                   position: "absolute",
                   inset: 0,
                   zIndex: 0,
-                  backgroundImage: `url(/uploads/${slide.backgroundImage})`,
+                  backgroundImage: `url({slide.backgroundImage})`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                   transform: isActive ? "scale(1.05)" : "scale(1)",
@@ -215,7 +215,7 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
                   }}
                 >
                   <img
-                    src={`/uploads/${slide.image}`}
+                    src={`${slide.image}`}
                     style={{
                       width: "100%",
                       maxHeight: "500px",

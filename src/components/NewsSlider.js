@@ -66,7 +66,7 @@ export default function NewsSlider({ items, lang }) {
                       left: "-10%",
                       right: "-10%",
                       bottom: "-10%",
-                      backgroundImage: `url(/uploads/${n.image})`,
+                      backgroundImage: `url(${n.image})`,
                       backgroundSize: "cover",
                       backgroundPosition: "center",
                       filter: "blur(25px)",
@@ -76,7 +76,7 @@ export default function NewsSlider({ items, lang }) {
                   />
                   {/* 2. Gambar Utama Utuh */}
                   <img
-                    src={`/uploads/${n.image}`}
+                    src={`${n.image}`}
                     alt={t(n, "title")}
                     style={{
                       position: "relative",
