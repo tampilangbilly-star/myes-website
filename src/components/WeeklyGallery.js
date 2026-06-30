@@ -2,10 +2,7 @@
 import { useState } from "react";
 
 export default function WeeklyGallery({ galleries, lang }) {
-  // State untuk menyimpan nama file foto yang sedang diklik
   const [selectedImage, setSelectedImage] = useState(null);
-
-  // Fungsi untuk menutup popup gambar
   const closeModal = () => setSelectedImage(null);
 
   return (
@@ -43,20 +40,45 @@ export default function WeeklyGallery({ galleries, lang }) {
               </span>
             </div>
 
+            {/* PEMUTAR VIDEO (HANYA MUNCUL JIKA ADA VIDEO DI DATABASE) */}
+            {gallery.video && (
+              <div
+                style={{
+                  marginBottom: "2rem",
+                  borderRadius: "12px",
+                  overflow: "hidden",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  backgroundColor: "#000",
+                }}
+              >
+                <video
+                  src={gallery.video}
+                  controls
+                  preload="metadata"
+                  style={{
+                    width: "100%",
+                    maxHeight: "500px",
+                    objectFit: "contain",
+                    display: "block",
+                  }}
+                />
+              </div>
+            )}
+
             <div className="gallery-grid">
-              {gallery.photos.map((photo, index) => (
-                <div
-                  key={photo.id}
-                  className="gallery-img-wrapper"
-                  onClick={() => setSelectedImage(photo.image)} // Buka modal saat diklik
-                >
-                  <img src={`${photo.image}`} alt={`Moment ${index + 1}`} />
-                  {/* Efek kaca pembesar saat di-hover */}
-                  <div className="zoom-overlay">
-                    <span>🔍</span>
+              {gallery.photos &&
+                gallery.photos.map((photo, index) => (
+                  <div
+                    key={photo.id}
+                    className="gallery-img-wrapper"
+                    onClick={() => setSelectedImage(photo.image)}
+                  >
+                    <img src={`${photo.image}`} alt={`Moment ${index + 1}`} />
+                    <div className="zoom-overlay">
+                      <span>🔍</span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
         ))}
@@ -74,7 +96,7 @@ export default function WeeklyGallery({ galleries, lang }) {
         )}
       </div>
 
-      {/* 2. BAGIAN MODAL POPUP (FULL SCREEN) */}
+      {/* 2. BAGIAN MODAL POPUP (FULL SCREEN) UNTUK FOTO */}
       {selectedImage && (
         <div
           style={{
@@ -83,8 +105,8 @@ export default function WeeklyGallery({ galleries, lang }) {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: "rgba(5, 11, 20, 0.95)", // Background gelap transparan
-            zIndex: 9999, // Memastikan selalu berada paling depan
+            backgroundColor: "rgba(5, 11, 20, 0.95)",
+            zIndex: 9999,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -92,9 +114,8 @@ export default function WeeklyGallery({ galleries, lang }) {
             padding: "2rem",
             backdropFilter: "blur(5px)",
           }}
-          onClick={closeModal} // Tutup modal jika area gelap di luar gambar diklik
+          onClick={closeModal}
         >
-          {/* Tombol Silang (Close) */}
           <button
             onClick={closeModal}
             style={{
@@ -113,24 +134,22 @@ export default function WeeklyGallery({ galleries, lang }) {
             &times;
           </button>
 
-          {/* Menampilkan Gambar Ukuran Asli */}
           <img
             src={`${selectedImage}`}
             alt="Full size"
             style={{
               maxWidth: "95%",
               maxHeight: "75vh",
-              objectFit: "contain", // KUNCI: Menjamin foto portrait atau landscape tidak terpotong sama sekali
+              objectFit: "contain",
               borderRadius: "8px",
               boxShadow: "0 20px 50px rgba(0,0,0,0.5)",
             }}
-            onClick={(e) => e.stopPropagation()} // Mencegah modal tertutup kalau gambarnya yang diklik
+            onClick={(e) => e.stopPropagation()}
           />
 
-          {/* Tombol Download */}
           <a
             href={`${selectedImage}`}
-            download // Atribut HTML bawaan untuk memaksa unduhan file
+            download
             onClick={(e) => e.stopPropagation()}
             style={{
               marginTop: "2rem",

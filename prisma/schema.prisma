@@ -168,3 +168,11 @@ model ContactMessage {
 
   @@map("contact_messages")
 }
+model Gallery {
+  id           String   @id @default(cuid())
+  titleEn      String?
+  titleId      String?
+  activityDate DateTime
+  // ... (kolom lain yang sudah ada)
+  video        String?  // <-- TAMBAHKAN BARIS INI
+}
