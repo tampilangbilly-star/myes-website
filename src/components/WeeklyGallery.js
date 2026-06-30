@@ -2,7 +2,10 @@
 import { useState } from "react";
 
 export default function WeeklyGallery({ galleries, lang }) {
+  // State untuk menyimpan nama file foto yang sedang diklik
   const [selectedImage, setSelectedImage] = useState(null);
+
+  // Fungsi untuk menutup popup gambar
   const closeModal = () => setSelectedImage(null);
 
   return (
@@ -19,19 +22,32 @@ export default function WeeklyGallery({ galleries, lang }) {
               border: "1px solid rgba(255,255,255,0.05)",
             }}
           >
+            {/* HEADER: JUDUL & TANGGAL */}
             <div
               style={{
                 borderBottom: "1px solid rgba(255,255,255,0.1)",
                 paddingBottom: "1rem",
-                marginBottom: "1rem",
+                marginBottom: "2rem",
               }}
             >
-              <h3 style={{ fontSize: "1.5rem", color: "#fff", margin: "0" }}>
+              <h3
+                style={{
+                  fontSize: "1.5rem",
+                  color: "#fff",
+                  margin: "0 0 0.5rem 0",
+                }}
+              >
                 {lang === "id"
                   ? gallery.titleId || gallery.titleEn
                   : gallery.titleEn}
               </h3>
-              <span style={{ color: "#94a3b8", fontSize: "0.9rem" }}>
+              <span
+                style={{
+                  color: "#3b82f6",
+                  fontSize: "0.95rem",
+                  fontWeight: "bold",
+                }}
+              >
                 📅{" "}
                 {new Date(gallery.activityDate).toLocaleDateString(
                   lang === "id" ? "id-ID" : "en-US",
@@ -40,46 +56,78 @@ export default function WeeklyGallery({ galleries, lang }) {
               </span>
             </div>
 
-            {/* PEMUTAR VIDEO (HANYA MUNCUL JIKA ADA VIDEO DI DATABASE) */}
+            {/* --- BAGIAN BARU: PEMUTAR VIDEO --- */}
             {gallery.video && (
-              <div
-                style={{
-                  marginBottom: "2rem",
-                  borderRadius: "12px",
-                  overflow: "hidden",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  backgroundColor: "#000",
-                }}
-              >
-                <video
-                  src={gallery.video}
-                  controls
-                  preload="metadata"
+              <div style={{ marginBottom: "3rem" }}>
+                <h4
                   style={{
-                    width: "100%",
-                    maxHeight: "500px",
-                    objectFit: "contain",
-                    display: "block",
+                    color: "#e2e8f0",
+                    marginBottom: "1rem",
+                    fontSize: "1.2rem",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
                   }}
-                />
+                >
+                  🎥 {lang === "id" ? "Video Sorotan" : "Highlight Video"}
+                </h4>
+                <div
+                  style={{
+                    borderRadius: "12px",
+                    overflow: "hidden",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    backgroundColor: "#000",
+                  }}
+                >
+                  <video
+                    src={gallery.video}
+                    controls
+                    preload="metadata"
+                    style={{
+                      width: "100%",
+                      maxHeight: "450px",
+                      objectFit: "contain",
+                      display: "block",
+                    }}
+                  />
+                </div>
               </div>
             )}
+            {/* --------------------------------- */}
 
-            <div className="gallery-grid">
-              {gallery.photos &&
-                gallery.photos.map((photo, index) => (
-                  <div
-                    key={photo.id}
-                    className="gallery-img-wrapper"
-                    onClick={() => setSelectedImage(photo.image)}
-                  >
-                    <img src={`${photo.image}`} alt={`Moment ${index + 1}`} />
-                    <div className="zoom-overlay">
-                      <span>🔍</span>
+            {/* --- BAGIAN GALERI FOTO --- */}
+            {gallery.photos && gallery.photos.length > 0 && (
+              <div>
+                <h4
+                  style={{
+                    color: "#e2e8f0",
+                    marginBottom: "1rem",
+                    fontSize: "1.2rem",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                  }}
+                >
+                  📸 {lang === "id" ? "Galeri Foto" : "Photo Gallery"}
+                </h4>
+                <div className="gallery-grid">
+                  {gallery.photos.map((photo, index) => (
+                    <div
+                      key={photo.id}
+                      className="gallery-img-wrapper"
+                      onClick={() => setSelectedImage(photo.image)} // Buka modal saat diklik
+                    >
+                      <img src={`${photo.image}`} alt={`Moment ${index + 1}`} />
+                      {/* Efek kaca pembesar saat di-hover */}
+                      <div className="zoom-overlay">
+                        <span>🔍</span>
+                      </div>
                     </div>
-                  </div>
-                ))}
-            </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {/* --------------------------- */}
           </div>
         ))}
 
@@ -96,7 +144,7 @@ export default function WeeklyGallery({ galleries, lang }) {
         )}
       </div>
 
-      {/* 2. BAGIAN MODAL POPUP (FULL SCREEN) UNTUK FOTO */}
+      {/* 2. BAGIAN MODAL POPUP (FULL SCREEN) */}
       {selectedImage && (
         <div
           style={{
@@ -105,8 +153,8 @@ export default function WeeklyGallery({ galleries, lang }) {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: "rgba(5, 11, 20, 0.95)",
-            zIndex: 9999,
+            backgroundColor: "rgba(5, 11, 20, 0.95)", // Background gelap transparan
+            zIndex: 9999, // Memastikan selalu berada paling depan
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -114,8 +162,9 @@ export default function WeeklyGallery({ galleries, lang }) {
             padding: "2rem",
             backdropFilter: "blur(5px)",
           }}
-          onClick={closeModal}
+          onClick={closeModal} // Tutup modal jika area gelap di luar gambar diklik
         >
+          {/* Tombol Silang (Close) */}
           <button
             onClick={closeModal}
             style={{
@@ -134,22 +183,24 @@ export default function WeeklyGallery({ galleries, lang }) {
             &times;
           </button>
 
+          {/* Menampilkan Gambar Ukuran Asli */}
           <img
             src={`${selectedImage}`}
             alt="Full size"
             style={{
               maxWidth: "95%",
               maxHeight: "75vh",
-              objectFit: "contain",
+              objectFit: "contain", // KUNCI: Menjamin foto portrait atau landscape tidak terpotong sama sekali
               borderRadius: "8px",
               boxShadow: "0 20px 50px rgba(0,0,0,0.5)",
             }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()} // Mencegah modal tertutup kalau gambarnya yang diklik
           />
 
+          {/* Tombol Download */}
           <a
             href={`${selectedImage}`}
-            download
+            download // Atribut HTML bawaan untuk memaksa unduhan file
             onClick={(e) => e.stopPropagation()}
             style={{
               marginTop: "2rem",

@@ -11,14 +11,13 @@ export default function AdminForm({
 }) {
   const router = useRouter();
   const isEdit = Boolean(initialData?.id);
-
   const defaults = {};
   fields.forEach((f) => {
     defaults[f.name] = "";
   });
 
   const [form, setForm] = useState(initialData || defaults);
-  const [mediaFiles, setMediaFiles] = useState({}); // Menyimpan file gambar atau video
+  const [imageFiles, setImageFiles] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
@@ -48,7 +47,7 @@ export default function AdminForm({
         data.sortOrder = parseInt(data.sortOrder) || 0;
       if (data.isActive !== undefined) data.isActive = !!data.isActive;
 
-      for (const [key, file] of Object.entries(mediaFiles)) {
+      for (const [key, file] of Object.entries(imageFiles)) {
         if (file) {
           data[key] = await uploadFile(
             file,
@@ -56,9 +55,7 @@ export default function AdminForm({
               ? "personnel"
               : key === "backgroundImage"
                 ? "slides/backgrounds"
-                : key === "video" // Folder khusus video
-                  ? "activities/videos"
-                  : "uploads",
+                : "uploads",
           );
         }
       }
@@ -74,7 +71,6 @@ export default function AdminForm({
         const err = await res.json().catch(() => ({}));
         throw new Error(err.error || "Gagal menyimpan data.");
       }
-
       router.push(redirectUrl);
       router.refresh();
     } catch (err) {
@@ -154,10 +150,10 @@ export default function AdminForm({
               />
             )}
 
-            {/* IMAGE FILE */}
+            {/* FILE */}
             {f.type === "file" && (
               <>
-                {form[f.name] && !mediaFiles[f.name] && (
+                {form[f.name] && !imageFiles[f.name] && (
                   <img
                     src={form[f.name]}
                     style={{
@@ -169,9 +165,9 @@ export default function AdminForm({
                     alt="Preview"
                   />
                 )}
-                {mediaFiles[f.name] && (
+                {imageFiles[f.name] && (
                   <img
-                    src={URL.createObjectURL(mediaFiles[f.name])}
+                    src={URL.createObjectURL(imageFiles[f.name])}
                     style={{
                       maxHeight: 100,
                       display: "block",
@@ -185,68 +181,17 @@ export default function AdminForm({
                   type="file"
                   accept="image/*"
                   onChange={(e) =>
-                    setMediaFiles({
-                      ...mediaFiles,
+                    setImageFiles({
+                      ...imageFiles,
                       [f.name]: e.target.files[0],
                     })
                   }
                 />
-              </>
-            )}
-
-            {/* VIDEO FILE (BARU) */}
-            {f.type === "video" && (
-              <>
-                {form[f.name] && !mediaFiles[f.name] && (
-                  <video
-                    src={form[f.name]}
-                    controls
-                    style={{
-                      maxHeight: 180,
-                      display: "block",
-                      marginBottom: 8,
-                      borderRadius: 6,
-                      backgroundColor: "#000",
-                    }}
-                  />
-                )}
-                {mediaFiles[f.name] && (
-                  <video
-                    src={URL.createObjectURL(mediaFiles[f.name])}
-                    controls
-                    style={{
-                      maxHeight: 180,
-                      display: "block",
-                      marginBottom: 8,
-                      borderRadius: 6,
-                      backgroundColor: "#000",
-                    }}
-                  />
-                )}
-                <input
-                  type="file"
-                  accept="video/mp4,video/webm,video/quicktime"
-                  onChange={(e) =>
-                    setMediaFiles({
-                      ...mediaFiles,
-                      [f.name]: e.target.files[0],
-                    })
-                  }
-                />
-                <small
-                  style={{
-                    color: "#94a3b8",
-                    display: "block",
-                    marginTop: "4px",
-                  }}
-                >
-                  *Format: MP4/WEBM. Direkomendasikan 20-30 detik agar upload
-                  lancar.
-                </small>
               </>
             )}
           </div>
         ))}
+
         <button type="submit" disabled={isSubmitting} className="save-btn">
           {isSubmitting ? "⏳ Menyimpan..." : "💾 Save"}
         </button>
