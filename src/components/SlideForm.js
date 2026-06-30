@@ -259,7 +259,7 @@ export default function SlideForm({ initialData = null }) {
               />
             ) : form.backgroundImage ? (
               <img
-                src={form.image}
+                src={form.backgroundImage}
                 style={{
                   maxHeight: 80,
                   borderRadius: 8,
