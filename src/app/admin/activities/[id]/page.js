@@ -16,7 +16,6 @@ const fields = [
   { name: "descriptionEn", label: "Description (EN)", type: "textarea" },
   { name: "descriptionId", label: "Description (ID)", type: "textarea" },
   { name: "sortOrder", label: "Sort Order", type: "number" },
-  { name: "video", label: "Video Dokumentasi (Opsional)", type: "video" },
 ];
 export default async function EditActivity({ params }) {
   const item = await prisma.activity.findUnique({
