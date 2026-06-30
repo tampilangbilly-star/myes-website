@@ -1,16 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-// PERBAIKAN: Route asli melakukan upload file (writeFile) langsung di sini via FormData,
-// tidak konsisten dengan sistem upload terpusat /api/upload.
-//
-// Solusi: Frontend (AdminWeeklyActivities) sekarang harus:
-//   1. Upload setiap foto ke /api/upload terlebih dahulu → dapat array of paths
-//   2. Kirim data JSON { titleEn, titleId, activityDate, isActive, photos: [path1, path2, ...] }
-//      ke endpoint ini.
-//
-// Route ini sekarang hanya menerima JSON.
-
 export async function GET() {
   try {
     const galleries = await prisma.activityGallery.findMany({
@@ -30,7 +20,8 @@ export async function GET() {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { titleEn, titleId, activityDate, isActive, photos } = body;
+    // Menambahkan 'video' dari body yang dikirim oleh AdminWeeklyActivities
+    const { titleEn, titleId, activityDate, isActive, photos, video } = body;
 
     if (!titleEn || !activityDate) {
       return NextResponse.json(
@@ -39,13 +30,14 @@ export async function POST(request) {
       );
     }
 
-    // 1. Simpan data induk galeri
+    // 1. Simpan data induk galeri beserta link videonya
     const gallery = await prisma.activityGallery.create({
       data: {
         titleEn,
         titleId: titleId || null,
         activityDate: new Date(activityDate),
         isActive: Boolean(isActive),
+        video: video || null, // <--- MENYIMPAN PATH VIDEO KE DATABASE
       },
     });
 
@@ -55,7 +47,7 @@ export async function POST(request) {
         if (photoPath) {
           await prisma.activityPhoto.create({
             data: {
-              image: photoPath, // path sudah diupload via /api/upload
+              image: photoPath,
               galleryId: gallery.id,
             },
           });
