@@ -88,14 +88,14 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
               pointerEvents: isActive ? "auto" : "none",
             }}
           >
-            {/* BACKGROUND IMAGE */}
+            {/* BACKGROUND IMAGE - DIPERBAIKI SINTAKSNYA */}
             {slide.backgroundImage ? (
               <div
                 style={{
                   position: "absolute",
                   inset: 0,
                   zIndex: 0,
-                  backgroundImage: `url({slide.backgroundImage})`,
+                  backgroundImage: `url(${slide.backgroundImage})`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                   transform: isActive ? "scale(1.05)" : "scale(1)",
@@ -139,7 +139,6 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
                 gap: "4rem",
               }}
             >
-              {/* Bagian Teks (Kiri) - DITAMBAHKAN PADDINGTOP UNTUK MOBILE */}
               <div style={{ flex: 1, maxWidth: "600px", paddingTop: "80px" }}>
                 {t(slide, "overline") && (
                   <div
@@ -155,7 +154,6 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
                     {t(slide, "overline")}
                   </div>
                 )}
-
                 <h2
                   style={{
                     fontSize: "clamp(2.5rem, 4.5vw, 4rem)",
@@ -167,7 +165,6 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
                 >
                   {t(slide, "title")}
                 </h2>
-
                 {t(slide, "description") && (
                   <p
                     style={{
@@ -181,7 +178,6 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
                     {t(slide, "description")}
                   </p>
                 )}
-
                 {t(slide, "buttonText") && (
                   <a
                     href={slide.buttonLink || "#"}
@@ -215,7 +211,7 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
                   }}
                 >
                   <img
-                    src={`${slide.image}`}
+                    src={slide.image}
                     style={{
                       width: "100%",
                       maxHeight: "500px",
@@ -225,7 +221,7 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
                       border: "1px solid rgba(255,255,255,0.1)",
                       transform: "rotate(-2deg)",
                     }}
-                    alt={slide.titleEn}
+                    alt={t(slide, "title")}
                   />
                 </div>
               )}
@@ -234,7 +230,6 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
         );
       })}
 
-      {/* Navigasi Dots & Arrows */}
       {total > 1 && (
         <>
           <div className="slider-dots">

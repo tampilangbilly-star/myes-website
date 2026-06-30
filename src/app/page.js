@@ -339,7 +339,8 @@ export default async function Home() {
         <section
           className="section"
           style={{
-            backgroundImage: `linear-gradient(rgba(5, 11, 20, 0.85), rgba(5, 11, 20, 0.95)), url('bg-programs.jpeg')`,
+            // KODE BARU (BENAR)
+            backgroundImage: `linear-gradient(rgba(5, 11, 20, 0.85), rgba(5, 11, 20, 0.95)), url('${mainBg || ""}')`,
             backgroundSize: "cover",
             backgroundPosition: "center",
             backgroundAttachment: "fixed",
