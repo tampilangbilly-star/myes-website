@@ -65,7 +65,7 @@ export default function Navbar({ lang = "en" }) {
         </div>
 
         {/* KONTROL BAHASA & HAMBURGER MENU (MOBILE) */}
-        <div className="nav-controls">
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
           <div className="lang-toggle">
             <button
               className={`lang-btn ${lang === "en" ? "active" : ""}`}

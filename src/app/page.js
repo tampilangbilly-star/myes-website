@@ -77,6 +77,147 @@ export default async function Home() {
     <>
       <Navbar lang={lang} />
 
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+        .hero-wrapper {
+          position: relative;
+          width: 100%;
+          overflow: hidden;
+        }
+        
+        .guest-speaker-overlay {
+          position: absolute;
+          top: 50%;
+          right: 8%;
+          transform: translateY(-50%);
+          z-index: 40;
+        }
+
+        .cta-button {
+          display: inline-block;
+          background: #3b82f6;
+          color: #fff;
+          padding: 1rem 2.5rem;
+          border-radius: 50px;
+          text-decoration: none;
+          font-weight: bold;
+          font-size: 1.1rem;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+        .cta-button:hover {
+          background: #2563eb;
+          transform: translateY(-3px);
+          box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6);
+        }
+
+        .viva-social {
+          display: flex;
+          align-items: center;
+          gap: 0.8rem;
+          color: #e2e8f0;
+          text-decoration: none;
+          font-weight: 500;
+          font-size: 1.05rem;
+          transition: all 0.3s ease;
+        }
+        .viva-social:hover {
+          color: #fff;
+          transform: translateY(-2px);
+        }
+
+        .modern-social-title {
+          margin: 0;
+          font-size: 1.4rem;
+          font-weight: 700;
+          color: #f8fafc;
+          letter-spacing: 0.5px;
+          display: flex;
+          align-items: center;
+        }
+
+        .bounce-right-arrow {
+          animation: bounceRight 1.5s infinite;
+          color: #3b82f6;
+          display: flex;
+          align-items: center;
+          margin-left: 1rem;
+          background: rgba(59, 130, 246, 0.1);
+          padding: 6px;
+          border-radius: 50%;
+        }
+
+        @keyframes bounceRight {
+          0%, 20%, 50%, 80%, 100% { transform: translateX(0); }
+          40% { transform: translateX(10px); }
+          60% { transform: translateX(5px); }
+        }
+
+        /* --- KELAS CSS RESPONSIF BARU --- */
+        .responsive-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+          gap: 4rem;
+          align-items: center;
+        }
+        
+        .news-title {
+          font-size: 2.8rem;
+          color: #fff;
+          font-weight: 800;
+          margin: 0.5rem 0 1.5rem 0;
+          line-height: 1.2;
+        }
+        
+        .location-title {
+          font-size: 2.2rem;
+          margin-bottom: 0.5rem;
+          color: #fff;
+          font-weight: bold;
+        }
+        
+        .section-padding {
+          padding-top: 6rem;
+          padding-bottom: 6rem;
+        }
+
+        @media (max-width: 992px) {
+          .guest-speaker-overlay {
+            position: relative;
+            top: auto;
+            right: auto;
+            transform: none;
+            margin: -100px auto 3rem auto;
+            display: flex;
+            justify-content: center;
+            padding: 0 1rem;
+            z-index: 40;
+          }
+        }
+        
+        @media (max-width: 768px) {
+          .responsive-grid {
+            gap: 2.5rem; /* Jarak antar elemen dikurangi di HP */
+          }
+          .news-title {
+            font-size: 2rem; /* Ukuran huruf dikecilkan di HP */
+          }
+          .location-title {
+            font-size: 1.8rem; /* Ukuran huruf dikecilkan di HP */
+          }
+          .section-padding {
+            padding-top: 4rem;
+            padding-bottom: 4rem;
+          }
+          .map-container {
+            height: 300px !important; /* Peta tidak terlalu panjang di HP */
+          }
+        }
+      `,
+        }}
+      />
+
       <div className="hero-wrapper">
         <HolySpiritAmbient />
 
@@ -89,9 +230,26 @@ export default async function Home() {
         )}
       </div>
 
-      <div className="social-strip">
-        <div className="container">
-          <div className="social-strip-title">
+      <div
+        style={{
+          backgroundColor: "#050B14",
+          borderBottom: "1px solid rgba(255,255,255,0.05)",
+          padding: "1.5rem 0",
+        }}
+      >
+        <div
+          className="container"
+          style={{
+            maxWidth: "1200px",
+            margin: "0 auto",
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "2rem",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center" }}>
             <h3 className="modern-social-title">
               {lang === "id" ? "Media Sosial" : "Social Media"}
             </h3>
@@ -112,7 +270,14 @@ export default async function Home() {
             </div>
           </div>
 
-          <div className="social-strip-links">
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "2.5rem",
+              alignItems: "center",
+            }}
+          >
             <a
               href="https://www.instagram.com/myes_worship?igsh=MW5sa211OHN6eTJodg=="
               className="viva-social"
@@ -172,9 +337,13 @@ export default async function Home() {
 
       {programs.length > 0 && (
         <section
-          className="section program-section-bg"
+          className="section"
           style={{
+            // KODE BARU (BENAR)
             backgroundImage: `linear-gradient(rgba(5, 11, 20, 0.85), rgba(5, 11, 20, 0.95)), url('${mainBg || ""}')`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundAttachment: "fixed",
           }}
         >
           <div className="container">
@@ -200,7 +369,17 @@ export default async function Home() {
                   />
                   <div className="program-card-body">
                     {p.image ? (
-                      <img src={`${p.image}`} className="program-img" alt="" />
+                      <img
+                        src={`${p.image}`}
+                        style={{
+                          width: "100%",
+                          height: 140,
+                          objectFit: "cover",
+                          borderRadius: 8,
+                          marginBottom: "1rem",
+                        }}
+                        alt=""
+                      />
                     ) : (
                       <span className="emoji">{p.emoji}</span>
                     )}
@@ -218,17 +397,64 @@ export default async function Home() {
       {/* 2. SEKSI BERITA TERBARU (DENGAN AMBIENT GLOW EFFECT)      */}
       {/* ======================================================== */}
       {news.length > 0 && (
-        <section className="section section-alt section-padding news-section-bg">
+        <section
+          className="section section-alt section-padding"
+          style={{
+            position: "relative",
+            overflow: "hidden",
+            backgroundColor: "#080e17",
+            borderTop: "1px solid rgba(255,255,255,0.02)",
+            borderBottom: "1px solid rgba(255,255,255,0.02)",
+          }}
+        >
           {/* Efek Kabut Cahaya Biru di Kiri */}
-          <div className="section-glow-left"></div>
+          <div
+            style={{
+              position: "absolute",
+              top: "-20%",
+              left: "-10%",
+              width: "50%",
+              height: "100%",
+              background:
+                "radial-gradient(circle, rgba(59,130,246,0.08) 0%, rgba(8,14,23,0) 70%)",
+              zIndex: 0,
+            }}
+          ></div>
 
           {/* Efek Kabut Cahaya Jingga di Kanan Bawah */}
-          <div className="section-glow-right"></div>
+          <div
+            style={{
+              position: "absolute",
+              bottom: "-20%",
+              right: "-10%",
+              width: "50%",
+              height: "100%",
+              background:
+                "radial-gradient(circle, rgba(234,67,53,0.05) 0%, rgba(8,14,23,0) 70%)",
+              zIndex: 0,
+            }}
+          ></div>
 
-          <div className="container container-relative">
+          <div
+            className="container"
+            style={{
+              position: "relative",
+              zIndex: 1,
+              maxWidth: "1200px",
+              margin: "0 auto",
+            }}
+          >
             <div className="responsive-grid">
-              <div className="text-left">
-                <div className="overline overline-blue">
+              <div style={{ textAlign: "left" }}>
+                <div
+                  className="overline"
+                  style={{
+                    color: "#3b82f6",
+                    fontWeight: "bold",
+                    textTransform: "uppercase",
+                    letterSpacing: "1.5px",
+                  }}
+                >
                   {lang === "id" ? "Warta Mingguan" : "Weekly Update"}
                 </div>
                 <h2 className="news-title">
@@ -236,12 +462,23 @@ export default async function Home() {
                     ? "Berita & Flyer Kegiatan"
                     : "Latest Event Flyers"}
                 </h2>
-                <p className="news-desc">
+                <p
+                  style={{
+                    color: "#94a3b8",
+                    lineHeight: "1.7",
+                    fontSize: "1.05rem",
+                    marginBottom: "2rem",
+                  }}
+                >
                   {lang === "id"
                     ? "Jangan lewatkan persekutuan ibadah, kelas pembelajaran bahasa Inggris, dan berbagai aktivitas seru M-YES setiap minggunya. Cek berkala deck kartu di samping untuk info terbaru!"
                     : "Stay tuned for our weekly youth worship services, English classes, and exciting fellowship events. Check out our dynamic card deck on the right!"}
                 </p>
-                <Link href="/news" className="cta-button cta-button-sm">
+                <Link
+                  href="/news"
+                  className="cta-button"
+                  style={{ padding: "0.8rem 2rem", fontSize: "1rem" }}
+                >
                   {lang === "id" ? "Lihat Semua Berita" : "View All News"}
                 </Link>
               </div>
@@ -254,9 +491,21 @@ export default async function Home() {
         </section>
       )}
 
-      <section className="section section-padding location-section-bg">
+      <section
+        className="section section-padding"
+        style={{
+          backgroundImage: `linear-gradient(rgba(5, 11, 20, 0.85), rgba(5, 11, 20, 0.95)), url('home.png')`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundAttachment: "fixed",
+          borderTop: "1px solid rgba(255,255,255,0.05)",
+        }}
+      >
         <div className="container">
-          <div className="section-header section-header-left">
+          <div
+            className="section-header"
+            style={{ textAlign: "left", marginBottom: "3rem" }}
+          >
             <div className="overline">
               {lang === "id" ? "Kunjungi Kami" : "Visit Us"}
             </div>
@@ -264,12 +513,22 @@ export default async function Home() {
           </div>
 
           <div className="responsive-grid">
-            <div className="map-container">
+            <div
+              className="map-container"
+              style={{
+                width: "100%",
+                height: "400px",
+                borderRadius: "16px",
+                overflow: "hidden",
+                border: "1px solid rgba(255,255,255,0.1)",
+                boxShadow: "0 10px 30px -10px rgba(0, 0, 0, 0.5)",
+              }}
+            >
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3453.6204589046138!2d124.80560197423821!3d1.4492102612499522!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x32877544d235223b%3A0x216b2b2a129e1930!2sMG.Maru.Home!5e1!3m2!1sen!2sus!4v1782539996785!5m2!1sen!2sus"
                 width="100%"
                 height="450"
-                className="location-iframe"
+                style={{ border: 0 }}
                 allowFullScreen=""
                 loading="lazy"
                 referrerPolicy="strict-origin-when-cross-origin"
@@ -278,16 +537,59 @@ export default async function Home() {
 
             <div className="location-info">
               <h3 className="location-title">M-YES Basecamp</h3>
-              <div className="accent-line"></div>
-              <h4 className="location-subtitle">KEL. MARU - KIMBAL</h4>
-              <p className="location-desc">
+              <div
+                style={{
+                  width: "60px",
+                  height: "4px",
+                  backgroundColor: "#3b82f6",
+                  marginBottom: "1.5rem",
+                }}
+              ></div>
+              <h4
+                style={{
+                  color: "#3b82f6",
+                  fontSize: "1.3rem",
+                  marginBottom: "1rem",
+                }}
+              >
+                KEL. MARU - KIMBAL
+              </h4>
+              <p
+                style={{
+                  color: "#94a3b8",
+                  lineHeight: "1.8",
+                  marginBottom: "2.5rem",
+                  fontSize: "1.05rem",
+                }}
+              >
                 {contactData.contact_address ||
                   "Lorong Tuminting 1 A, Jalan Sea Malalayang 1 Barat, Manado, Sulawesi Utara, Indonesia"}
               </p>
 
-              <div className="contact-methods">
-                <div className="contact-method-item">
-                  <div className="contact-icon-wrap wa">
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "1.5rem",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "1.2rem",
+                  }}
+                >
+                  <div
+                    style={{
+                      background: "rgba(37, 211, 102, 0.15)",
+                      padding: "12px",
+                      borderRadius: "12px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="24"
@@ -299,20 +601,51 @@ export default async function Home() {
                     </svg>
                   </div>
                   <div>
-                    <span className="contact-method-label">WhatsApp</span>
+                    <span
+                      style={{
+                        display: "block",
+                        fontSize: "0.85rem",
+                        color: "#64748b",
+                        textTransform: "uppercase",
+                        letterSpacing: "1px",
+                        marginBottom: "4px",
+                      }}
+                    >
+                      WhatsApp
+                    </span>
                     <a
                       href={`https://wa.me/${cleanPhone}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="contact-method-value"
+                      style={{
+                        color: "#e2e8f0",
+                        textDecoration: "none",
+                        fontWeight: "bold",
+                        fontSize: "1.1rem",
+                      }}
                     >
                       {rawPhone}
                     </a>
                   </div>
                 </div>
 
-                <div className="contact-method-item">
-                  <div className="contact-icon-wrap email">
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "1.2rem",
+                  }}
+                >
+                  <div
+                    style={{
+                      background: "rgba(234, 67, 53, 0.15)",
+                      padding: "12px",
+                      borderRadius: "12px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="24"
@@ -338,10 +671,26 @@ export default async function Home() {
                     </svg>
                   </div>
                   <div>
-                    <span className="contact-method-label">Email</span>
+                    <span
+                      style={{
+                        display: "block",
+                        fontSize: "0.85rem",
+                        color: "#64748b",
+                        textTransform: "uppercase",
+                        letterSpacing: "1px",
+                        marginBottom: "4px",
+                      }}
+                    >
+                      Email
+                    </span>
                     <a
                       href={`mailto:${displayEmail}`}
-                      className="contact-method-value"
+                      style={{
+                        color: "#e2e8f0",
+                        textDecoration: "none",
+                        fontWeight: "bold",
+                        fontSize: "1.1rem",
+                      }}
                     >
                       {displayEmail}
                     </a>
