@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 export default function Footer({ lang = "en" }) {
   const pathname = usePathname();
 
-  // Logika penyembunyi: Jika rute berawalan /admin, jangan tampilkan footer
   if (pathname?.startsWith("/admin")) {
     return null;
   }
@@ -13,7 +12,6 @@ export default function Footer({ lang = "en" }) {
   return (
     <footer
       style={{
-        /* KUNCI GRADASI HALUS (FADE TO BLACK) */
         backgroundImage: `linear-gradient(to bottom, rgba(5, 11, 20, 0.4) 0%, rgba(5, 11, 20, 0.9) 55%, rgba(5, 11, 20, 1) 75%), url('bg-s.jpeg')`,
         backgroundSize: "cover",
         backgroundPosition: "center",
@@ -29,66 +27,64 @@ export default function Footer({ lang = "en" }) {
       <style
         dangerouslySetInnerHTML={{
           __html: `
-        .footer-link {
-          position: relative;
-          color: #94a3b8;
-          text-decoration: none;
-          transition: color 0.3s ease;
-          display: inline-block;
-        }
-        .footer-link:hover {
-          color: #fff;
-        }
-        .footer-link::after {
-          content: '';
-          position: absolute;
-          width: 0;
-          height: 2px;
-          bottom: -4px;
-          left: 0;
-          background-color: #3b82f6; 
-          transition: width 0.3s ease;
-        }
-        .footer-link:hover::after {
-          width: 100%;
-        }
-        .cta-button {
-          display: inline-block;
-          background: #3b82f6;
-          color: #fff;
-          padding: 0.8rem 2.2rem;
-          border-radius: 50px;
-          text-decoration: none;
-          font-weight: bold;
-          font-size: 1rem;
-          transition: all 0.3s ease;
-          box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
-        }
-        .cta-button:hover {
-          background: #2563eb;
-          transform: translateY(-3px);
-          box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6);
-        }
-      `,
+            .footer-link {
+              position: relative;
+              color: #94a3b8;
+              text-decoration: none;
+              transition: color 0.3s ease;
+              display: inline-block;
+            }
+            .footer-link:hover {
+              color: #fff;
+            }
+            .footer-link::after {
+              content: '';
+              position: absolute;
+              width: 0;
+              height: 2px;
+              bottom: -4px;
+              left: 0;
+              background-color: #3b82f6;
+              transition: width 0.3s ease;
+            }
+            .footer-link:hover::after {
+              width: 100%;
+            }
+            .cta-button {
+              display: inline-block;
+              background: #3b82f6;
+              color: #fff;
+              padding: 0.8rem 2.2rem;
+              border-radius: 50px;
+              text-decoration: none;
+              font-weight: bold;
+              font-size: 1rem;
+              transition: all 0.3s ease;
+              box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            }
+            .cta-button:hover {
+              background: #2563eb;
+              transform: translateY(-3px);
+              box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6);
+            }
+          `,
         }}
       />
 
-      {/* ========================================== */}
-      {/* BAGIAN ATAS: READY TO GROW (Flex 1 agar mengisi ruang tengah) */}
-      {/* ========================================== */}
       <div
         style={{
           flex: 1,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: "2rem 1rem" /* Jarak diperkecil agar muat di layar */,
+          padding: "2rem 1rem",
           borderBottom: "1px solid rgba(255,255,255,0.05)",
+          width: "100%",
         }}
       >
         <div
           className="container"
-          style={{ maxWidth: "800px", margin: "0 auto", textAlign: "center" }}
+          style={{ textAlign: "center", width: "100%" }}
         >
           <h2
             style={{
@@ -120,17 +116,9 @@ export default function Footer({ lang = "en" }) {
         </div>
       </div>
 
-      {/* ========================================== */}
-      {/* BAGIAN BAWAH: MENU & COPYRIGHT             */}
-      {/* ========================================== */}
       <div
         className="container"
-        style={{
-          maxWidth: "1200px",
-          margin: "0 auto",
-          padding: "2rem 1.5rem 1rem 1.5rem" /* Jarak atas bawah dirapatkan */,
-          width: "100%",
-        }}
+        style={{ padding: "2rem 1.5rem 1rem 1.5rem", width: "100%" }}
       >
         <div
           style={{
@@ -140,7 +128,6 @@ export default function Footer({ lang = "en" }) {
             marginBottom: "2rem",
           }}
         >
-          {/* Kolom 1: Identitas Brand */}
           <div>
             <h2
               style={{
@@ -167,7 +154,6 @@ export default function Footer({ lang = "en" }) {
             </p>
           </div>
 
-          {/* Kolom 2: Quick Links */}
           <div>
             <h3
               style={{
@@ -208,7 +194,6 @@ export default function Footer({ lang = "en" }) {
             </ul>
           </div>
 
-          {/* Kolom 3: Explore */}
           <div>
             <h3
               style={{
@@ -250,7 +235,6 @@ export default function Footer({ lang = "en" }) {
           </div>
         </div>
 
-        {/* COPYRIGHT & DEVELOPER CREDIT */}
         <div
           style={{
             display: "flex",
@@ -267,7 +251,6 @@ export default function Footer({ lang = "en" }) {
             © {new Date().getFullYear()} Manado Youth English Service (M-YES).
             All rights reserved.
           </p>
-
           <div style={{ margin: 0 }}>
             <Link
               href="/admin"
@@ -277,14 +260,6 @@ export default function Footer({ lang = "en" }) {
                 textDecoration: "none",
                 letterSpacing: "1px",
                 transition: "all 0.3s ease",
-              }}
-              onMouseOver={(e) => {
-                e.target.style.opacity = "1";
-                e.target.style.color = "#3b82f6";
-              }}
-              onMouseOut={(e) => {
-                e.target.style.opacity = "0.6";
-                e.target.style.color = "#64748b";
               }}
             >
               Admin{" "}

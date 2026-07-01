@@ -41,7 +41,7 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
           <div className="slide-content">
             <div
               className="slide-text"
-              style={{ textAlign: "center", maxWidth: "100%" }}
+              style={{ textAlign: "center", margin: "0 auto" }}
             >
               <h2 className="slide-title">
                 Manado Youth
@@ -75,7 +75,6 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
       {slides.map((slide, i) => {
         const isActive = i === current;
         const isPrev = i === prevIndex;
-
         return (
           <div
             key={slide.id}
@@ -88,7 +87,6 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
               pointerEvents: isActive ? "auto" : "none",
             }}
           >
-            {/* BACKGROUND IMAGE - DIPERBAIKI SINTAKSNYA */}
             {slide.backgroundImage ? (
               <div
                 style={{
@@ -113,7 +111,6 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
               />
             )}
 
-            {/* CINEMATIC OVERLAY */}
             <div
               style={{
                 position: "absolute",
@@ -124,22 +121,9 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
               }}
             />
 
-            {/* KONTEN UTAMA */}
-            <div
-              style={{
-                position: "relative",
-                zIndex: 2,
-                height: "100%",
-                maxWidth: "1280px",
-                margin: "0 auto",
-                padding: "0 2rem",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: "4rem",
-              }}
-            >
-              <div style={{ flex: 1, maxWidth: "600px", paddingTop: "80px" }}>
+            {/* KUNCI PERBAIKAN: Menggunakan className="slide-content" murni dari CSS */}
+            <div className="slide-content" style={{ zIndex: 2 }}>
+              <div className="slide-text">
                 {t(slide, "overline") && (
                   <div
                     style={{
@@ -201,25 +185,19 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
                 )}
               </div>
 
-              {/* Bagian Slide Image (Kanan) */}
               {slide.image && (
                 <div
-                  style={{
-                    flex: "0 0 auto",
-                    maxWidth: "45%",
-                    animation: "fadeInUp 1.5s ease forwards",
-                  }}
+                  className="slide-image"
+                  style={{ animation: "fadeInUp 1.5s ease forwards" }}
                 >
                   <img
                     src={slide.image}
                     style={{
                       width: "100%",
-                      maxHeight: "500px",
                       objectFit: "cover",
                       borderRadius: "16px",
                       boxShadow: "0 25px 60px rgba(0,0,0,0.8)",
                       border: "1px solid rgba(255,255,255,0.1)",
-                      transform: "rotate(-2deg)",
                     }}
                     alt={t(slide, "title")}
                   />
