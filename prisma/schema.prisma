@@ -17,11 +17,11 @@ model User {
 }
 
 model Setting {
-  id       Int      @id @default(autoincrement())
-  key      String   @unique
-  valueEn  String?  @db.Text @map("value_en")
-  valueId  String?  @db.Text @map("value_id")
-  group    String   @default("general")
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  valueEn   String?  @db.Text @map("value_en")
+  valueId   String?  @db.Text @map("value_id")
+  group     String   @default("general")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -131,33 +131,19 @@ model News {
 
   @@map("news")
 }
-model ActivityGallery {
-  id           Int             @id @default(autoincrement())
-  activityDate DateTime
-  titleEn      String
-  titleId      String?
-  isActive     Boolean         @default(true)
-  createdAt    DateTime        @default(now())
-  photos       ActivityPhoto[]
-}
 
-model ActivityPhoto {
-  id        Int             @id @default(autoincrement())
-  image     String
-  galleryId Int
-  gallery   ActivityGallery @relation(fields: [galleryId], references: [id], onDelete: Cascade)
-}
 model GuestSpeaker {
-  id          Int      @id @default(autoincrement())
-  name        String
-  origin      String?  // Untuk menyimpan asal gereja, pelayanan, atau profesi
-  image       String   // Untuk menyimpan foto pembicara
-  dateServed  DateTime // Tanggal saat melayani di M-YES
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
+  id         Int      @id @default(autoincrement())
+  name       String
+  origin     String?  // Untuk menyimpan asal gereja, pelayanan, atau profesi
+  image      String   // Untuk menyimpan foto pembicara
+  dateServed DateTime // Tanggal saat melayani di M-YES
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
 
   @@map("guest_speakers")
 }
+
 model ContactMessage {
   id        Int      @id @default(autoincrement())
   name      String
@@ -168,11 +154,21 @@ model ContactMessage {
 
   @@map("contact_messages")
 }
-model Gallery {
-  id           String   @id @default(cuid())
-  titleEn      String?
+
+// --- BAGIAN YANG DIPERBAIKI ---
+model ActivityPhoto {
+  id        Int             @id @default(autoincrement())
+  image     String
+  galleryId Int
+  gallery   ActivityGallery @relation(fields: [galleryId], references: [id], onDelete: Cascade)
+}
+model ActivityGallery {
+  id           Int             @id @default(autoincrement())
+  titleEn      String
   titleId      String?
   activityDate DateTime
-  // ... (kolom lain yang sudah ada)
-  video        String?  // <-- TAMBAHKAN BARIS INI
+  isActive     Boolean         @default(true)
+  video        String?         // Fitur video sudah siap
+  photos       ActivityPhoto[]
+  createdAt    DateTime        @default(now())
 }
