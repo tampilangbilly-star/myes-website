@@ -20,7 +20,6 @@ export async function GET() {
 export async function POST(request) {
   try {
     const body = await request.json();
-    // Menambahkan 'video' dari body yang dikirim oleh AdminWeeklyActivities
     const { titleEn, titleId, activityDate, isActive, photos, video } = body;
 
     if (!titleEn || !activityDate) {
@@ -37,7 +36,7 @@ export async function POST(request) {
         titleId: titleId || null,
         activityDate: new Date(activityDate),
         isActive: Boolean(isActive),
-        video: video || null, // <--- MENYIMPAN PATH VIDEO KE DATABASE
+        video: video || null, // <--- Link YouTube akan disimpan di sini
       },
     });
 

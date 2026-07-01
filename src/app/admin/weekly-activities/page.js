@@ -12,7 +12,7 @@ export default function AdminWeeklyActivities() {
   const [activityDate, setActivityDate] = useState("");
   const [isActive, setIsActive] = useState(true);
   const [selectedPhotos, setSelectedPhotos] = useState([]);
-  const [selectedVideo, setSelectedVideo] = useState(null); // State baru untuk video
+  const [videoUrl, setVideoUrl] = useState(""); // State diubah untuk menampung teks link YouTube
 
   useEffect(() => {
     fetchGalleries();
@@ -38,20 +38,7 @@ export default function AdminWeeklyActivities() {
     setError(null);
 
     try {
-      // 1. Upload Video (jika ada)
-      let videoPath = null;
-      if (selectedVideo) {
-        setUploadProgress("Mengupload video...");
-        const fd = new FormData();
-        fd.append("file", selectedVideo);
-        fd.append("folder", "weekly-activities/videos");
-        const res = await fetch("/api/upload", { method: "POST", body: fd });
-        if (!res.ok) throw new Error("Gagal mengupload video");
-        const result = await res.json();
-        videoPath = result.path;
-      }
-
-      // 2. Upload Semua Foto
+      // 1. Upload Semua Foto (Tetap utuh dan aman)
       const photoPaths = [];
       for (let i = 0; i < selectedPhotos.length; i++) {
         setUploadProgress(
@@ -60,18 +47,24 @@ export default function AdminWeeklyActivities() {
         const fd = new FormData();
         fd.append("file", selectedPhotos[i]);
         fd.append("folder", "weekly-activities");
+
         const uploadRes = await fetch("/api/upload", {
           method: "POST",
           body: fd,
         });
-        if (!uploadRes.ok) throw new Error(`Gagal upload foto ${i + 1}`);
+
+        if (!uploadRes.ok) {
+          const errText = await uploadRes.text();
+          throw new Error(`Gagal upload foto ${i + 1}: ${errText}`);
+        }
+
         const uploadResult = await uploadRes.json();
         photoPaths.push(uploadResult.path);
       }
 
-      setUploadProgress("Menyimpan data...");
+      setUploadProgress("Menyimpan ke database...");
 
-      // 3. Simpan ke Database
+      // 2. Simpan ke Database
       const res = await fetch("/api/weekly-activities", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -81,22 +74,29 @@ export default function AdminWeeklyActivities() {
           activityDate,
           isActive,
           photos: photoPaths,
-          video: videoPath, // Kirim path video ke backend
+          video: videoUrl, // Langsung mengirimkan teks link YouTube
         }),
       });
 
-      if (!res.ok) throw new Error("Gagal menyimpan ke database");
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || "Gagal menyimpan ke database");
+      }
+
+      alert("Berhasil menyimpan galeri!");
 
       // Reset Form
       setTitleEn("");
       setTitleId("");
       setActivityDate("");
       setSelectedPhotos([]);
-      setSelectedVideo(null);
+      setVideoUrl("");
       setUploadProgress("");
       fetchGalleries();
     } catch (err) {
+      console.error("Submit Error:", err);
       setError(err.message);
+      alert("Error: " + err.message);
       setUploadProgress("");
     } finally {
       setLoading(false);
@@ -179,13 +179,14 @@ export default function AdminWeeklyActivities() {
             />
           </div>
 
-          {/* INPUT VIDEO */}
+          {/* INPUT VIDEO SEKARANG BERUPA TEKS LINK YOUTUBE */}
           <div>
-            <label>Upload Video (Opsional)</label>
+            <label>Video URL (Link YouTube) - Opsional</label>
             <input
-              type="file"
-              accept="video/*"
-              onChange={(e) => setSelectedVideo(e.target.files[0])}
+              type="text"
+              placeholder="Contoh: https://youtu.be/..."
+              value={videoUrl}
+              onChange={(e) => setVideoUrl(e.target.value)}
               style={inputStyle}
             />
           </div>

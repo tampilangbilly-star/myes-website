@@ -1,16 +1,27 @@
 "use client";
 import { useState } from "react";
 
-export default function WeeklyGallery({ galleries, lang }) {
-  // State untuk menyimpan nama file foto yang sedang diklik
-  const [selectedImage, setSelectedImage] = useState(null);
+// Fungsi khusus untuk mengubah link YouTube standar menjadi link embed otomatis
+const getYouTubeEmbedUrl = (url) => {
+  if (!url) return null;
+  let videoId = "";
+  if (url.includes("youtu.be/")) {
+    videoId = url.split("youtu.be/")[1]?.split("?")[0];
+  } else if (url.includes("youtube.com/watch")) {
+    const urlParams = new URLSearchParams(new URL(url).search);
+    videoId = urlParams.get("v");
+  } else if (url.includes("youtube.com/embed/")) {
+    return url;
+  }
+  return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
+};
 
-  // Fungsi untuk menutup popup gambar
+export default function WeeklyGallery({ galleries, lang }) {
+  const [selectedImage, setSelectedImage] = useState(null);
   const closeModal = () => setSelectedImage(null);
 
   return (
     <>
-      {/* 1. BAGIAN GRID GALERI UTAMA */}
       <div style={{ display: "flex", flexDirection: "column", gap: "4rem" }}>
         {galleries.map((gallery) => (
           <div
@@ -22,7 +33,6 @@ export default function WeeklyGallery({ galleries, lang }) {
               border: "1px solid rgba(255,255,255,0.05)",
             }}
           >
-            {/* HEADER: JUDUL & TANGGAL */}
             <div
               style={{
                 borderBottom: "1px solid rgba(255,255,255,0.1)",
@@ -56,7 +66,7 @@ export default function WeeklyGallery({ galleries, lang }) {
               </span>
             </div>
 
-            {/* --- BAGIAN BARU: PEMUTAR VIDEO --- */}
+            {/* --- BAGIAN PLAYER YOUTUBE --- */}
             {gallery.video && (
               <div style={{ marginBottom: "3rem" }}>
                 <h4
@@ -71,29 +81,35 @@ export default function WeeklyGallery({ galleries, lang }) {
                 >
                   🎥 {lang === "id" ? "Video Sorotan" : "Highlight Video"}
                 </h4>
+                {/* Desain container khusus agar video YouTube tetap 16:9 saat dibuka di HP */}
                 <div
                   style={{
                     borderRadius: "12px",
                     overflow: "hidden",
                     border: "1px solid rgba(255,255,255,0.1)",
                     backgroundColor: "#000",
+                    position: "relative",
+                    paddingBottom: "56.25%",
+                    height: 0,
                   }}
                 >
-                  <video
-                    src={gallery.video}
-                    controls
-                    preload="metadata"
+                  <iframe
+                    src={getYouTubeEmbedUrl(gallery.video)}
                     style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
                       width: "100%",
-                      maxHeight: "450px",
-                      objectFit: "contain",
-                      display: "block",
+                      height: "100%",
+                      border: "none",
                     }}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    title="Highlight Video"
                   />
                 </div>
               </div>
             )}
-            {/* --------------------------------- */}
 
             {/* --- BAGIAN GALERI FOTO --- */}
             {gallery.photos && gallery.photos.length > 0 && (
@@ -115,10 +131,9 @@ export default function WeeklyGallery({ galleries, lang }) {
                     <div
                       key={photo.id}
                       className="gallery-img-wrapper"
-                      onClick={() => setSelectedImage(photo.image)} // Buka modal saat diklik
+                      onClick={() => setSelectedImage(photo.image)}
                     >
                       <img src={`${photo.image}`} alt={`Moment ${index + 1}`} />
-                      {/* Efek kaca pembesar saat di-hover */}
                       <div className="zoom-overlay">
                         <span>🔍</span>
                       </div>
@@ -127,7 +142,6 @@ export default function WeeklyGallery({ galleries, lang }) {
                 </div>
               </div>
             )}
-            {/* --------------------------- */}
           </div>
         ))}
 
@@ -144,7 +158,6 @@ export default function WeeklyGallery({ galleries, lang }) {
         )}
       </div>
 
-      {/* 2. BAGIAN MODAL POPUP (FULL SCREEN) */}
       {selectedImage && (
         <div
           style={{
@@ -153,8 +166,8 @@ export default function WeeklyGallery({ galleries, lang }) {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: "rgba(5, 11, 20, 0.95)", // Background gelap transparan
-            zIndex: 9999, // Memastikan selalu berada paling depan
+            backgroundColor: "rgba(5, 11, 20, 0.95)",
+            zIndex: 9999,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -162,9 +175,8 @@ export default function WeeklyGallery({ galleries, lang }) {
             padding: "2rem",
             backdropFilter: "blur(5px)",
           }}
-          onClick={closeModal} // Tutup modal jika area gelap di luar gambar diklik
+          onClick={closeModal}
         >
-          {/* Tombol Silang (Close) */}
           <button
             onClick={closeModal}
             style={{
@@ -182,25 +194,21 @@ export default function WeeklyGallery({ galleries, lang }) {
           >
             &times;
           </button>
-
-          {/* Menampilkan Gambar Ukuran Asli */}
           <img
             src={`${selectedImage}`}
             alt="Full size"
             style={{
               maxWidth: "95%",
               maxHeight: "75vh",
-              objectFit: "contain", // KUNCI: Menjamin foto portrait atau landscape tidak terpotong sama sekali
+              objectFit: "contain",
               borderRadius: "8px",
               boxShadow: "0 20px 50px rgba(0,0,0,0.5)",
             }}
-            onClick={(e) => e.stopPropagation()} // Mencegah modal tertutup kalau gambarnya yang diklik
+            onClick={(e) => e.stopPropagation()}
           />
-
-          {/* Tombol Download */}
           <a
             href={`${selectedImage}`}
-            download // Atribut HTML bawaan untuk memaksa unduhan file
+            download
             onClick={(e) => e.stopPropagation()}
             style={{
               marginTop: "2rem",
