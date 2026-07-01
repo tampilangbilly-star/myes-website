@@ -39,16 +39,11 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
           />
           <div className="slide-overlay" />
           <div className="slide-content">
-            <div
-              className="slide-text"
-              style={{ textAlign: "center", maxWidth: "100%" }}
-            >
+            <div className="slide-text text-center-full">
               <h2 className="slide-title">
                 Manado Youth
                 <br />
-                <span style={{ color: "var(--gold-light)" }}>
-                  English Service
-                </span>
+                <span className="slide-title-accent">English Service</span>
               </h2>
               <p className="slide-desc">
                 {lang === "id"
@@ -63,15 +58,7 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
   }
 
   return (
-    <section
-      className="hero-slider"
-      style={{
-        position: "relative",
-        height: "100vh",
-        overflow: "hidden",
-        backgroundColor: "#030812",
-      }}
-    >
+    <section className="hero-slider">
       {slides.map((slide, i) => {
         const isActive = i === current;
         const isPrev = i === prevIndex;
@@ -79,123 +66,45 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
         return (
           <div
             key={slide.id}
+            className={`slide ${isActive ? "active" : ""}`}
             style={{
-              position: "absolute",
-              inset: 0,
               zIndex: isActive ? 2 : isPrev ? 1 : 0,
               opacity: isActive || isPrev ? 1 : 0,
-              transition: "opacity 1.2s ease-in-out",
               pointerEvents: isActive ? "auto" : "none",
             }}
           >
-            {/* BACKGROUND IMAGE - DIPERBAIKI SINTAKSNYA */}
+            {/* BACKGROUND IMAGE */}
             {slide.backgroundImage ? (
               <div
+                className="slide-bg"
                 style={{
-                  position: "absolute",
-                  inset: 0,
-                  zIndex: 0,
                   backgroundImage: `url(${slide.backgroundImage})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  transform: isActive ? "scale(1.05)" : "scale(1)",
-                  transition: "transform 8s ease-out",
                 }}
               />
             ) : (
               <div
+                className="slide-bg"
                 style={{
-                  position: "absolute",
-                  inset: 0,
-                  zIndex: 0,
                   background: `linear-gradient(135deg, ${slide.backgroundColor || "#0a1628"}, #030812)`,
                 }}
               />
             )}
 
             {/* CINEMATIC OVERLAY */}
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                zIndex: 1,
-                background:
-                  "linear-gradient(to right, rgba(3,8,18,0.95) 0%, rgba(3,8,18,0.7) 40%, rgba(3,8,18,0.3) 100%)",
-              }}
-            />
+            <div className="slide-overlay" />
 
             {/* KONTEN UTAMA */}
-            <div
-              style={{
-                position: "relative",
-                zIndex: 2,
-                height: "100%",
-                maxWidth: "1280px",
-                margin: "0 auto",
-                padding: "0 2rem",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: "4rem",
-              }}
-            >
-              <div style={{ flex: 1, maxWidth: "600px", paddingTop: "80px" }}>
+            <div className="slide-content">
+              <div className="slide-text">
                 {t(slide, "overline") && (
-                  <div
-                    style={{
-                      color: "var(--accent-gold)",
-                      letterSpacing: "4px",
-                      fontSize: "0.85rem",
-                      textTransform: "uppercase",
-                      marginBottom: "1.2rem",
-                      animation: "fadeInUp 1s ease forwards",
-                    }}
-                  >
-                    {t(slide, "overline")}
-                  </div>
+                  <div className="slide-overline">{t(slide, "overline")}</div>
                 )}
-                <h2
-                  style={{
-                    fontSize: "clamp(2.5rem, 4.5vw, 4rem)",
-                    color: "#fff",
-                    marginBottom: "1.5rem",
-                    textShadow: "0 10px 30px rgba(0,0,0,0.8)",
-                    animation: "fadeInUp 1.2s ease forwards",
-                  }}
-                >
-                  {t(slide, "title")}
-                </h2>
+                <h2 className="slide-title">{t(slide, "title")}</h2>
                 {t(slide, "description") && (
-                  <p
-                    style={{
-                      color: "var(--text-secondary)",
-                      fontSize: "1.1rem",
-                      lineHeight: "1.8",
-                      marginBottom: "2.5rem",
-                      animation: "fadeInUp 1.4s ease forwards",
-                    }}
-                  >
-                    {t(slide, "description")}
-                  </p>
+                  <p className="slide-desc">{t(slide, "description")}</p>
                 )}
                 {t(slide, "buttonText") && (
-                  <a
-                    href={slide.buttonLink || "#"}
-                    style={{
-                      display: "inline-block",
-                      padding: "14px 36px",
-                      background: "var(--accent-gold)",
-                      color: "#fff",
-                      borderRadius: "8px",
-                      fontSize: "0.9rem",
-                      fontWeight: "700",
-                      textTransform: "uppercase",
-                      textDecoration: "none",
-                      transition: "all 0.3s ease",
-                      boxShadow: "0 8px 25px var(--accent-gold-glow)",
-                      animation: "fadeInUp 1.6s ease forwards",
-                    }}
-                  >
+                  <a href={slide.buttonLink || "#"} className="slide-btn">
                     {t(slide, "buttonText")}
                   </a>
                 )}
@@ -203,26 +112,8 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
 
               {/* Bagian Slide Image (Kanan) */}
               {slide.image && (
-                <div
-                  style={{
-                    flex: "0 0 auto",
-                    maxWidth: "45%",
-                    animation: "fadeInUp 1.5s ease forwards",
-                  }}
-                >
-                  <img
-                    src={slide.image}
-                    style={{
-                      width: "100%",
-                      maxHeight: "500px",
-                      objectFit: "cover",
-                      borderRadius: "16px",
-                      boxShadow: "0 25px 60px rgba(0,0,0,0.8)",
-                      border: "1px solid rgba(255,255,255,0.1)",
-                      transform: "rotate(-2deg)",
-                    }}
-                    alt={t(slide, "title")}
-                  />
+                <div className="slide-image">
+                  <img src={slide.image} alt={t(slide, "title")} />
                 </div>
               )}
             </div>
