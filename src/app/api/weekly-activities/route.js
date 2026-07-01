@@ -36,7 +36,7 @@ export async function POST(request) {
         titleId: titleId || null,
         activityDate: new Date(activityDate),
         isActive: Boolean(isActive),
-        video: video || null, // <--- Link YouTube akan disimpan di sini
+        video: video || null,
       },
     });
 
@@ -59,6 +59,35 @@ export async function POST(request) {
     console.error("Error saving gallery:", error);
     return NextResponse.json(
       { error: "Failed to save gallery" },
+      { status: 500 },
+    );
+  }
+}
+
+// FUNGSI BARU UNTUK MENGHAPUS DATA
+export async function DELETE(request) {
+  try {
+    // Mengambil ID dari URL (contoh: /api/weekly-activities?id=1)
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "ID tidak ditemukan" },
+        { status: 400 },
+      );
+    }
+
+    // Menghapus data berdasarkan ID (karena ID kita sekarang Int, gunakan parseInt)
+    await prisma.activityGallery.delete({
+      where: { id: parseInt(id) },
+    });
+
+    return NextResponse.json({ message: "Berhasil dihapus" }, { status: 200 });
+  } catch (error) {
+    console.error("Error deleting gallery:", error);
+    return NextResponse.json(
+      { error: "Gagal menghapus galeri" },
       { status: 500 },
     );
   }

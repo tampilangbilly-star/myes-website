@@ -12,7 +12,7 @@ export default function AdminWeeklyActivities() {
   const [activityDate, setActivityDate] = useState("");
   const [isActive, setIsActive] = useState(true);
   const [selectedPhotos, setSelectedPhotos] = useState([]);
-  const [videoUrl, setVideoUrl] = useState(""); // State diubah untuk menampung teks link YouTube
+  const [videoUrl, setVideoUrl] = useState("");
 
   useEffect(() => {
     fetchGalleries();
@@ -38,7 +38,6 @@ export default function AdminWeeklyActivities() {
     setError(null);
 
     try {
-      // 1. Upload Semua Foto (Tetap utuh dan aman)
       const photoPaths = [];
       for (let i = 0; i < selectedPhotos.length; i++) {
         setUploadProgress(
@@ -52,19 +51,16 @@ export default function AdminWeeklyActivities() {
           method: "POST",
           body: fd,
         });
-
         if (!uploadRes.ok) {
           const errText = await uploadRes.text();
           throw new Error(`Gagal upload foto ${i + 1}: ${errText}`);
         }
-
         const uploadResult = await uploadRes.json();
         photoPaths.push(uploadResult.path);
       }
 
       setUploadProgress("Menyimpan ke database...");
 
-      // 2. Simpan ke Database
       const res = await fetch("/api/weekly-activities", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -74,7 +70,7 @@ export default function AdminWeeklyActivities() {
           activityDate,
           isActive,
           photos: photoPaths,
-          video: videoUrl, // Langsung mengirimkan teks link YouTube
+          video: videoUrl,
         }),
       });
 
@@ -85,21 +81,42 @@ export default function AdminWeeklyActivities() {
 
       alert("Berhasil menyimpan galeri!");
 
-      // Reset Form
       setTitleEn("");
       setTitleId("");
       setActivityDate("");
       setSelectedPhotos([]);
       setVideoUrl("");
       setUploadProgress("");
-      fetchGalleries();
+      fetchGalleries(); // Auto-refresh tabel di bawah
     } catch (err) {
-      console.error("Submit Error:", err);
       setError(err.message);
       alert("Error: " + err.message);
       setUploadProgress("");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // FUNGSI MENGHAPUS GALERI
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm(
+      "Apakah Anda yakin ingin menghapus galeri ini? Semua foto di dalamnya akan ikut terhapus permanen.",
+    );
+    if (!confirmDelete) return;
+
+    try {
+      const res = await fetch(`/api/weekly-activities?id=${id}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        throw new Error("Gagal menghapus data dari server");
+      }
+
+      alert("Galeri berhasil dihapus!");
+      fetchGalleries(); // Refresh tabel setelah dihapus
+    } catch (err) {
+      alert("Error: " + err.message);
     }
   };
 
@@ -117,7 +134,7 @@ export default function AdminWeeklyActivities() {
       style={{
         padding: "2rem",
         color: "#fff",
-        maxWidth: "1000px",
+        maxWidth: "1200px",
         margin: "0 auto",
       }}
     >
@@ -127,6 +144,7 @@ export default function AdminWeeklyActivities() {
         Manage Weekly Activities
       </h1>
 
+      {/* FORM SECTION */}
       <div
         style={{
           backgroundColor: "#0f172a",
@@ -136,6 +154,16 @@ export default function AdminWeeklyActivities() {
           marginBottom: "3rem",
         }}
       >
+        <h3
+          style={{
+            fontSize: "1.5rem",
+            marginBottom: "1.5rem",
+            borderBottom: "1px solid rgba(255,255,255,0.1)",
+            paddingBottom: "0.5rem",
+          }}
+        >
+          Add New Gallery Event
+        </h3>
         <form
           onSubmit={handleSubmit}
           style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
@@ -167,7 +195,6 @@ export default function AdminWeeklyActivities() {
               />
             </div>
           </div>
-
           <div>
             <label>Activity Date *</label>
             <input
@@ -178,8 +205,6 @@ export default function AdminWeeklyActivities() {
               style={inputStyle}
             />
           </div>
-
-          {/* INPUT VIDEO SEKARANG BERUPA TEKS LINK YOUTUBE */}
           <div>
             <label>Video URL (Link YouTube) - Opsional</label>
             <input
@@ -190,8 +215,6 @@ export default function AdminWeeklyActivities() {
               style={inputStyle}
             />
           </div>
-
-          {/* INPUT FOTO */}
           <div>
             <label>Select Photos</label>
             <input
@@ -202,7 +225,6 @@ export default function AdminWeeklyActivities() {
               style={inputStyle}
             />
           </div>
-
           <button
             type="submit"
             disabled={loading}
@@ -213,11 +235,202 @@ export default function AdminWeeklyActivities() {
               border: "none",
               borderRadius: "8px",
               cursor: "pointer",
+              fontWeight: "bold",
             }}
           >
-            {loading ? "⏳ Memproses..." : "💾 Save Gallery Event"}
+            {loading
+              ? `⏳ ${uploadProgress || "Memproses..."}`
+              : "💾 Save Gallery Event"}
           </button>
         </form>
+      </div>
+
+      {/* LIST/TABLE SECTION */}
+      <div
+        style={{
+          backgroundColor: "#0B1120",
+          padding: "2rem",
+          borderRadius: "16px",
+          border: "1px solid rgba(255,255,255,0.05)",
+        }}
+      >
+        <h3 style={{ fontSize: "1.5rem", marginBottom: "1.5rem" }}>
+          Existing Galleries
+        </h3>
+
+        <div style={{ overflowX: "auto" }}>
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              textAlign: "left",
+              fontSize: "0.95rem",
+            }}
+          >
+            <thead>
+              <tr
+                style={{
+                  borderBottom: "1px solid #1e293b",
+                  color: "#94a3b8",
+                  textTransform: "uppercase",
+                  fontSize: "0.8rem",
+                  letterSpacing: "1px",
+                }}
+              >
+                <th style={{ padding: "1rem" }}>IMG</th>
+                <th style={{ padding: "1rem" }}>Title</th>
+                <th style={{ padding: "1rem" }}>Media</th>
+                <th style={{ padding: "1rem" }}>Date</th>
+                <th style={{ padding: "1rem", textAlign: "center" }}>
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {galleries.map((g) => (
+                <tr
+                  key={g.id}
+                  style={{
+                    borderBottom: "1px solid #1e293b",
+                    transition: "background 0.2s",
+                  }}
+                  onMouseOver={(e) =>
+                    (e.currentTarget.style.backgroundColor = "#0f172a")
+                  }
+                  onMouseOut={(e) =>
+                    (e.currentTarget.style.backgroundColor = "transparent")
+                  }
+                >
+                  {/* KOLOM GAMBAR */}
+                  <td style={{ padding: "1rem" }}>
+                    <div
+                      style={{
+                        width: "60px",
+                        height: "45px",
+                        backgroundColor: "#1e293b",
+                        borderRadius: "6px",
+                        overflow: "hidden",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      {g.photos && g.photos.length > 0 ? (
+                        <img
+                          src={g.photos[0].image}
+                          alt="Thumbnail"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
+                        />
+                      ) : (
+                        <span style={{ fontSize: "0.8rem", color: "#64748b" }}>
+                          No Img
+                        </span>
+                      )}
+                    </div>
+                  </td>
+
+                  {/* KOLOM JUDUL */}
+                  <td style={{ padding: "1rem", fontWeight: "bold" }}>
+                    {g.titleEn} <br />
+                    <span
+                      style={{
+                        fontSize: "0.8rem",
+                        color: "#94a3b8",
+                        fontWeight: "normal",
+                      }}
+                    >
+                      {g.titleId || "-"}
+                    </span>
+                  </td>
+
+                  {/* KOLOM MEDIA (Tag) */}
+                  <td style={{ padding: "1rem", color: "#94a3b8" }}>
+                    {g.photos?.length || 0} Photos <br />
+                    {g.video ? (
+                      <span style={{ color: "#ef4444", fontSize: "0.8rem" }}>
+                        ▶ Video
+                      </span>
+                    ) : (
+                      ""
+                    )}
+                  </td>
+
+                  {/* KOLOM TANGGAL */}
+                  <td style={{ padding: "1rem", color: "#e2e8f0" }}>
+                    {new Date(g.activityDate).toLocaleDateString("en-US", {
+                      month: "numeric",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </td>
+
+                  {/* KOLOM AKSI (Edit & Delete) */}
+                  <td style={{ padding: "1rem", textAlign: "center" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "0.5rem",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <button
+                        onClick={() =>
+                          alert(
+                            "Fitur edit detail sedang disiapkan. Anda bisa menghapus dan membuatnya ulang jika ada kesalahan.",
+                          )
+                        }
+                        style={{
+                          padding: "0.5rem",
+                          backgroundColor: "rgba(59, 130, 246, 0.1)",
+                          border: "1px solid rgba(59, 130, 246, 0.2)",
+                          borderRadius: "6px",
+                          color: "#3b82f6",
+                          cursor: "pointer",
+                        }}
+                        title="Edit"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        onClick={() => handleDelete(g.id)}
+                        style={{
+                          padding: "0.5rem",
+                          backgroundColor: "rgba(239, 68, 68, 0.1)",
+                          border: "1px solid rgba(239, 68, 68, 0.2)",
+                          borderRadius: "6px",
+                          color: "#ef4444",
+                          cursor: "pointer",
+                        }}
+                        title="Delete"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+
+              {galleries.length === 0 && (
+                <tr>
+                  <td
+                    colSpan="5"
+                    style={{
+                      padding: "2rem",
+                      textAlign: "center",
+                      color: "#94a3b8",
+                    }}
+                  >
+                    Belum ada data galeri kegiatan yang diunggah.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
