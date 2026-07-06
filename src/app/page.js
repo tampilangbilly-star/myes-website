@@ -41,11 +41,13 @@ async function getData() {
     }),
     prisma.setting.findMany({ where: { group: "contact" } }),
   ]);
+
   const socials = {};
   socialItems.forEach((s) => {
     socials[s.key.replace("social_", "")] = s.valueEn;
   });
   const mainBg = mainBgSetting?.valueEn;
+
   return { slides, programs, news, socials, mainBg, speakers, contactItems };
 }
 
@@ -54,16 +56,19 @@ export default async function Home() {
   const lang = cookieStore.get("lang")?.value || "en";
   const { slides, programs, news, socials, mainBg, speakers, contactItems } =
     await getData();
+
   const t = (item, field) => {
     if (!item) return "";
     return lang === "id"
       ? item[field + "Id"] || item[field + "En"] || ""
       : item[field + "En"] || "";
   };
+
   const contactData = {};
   contactItems.forEach((i) => {
     contactData[i.key] = lang === "id" ? i.valueId || i.valueEn : i.valueEn;
   });
+
   const rawPhone = contactData.contact_phone || "+62 822 9065 8336";
   const cleanPhone = rawPhone.replace(/\D/g, "");
   const displayEmail = contactData.contact_email || "myesworship@gmail.com";
@@ -71,6 +76,7 @@ export default async function Home() {
   return (
     <>
       <Navbar lang={lang} />
+
       <style
         dangerouslySetInnerHTML={{
           __html: `
@@ -87,6 +93,7 @@ export default async function Home() {
           transform: translateY(-50%);
           z-index: 40;
         }
+
         .cta-button {
           display: inline-block;
           background: #3b82f6;
@@ -104,6 +111,7 @@ export default async function Home() {
           transform: translateY(-3px);
           box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6);
         }
+
         .viva-social {
           display: flex;
           align-items: center;
@@ -118,6 +126,7 @@ export default async function Home() {
           color: #fff;
           transform: translateY(-2px);
         }
+
         .modern-social-title {
           margin: 0;
           font-size: 1.4rem;
@@ -127,6 +136,7 @@ export default async function Home() {
           display: flex;
           align-items: center;
         }
+
         .bounce-right-arrow {
           animation: bounceRight 1.5s infinite;
           color: #3b82f6;
@@ -137,11 +147,13 @@ export default async function Home() {
           padding: 6px;
           border-radius: 50%;
         }
+
         @keyframes bounceRight {
           0%, 20%, 50%, 80%, 100% { transform: translateX(0); }
           40% { transform: translateX(10px); }
           60% { transform: translateX(5px); }
         }
+
         /* --- KELAS CSS RESPONSIF BARU --- */
         .responsive-grid {
           display: grid;
@@ -170,13 +182,6 @@ export default async function Home() {
           padding-bottom: 6rem;
         }
 
-        /* PERBAIKAN BACKGROUND RESPONSIF */
-        .responsive-bg-fixed {
-          background-size: cover;
-          background-position: center;
-          background-attachment: fixed;
-        }
-
         @media (max-width: 992px) {
           .guest-speaker-overlay {
             position: relative;
@@ -193,25 +198,20 @@ export default async function Home() {
         
         @media (max-width: 768px) {
           .responsive-grid {
-            gap: 2.5rem;
+            gap: 2.5rem; /* Jarak antar elemen dikurangi di HP */
           }
           .news-title {
-            font-size: 2rem;
+            font-size: 2rem; /* Ukuran huruf dikecilkan di HP */
           }
           .location-title {
-            font-size: 1.8rem;
+            font-size: 1.8rem; /* Ukuran huruf dikecilkan di HP */
           }
           .section-padding {
             padding-top: 4rem;
             padding-bottom: 4rem;
           }
           .map-container {
-            height: 300px !important;
-          }
-          /* Matikan efek fixed di HP agar gambar tidak super zoom/terpotong */
-          .responsive-bg-fixed {
-            background-attachment: scroll !important;
-            background-position: center top !important;
+            height: 300px !important; /* Peta tidak terlalu panjang di HP */
           }
         }
       `,
@@ -220,7 +220,9 @@ export default async function Home() {
 
       <div className="hero-wrapper">
         <HolySpiritAmbient />
+
         <HeroSlider slides={slides} socials={socials} lang={lang} />
+
         {speakers && speakers.length > 0 && (
           <div className="guest-speaker-overlay">
             <GuestSpeakerSlider speakers={speakers} lang={lang} />
@@ -267,6 +269,7 @@ export default async function Home() {
               </svg>
             </div>
           </div>
+
           <div
             style={{
               display: "flex",
@@ -334,9 +337,13 @@ export default async function Home() {
 
       {programs.length > 0 && (
         <section
-          className="section responsive-bg-fixed"
+          className="section"
           style={{
+            // KODE BARU (BENAR)
             backgroundImage: `linear-gradient(rgba(5, 11, 20, 0.85), rgba(5, 11, 20, 0.95)), url('${mainBg || ""}')`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundAttachment: "fixed",
           }}
         >
           <div className="container">
@@ -387,7 +394,7 @@ export default async function Home() {
       )}
 
       {/* ======================================================== */}
-      {/* 2. SEKSI BERITA TERBARU (DENGAN AMBIENT GLOW EFFECT)       */}
+      {/* 2. SEKSI BERITA TERBARU (DENGAN AMBIENT GLOW EFFECT)      */}
       {/* ======================================================== */}
       {news.length > 0 && (
         <section
@@ -400,6 +407,7 @@ export default async function Home() {
             borderBottom: "1px solid rgba(255,255,255,0.02)",
           }}
         >
+          {/* Efek Kabut Cahaya Biru di Kiri */}
           <div
             style={{
               position: "absolute",
@@ -412,6 +420,8 @@ export default async function Home() {
               zIndex: 0,
             }}
           ></div>
+
+          {/* Efek Kabut Cahaya Jingga di Kanan Bawah */}
           <div
             style={{
               position: "absolute",
@@ -424,6 +434,7 @@ export default async function Home() {
               zIndex: 0,
             }}
           ></div>
+
           <div
             className="container"
             style={{
@@ -471,6 +482,7 @@ export default async function Home() {
                   {lang === "id" ? "Lihat Semua Berita" : "View All News"}
                 </Link>
               </div>
+
               <div>
                 <NewsHomeSlider items={news} lang={lang} />
               </div>
@@ -480,9 +492,12 @@ export default async function Home() {
       )}
 
       <section
-        className="section section-padding responsive-bg-fixed"
+        className="section section-padding"
         style={{
           backgroundImage: `linear-gradient(rgba(5, 11, 20, 0.85), rgba(5, 11, 20, 0.95)), url('home.png')`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundAttachment: "fixed",
           borderTop: "1px solid rgba(255,255,255,0.05)",
         }}
       >
@@ -496,6 +511,7 @@ export default async function Home() {
             </div>
             <h2>{lang === "id" ? "Lokasi Kami" : "Our Location"}</h2>
           </div>
+
           <div className="responsive-grid">
             <div
               className="map-container"
@@ -518,6 +534,7 @@ export default async function Home() {
                 referrerPolicy="strict-origin-when-cross-origin"
               ></iframe>
             </div>
+
             <div className="location-info">
               <h3 className="location-title">M-YES Basecamp</h3>
               <div
@@ -548,6 +565,7 @@ export default async function Home() {
                 {contactData.contact_address ||
                   "Lorong Tuminting 1 A, Jalan Sea Malalayang 1 Barat, Manado, Sulawesi Utara, Indonesia"}
               </p>
+
               <div
                 style={{
                   display: "flex",
@@ -610,6 +628,7 @@ export default async function Home() {
                     </a>
                   </div>
                 </div>
+
                 <div
                   style={{
                     display: "flex",
