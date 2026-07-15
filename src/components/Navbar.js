@@ -39,7 +39,11 @@ export default function Navbar({ lang = "en" }) {
           {/* Ganti kotak M-Y dengan tag img ini. 
             Pastikan src-nya sesuai dengan nama file di folder public Anda 
           */}
-          <img src="/icon1.png" alt="Logo M-YES" className="nav-logo-image" />
+          <img
+            src="/logo-myes.png"
+            alt="Logo M-YES"
+            className="nav-logo-image"
+          />
 
           <div className="nav-logo-text">
             M-YES<small>Manado Youth English Service</small>
