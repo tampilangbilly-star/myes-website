@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Playfair+Display:wght@500;600;700;800;900&family=Source+Sans+3:wght@300;400;500;600;700&display=swap");
 
 /* ─── DESIGN TOKENS ───────────────────────────────────────────────── */
 :root {
@@ -2676,5 +2676,404 @@ ul {
   .cancel-btn,
   .btn-submit {
     width: 100%;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   FINAL POLISH LAYER v2 — MOBILE / ANDROID PERFECTION
+   Lapisan ini diletakkan PALING BAWAH agar menjadi aturan final yang
+   memenangkan konflik antar media-query lama & menimpa inline-style
+   desktop yang membuat tampilan Android berantakan.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Fondasi anti-geser horizontal (penyebab utama layout "lari" di HP) ── */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img,
+video,
+iframe {
+  max-width: 100%;
+}
+
+/* Area aman untuk HP dengan notch / gesture bar */
+body {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* ── 2. Tipografi fluid & konsisten di semua perangkat ── */
+h1 {
+  font-size: clamp(2rem, 5vw + 0.5rem, 4rem);
+}
+h2 {
+  font-size: clamp(1.6rem, 3.5vw + 0.4rem, 2.6rem);
+}
+h3 {
+  font-size: clamp(1.2rem, 2vw + 0.4rem, 1.6rem);
+}
+
+.section-header h2 {
+  font-size: clamp(1.7rem, 4vw, 2.8rem);
+}
+
+/* ── 3. Hero Slider baru (kelas hs-*) ── */
+.hs-slider {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  background-color: #030812;
+}
+
+.hs-slide {
+  position: absolute;
+  inset: 0;
+  transition: opacity 1.2s ease-in-out;
+}
+
+.hs-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  transition: transform 8s ease-out;
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.hs-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    to right,
+    rgba(3, 8, 18, 0.95) 0%,
+    rgba(3, 8, 18, 0.7) 40%,
+    rgba(3, 8, 18, 0.3) 100%
+  );
+}
+
+.hs-content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  min-height: 100svh;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 96px 2rem 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4rem;
+}
+
+.hs-text {
+  flex: 1;
+  max-width: 600px;
+}
+
+.hs-overline {
+  color: var(--accent-gold);
+  letter-spacing: 4px;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  margin-bottom: 1.2rem;
+  font-family: "DM Sans", sans-serif;
+  font-weight: 600;
+  animation: fadeInUp 1s ease forwards;
+}
+
+.hs-title {
+  font-size: clamp(2rem, 4.5vw + 0.5rem, 4rem);
+  color: #fff;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+  animation: fadeInUp 1.2s ease forwards;
+  line-height: 1.15;
+}
+
+.hs-desc {
+  color: var(--text-secondary);
+  font-size: clamp(0.98rem, 1.5vw, 1.1rem);
+  line-height: 1.8;
+  margin-bottom: 2.2rem;
+  animation: fadeInUp 1.4s ease forwards;
+}
+
+.hs-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 14px 36px;
+  background: var(--accent-gold);
+  color: #fff;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    background 0.3s ease;
+  box-shadow: 0 8px 25px var(--accent-gold-glow);
+  animation: fadeInUp 1.6s ease forwards;
+  touch-action: manipulation;
+}
+
+.hs-btn:hover {
+  background: #2563eb;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px var(--accent-gold-glow);
+}
+
+.hs-image {
+  flex: 0 0 auto;
+  max-width: 42%;
+  animation: fadeInUp 1.5s ease forwards;
+}
+
+.hs-image img {
+  width: 100%;
+  max-height: 500px;
+  object-fit: cover;
+  border-radius: 16px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transform: rotate(-2deg);
+  transition: transform 0.5s ease;
+}
+
+.hs-image img:hover {
+  transform: rotate(0deg) scale(1.02);
+}
+
+/* Tablet: hero jadi kolom, teks di atas gambar */
+@media (max-width: 992px) {
+  .hs-content {
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    gap: 2rem;
+    padding: 100px 1.5rem 3rem;
+  }
+
+  .hs-overlay {
+    background: linear-gradient(
+      to bottom,
+      rgba(3, 8, 18, 0.92) 0%,
+      rgba(3, 8, 18, 0.65) 55%,
+      rgba(3, 8, 18, 0.85) 100%
+    );
+  }
+
+  .hs-text {
+    max-width: 640px;
+  }
+
+  .hs-desc {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 520px;
+  }
+
+  .hs-image {
+    max-width: min(380px, 78vw);
+  }
+
+  .hs-image img {
+    max-height: 320px;
+    transform: rotate(0deg);
+  }
+}
+
+/* HP: lebih ringkas & rapi */
+@media (max-width: 600px) {
+  .hs-content {
+    padding: 92px 1.25rem 2.5rem;
+    gap: 1.5rem;
+  }
+
+  .hs-overline {
+    letter-spacing: 3px;
+    font-size: 0.75rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .hs-title {
+    margin-bottom: 1rem;
+  }
+
+  .hs-btn {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .hs-image img {
+    max-height: 240px;
+  }
+}
+
+/* ── 4. Kartu Guest Speaker: tidak lagi overflow di HP sempit ── */
+.speaker-glass-card {
+  width: min(360px, calc(100vw - 2.5rem)) !important;
+}
+
+@media (max-width: 992px) {
+  .guest-speaker-overlay {
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+    transform: none !important;
+    margin: -70px auto 2.5rem auto !important;
+    display: flex;
+    justify-content: center;
+    padding: 0 1rem;
+    z-index: 40;
+  }
+}
+
+@media (max-width: 600px) {
+  .speaker-glass-card {
+    padding: 1rem 1.1rem !important;
+  }
+}
+
+/* ── 5. Header halaman (About, News, Mission, dll.):
+       menimpa inline font-size 4.5rem yang kebesaran di HP ── */
+.page-header h1 {
+  font-size: clamp(2.1rem, 6.5vw + 0.5rem, 4.5rem) !important;
+  line-height: 1.12 !important;
+  overflow-wrap: break-word;
+}
+
+.page-header-inner {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+/* ── 6. Perbaikan khusus Android:
+       background-attachment fixed menyebabkan patah-patah / gambar zoom
+       aneh di Chrome Android — matikan paksa termasuk yang inline ── */
+@media (max-width: 1024px) {
+  section,
+  footer,
+  .section,
+  .hero-wrapper {
+    background-attachment: scroll !important;
+  }
+}
+
+/* ── 7. Judul & spacing seksi beranda di HP ── */
+@media (max-width: 768px) {
+  .news-title {
+    font-size: clamp(1.7rem, 6vw, 2rem) !important;
+  }
+
+  .location-title {
+    font-size: clamp(1.5rem, 5.5vw, 1.8rem) !important;
+  }
+
+  .modern-social-title {
+    font-size: 1.15rem !important;
+  }
+
+  .viva-social {
+    font-size: 0.95rem !important;
+  }
+
+  .map-container {
+    height: 300px !important;
+  }
+
+  .responsive-grid {
+    gap: 2rem !important;
+  }
+
+  .section-padding {
+    padding-top: 3.5rem !important;
+    padding-bottom: 3.5rem !important;
+  }
+}
+
+/* ── 8. Sentuhan nyaman: semua tombol & link penting mudah di-tap ── */
+.cta-button,
+.slide-btn,
+.hs-btn,
+.btn-submit,
+.tab-btn,
+.lang-btn,
+.hamburger {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hamburger {
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── 9. Navbar di HP: logo & kontrol tetap proporsional ── */
+@media (max-width: 600px) {
+  .nav-inner {
+    padding: 0 0.9rem !important;
+    height: 64px;
+  }
+
+  .nav-logo-image {
+    height: 38px;
+  }
+
+  .nav-logo-text {
+    font-size: 0.95rem;
+  }
+
+  .nav-links {
+    top: 0;
+  }
+
+  .lang-toggle {
+    margin-left: 0.25rem;
+  }
+}
+
+/* ── 10. Footer & seksi gelap: teks tak menempel tepi layar ── */
+@media (max-width: 600px) {
+  footer .container,
+  footer > div {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+}
+
+/* ── 11. Hormati preferensi aksesibilitas pengguna ── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

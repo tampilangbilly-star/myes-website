@@ -60,7 +60,7 @@ export default function GuestSpeakerSlider({ speakers, lang }) {
         border: "1px solid rgba(255, 255, 255, 0.15)",
         borderRadius: "20px",
         padding: "1.2rem 1.5rem", // Padding atas-bawah sedikit dikurangi agar lebih proporsional
-        width: "360px",
+        width: "min(360px, calc(100vw - 2.5rem))",
         boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
         color: "white",
         transform: cardTransform,
@@ -112,7 +112,7 @@ export default function GuestSpeakerSlider({ speakers, lang }) {
       <div
         style={{
           width: "100%",
-          height: "280px", // KUNCI: Gambar dibesarkan kembali agar porsinya dominan di dalam kartu
+          height: "clamp(210px, 60vw, 280px)", // KUNCI: Tinggi foto kini fluid — dominan di desktop, pas di layar HP
           borderRadius: "12px",
           overflow: "hidden",
           marginBottom: "1rem",
