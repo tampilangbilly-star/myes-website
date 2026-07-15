@@ -186,7 +186,7 @@ export default async function AboutPage() {
               </h2>
               <div
                 style={{
-                  maxWidth: "900px",
+                  maxWidth: "1200px",
                   margin: "0 auto",
                   display: "flex",
                   flexDirection: "column",
