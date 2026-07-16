@@ -12,24 +12,6 @@ export default async function AboutPage() {
     <>
       <Navbar lang={lang} />
 
-      {/* --- BACKGROUND GAMBAR FULL PAGE (RESPONSIF MOBILE & DESKTOP) --- */}
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100vw",
-          height: "100vh",
-          /* GANTI 'bg-about.jpg' DI BAWAH INI DENGAN NAMA FILE FOTO ANDA */
-          backgroundImage:
-            "linear-gradient(rgba(2, 6, 23, 0.75), rgba(2, 6, 23, 0.85)), url('/bg-about.jpeg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          zIndex: -2,
-        }}
-      />
-
       {/* CSS KHUSUS HALAMAN ABOUT — LAYOUT BARU */}
       <style
         dangerouslySetInnerHTML={{
@@ -76,11 +58,6 @@ export default async function AboutPage() {
         .vm-card {
           padding: clamp(1.75rem, 5vw, 2.75rem);
           overflow: hidden;
-          position: relative;
-          background: rgba(15, 26, 46, 0.6); /* Tambahan agar card menonjol dari background foto */
-          backdrop-filter: blur(8px);
-          border-radius: 20px;
-          border: 1px solid rgba(148, 178, 224, 0.12);
         }
         .vm-card::before {
           content: '';
@@ -93,7 +70,7 @@ export default async function AboutPage() {
           background: linear-gradient(90deg, #1d4ed8, #60a5fa);
         }
         .vm-card.goldline::before {
-          background: linear-gradient(90deg, #eab308, #fef08a);
+          background: linear-gradient(90deg, var(--gold), var(--gold-light));
         }
         .vm-icon {
           width: 56px;
@@ -143,7 +120,7 @@ export default async function AboutPage() {
           width: 12px;
           height: 2px;
           border-radius: 99px;
-          background: linear-gradient(90deg, #eab308, #fef08a);
+          background: linear-gradient(90deg, var(--gold), var(--gold-light));
         }
 
         /* Nilai Inti: strip horizontal dengan pemisah cahaya */
@@ -154,7 +131,6 @@ export default async function AboutPage() {
           border-radius: 20px;
           overflow: hidden;
           background: linear-gradient(180deg, rgba(15, 26, 46, 0.7), rgba(7, 14, 27, 0.9));
-          backdrop-filter: blur(8px);
         }
         .value-cell {
           text-align: center;
@@ -199,10 +175,6 @@ export default async function AboutPage() {
           .story-panel {
             grid-template-columns: 1fr;
             text-align: center;
-            background: rgba(15, 26, 46, 0.6);
-            backdrop-filter: blur(8px);
-            border-radius: 20px;
-            border: 1px solid rgba(148, 178, 224, 0.12);
           }
           .story-icon { margin: 0 auto; }
           .value-cell + .value-cell::before {
@@ -216,38 +188,19 @@ export default async function AboutPage() {
       />
 
       {/* 1. PAGE HEADER EDITORIAL BARU */}
-      <header
-        className="ph2"
-        style={{
-          position: "relative",
-          zIndex: 1,
-          paddingTop: "8rem",
-          paddingBottom: "4rem",
-          textAlign: "center",
-        }}
-      >
+      <header className="ph2">
         <div className="ph2-inner">
-          <span
-            className="ph2-watermark"
-            aria-hidden="true"
-            style={{ opacity: 0.05 }}
-          >
+          <span className="ph2-watermark" aria-hidden="true">
             M-YES
           </span>
           <div className="ph2-overline">
             <span className="live-dot" />
             {lang === "id" ? "Kenali Kami Lebih Dekat" : "Get To Know Us"}
           </div>
-          <h1
-            className="ph2-title"
-            style={{ color: "#fff", fontSize: "3rem", margin: "1rem 0" }}
-          >
+          <h1 className="ph2-title">
             About <em>M-YES</em>
           </h1>
-          <p
-            className="ph2-sub"
-            style={{ color: "#cbd5e1", maxWidth: "600px", margin: "0 auto" }}
-          >
+          <p className="ph2-sub">
             {lang === "id"
               ? "Komunitas pemuda Manado yang bertumbuh dalam iman dan bahasa Inggris."
               : "A Manado youth community growing in faith and English."}
@@ -262,12 +215,7 @@ export default async function AboutPage() {
       {/* 2. MAIN CONTENT */}
       <section
         className="section"
-        style={{
-          position: "relative",
-          overflow: "hidden",
-          zIndex: 1,
-          paddingBottom: "4rem",
-        }}
+        style={{ position: "relative", overflow: "hidden" }}
       >
         {/* Background glow effects tipis di area konten */}
         <div
@@ -278,8 +226,8 @@ export default async function AboutPage() {
             width: "40%",
             height: "60%",
             background:
-              "radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 70%)",
-            zIndex: -1,
+              "radial-gradient(circle, rgba(59,130,246,0.05) 0%, transparent 70%)",
+            zIndex: 0,
           }}
         />
         <div
@@ -290,33 +238,20 @@ export default async function AboutPage() {
             width: "40%",
             height: "60%",
             background:
-              "radial-gradient(circle, rgba(234,179,8,0.08) 0%, transparent 70%)",
-            zIndex: -1,
+              "radial-gradient(circle, rgba(234,179,8,0.03) 0%, transparent 70%)",
+            zIndex: 0,
           }}
         />
 
         <div
           className="container"
-          style={{
-            position: "relative",
-            zIndex: 1,
-            maxWidth: "1200px",
-            margin: "0 auto",
-            padding: "0 1.5rem",
-          }}
+          style={{ position: "relative", zIndex: 1, maxWidth: "1200px" }}
         >
           {/* Cerita Kami */}
           <div className="panel story-panel">
             <div className="story-icon">📖</div>
             <div>
-              <div
-                className="panel-kicker"
-                style={{
-                  color: "#60a5fa",
-                  fontWeight: "bold",
-                  marginBottom: "0.5rem",
-                }}
-              >
+              <div className="panel-kicker">
                 {lang === "id" ? "Awal Mula" : "Where It Began"}
               </div>
               <h2>{lang === "id" ? "Cerita Kami" : "Our Story"}</h2>
@@ -345,14 +280,7 @@ export default async function AboutPage() {
           <div className="vm-grid">
             <div className="panel vm-card blue">
               <div className="vm-icon">👁️</div>
-              <div
-                className="panel-kicker"
-                style={{
-                  color: "#60a5fa",
-                  fontWeight: "bold",
-                  marginBottom: "0.5rem",
-                }}
-              >
+              <div className="panel-kicker">
                 {lang === "id" ? "Arah Kami" : "Our Direction"}
               </div>
               <h3>{lang === "id" ? "Visi" : "Vision"}</h3>
@@ -365,14 +293,7 @@ export default async function AboutPage() {
 
             <div className="panel panel--gold vm-card goldline">
               <div className="vm-icon">🎯</div>
-              <div
-                className="panel-kicker gold"
-                style={{
-                  color: "#eab308",
-                  fontWeight: "bold",
-                  marginBottom: "0.5rem",
-                }}
-              >
+              <div className="panel-kicker gold">
                 {lang === "id" ? "Langkah Kami" : "Our Steps"}
               </div>
               <h3>{lang === "id" ? "Misi" : "Mission"}</h3>
@@ -406,43 +327,16 @@ export default async function AboutPage() {
       {/* 3. CORE VALUES SECTION */}
       <section
         className="section section-alt"
-        style={{
-          position: "relative",
-          zIndex: 1,
-          padding: "4rem 0",
-          background: "transparent",
-        }}
+        style={{ backgroundColor: "#020617" }}
       >
-        <div
-          className="container"
-          style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 1.5rem" }}
-        >
-          <div
-            className="vh-heading"
-            style={{ textAlign: "center", marginBottom: "3rem" }}
-          >
+        <div className="container" style={{ maxWidth: "1200px" }}>
+          <div className="vh-heading">
             <span className="bar" />
             <div>
-              <span
-                className="overline"
-                style={{
-                  color: "#eab308",
-                  fontWeight: "bold",
-                  textTransform: "uppercase",
-                  letterSpacing: "1px",
-                }}
-              >
+              <span className="overline" style={{ color: "#eab308" }}>
                 {lang === "id" ? "Prinsip Kami" : "Our Principles"}
               </span>
-              <h2
-                style={{
-                  color: "#fff",
-                  fontSize: "2.5rem",
-                  marginTop: "0.5rem",
-                }}
-              >
-                {lang === "id" ? "Nilai-Nilai Inti" : "Core Values"}
-              </h2>
+              <h2>{lang === "id" ? "Nilai-Nilai Inti" : "Core Values"}</h2>
             </div>
           </div>
 
@@ -480,7 +374,6 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      <Footer />
       <SocialFloat />
     </>
   );
