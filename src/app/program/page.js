@@ -20,107 +20,221 @@ export default async function ProgramPage() {
       <style
         dangerouslySetInnerHTML={{
           __html: `
-        .program-card {
-          position: relative;
-          overflow: hidden;
-          transition: transform 0.4s ease;
+        .pg-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+          gap: clamp(1.25rem, 3vw, 2.25rem);
         }
 
-        /* Overlay yang muncul saat di-hover */
-        .program-overlay {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(5, 11, 20, 0.9);
+        .pg-card {
           display: flex;
           flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          padding: 2rem;
-          opacity: 0;
-          transition: opacity 0.4s ease;
-          text-align: center;
-          z-index: 2;
+          overflow: hidden;
         }
 
-        .program-card:hover .program-overlay {
-          opacity: 1;
+        .pg-media {
+          position: relative;
+          aspect-ratio: 16 / 10;
+          background: #030812;
+          overflow: hidden;
+        }
+        .pg-media img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .pg-card:hover .pg-media img {
+          transform: scale(1.06);
+        }
+        .pg-media .emoji-hero {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 4rem;
+          background:
+            radial-gradient(circle at 30% 20%, rgba(59, 130, 246, 0.18), transparent 60%),
+            radial-gradient(circle at 75% 85%, rgba(232, 163, 61, 0.1), transparent 55%);
+          filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.5));
+        }
+        /* Nomor program besar di pojok media */
+        .pg-index {
+          position: absolute;
+          top: 12px;
+          left: 14px;
+          z-index: 2;
+          font-family: "Playfair Display", serif;
+          font-size: 1rem;
+          font-weight: 700;
+          color: #fff;
+          background: rgba(3, 8, 18, 0.65);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          padding: 4px 12px;
+          border-radius: 99px;
+          letter-spacing: 1px;
+        }
+        .pg-media::after {
+          content: '';
+          position: absolute;
+          inset: auto 0 0 0;
+          height: 60%;
+          background: linear-gradient(to top, rgba(7, 14, 27, 0.95), transparent);
+        }
+
+        .pg-body {
+          padding: 1.5rem 1.5rem 1.25rem;
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+        }
+        .pg-body h3 {
+          font-size: 1.35rem;
+          color: #fff;
+          margin: 0 0 0.6rem;
+        }
+        .pg-body .pg-excerpt {
+          color: #94a3b8;
+          font-size: 0.95rem;
+          line-height: 1.7;
+          margin: 0;
+        }
+
+        /* ====== FOOTER AKSI KARTU ======
+           Deskripsi lengkap + tombol Join.
+           Di layar sentuh (Android/iOS) SELALU terlihat — bukan hover. */
+        .program-overlay {
+          padding: 0 1.5rem 1.5rem;
+          display: flex;
+          flex-direction: column;
+          gap: 0.9rem;
+          text-align: left;
+        }
+        .program-overlay .full-desc {
+          color: #cbd5e1;
+          font-size: 0.92rem;
+          line-height: 1.7;
+          margin: 0;
+          border-top: 1px dashed rgba(148, 178, 224, 0.2);
+          padding-top: 0.9rem;
         }
 
         .join-btn {
-          margin-top: 1rem;
-          padding: 0.8rem 1.5rem;
-          background: #3b82f6;
+          align-self: flex-start;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          min-height: 46px;
+          padding: 0.7rem 1.6rem;
+          background: linear-gradient(135deg, #1d4ed8, #3b82f6);
           color: white;
           border-radius: 50px;
           text-decoration: none;
           font-weight: bold;
           font-size: 0.9rem;
+          box-shadow: 0 8px 22px rgba(59, 130, 246, 0.4);
+          transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                      box-shadow 0.35s ease;
+        }
+        .join-btn::after {
+          content: '→';
+          transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .join-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 14px 32px rgba(59, 130, 246, 0.55);
+        }
+        .join-btn:hover::after {
+          transform: translateX(4px);
+        }
+
+        /* Di perangkat dengan hover (desktop): deskripsi lengkap
+           muncul mengembang saat kursor menyentuh kartu */
+        @media (hover: hover) and (pointer: fine) {
+          .program-overlay .full-desc {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            padding-top: 0;
+            border-top-color: transparent;
+            transition: max-height 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+                        opacity 0.4s ease,
+                        padding-top 0.4s ease;
+          }
+          .pg-card:hover .program-overlay .full-desc {
+            max-height: 300px;
+            opacity: 1;
+            padding-top: 0.9rem;
+            border-top-color: rgba(148, 178, 224, 0.2);
+          }
         }
       `,
         }}
       />
 
-      <header className="page-header">
-        <div className="page-header-inner">
-          <div className="overline">
+      <header className="ph2">
+        <div className="ph2-inner">
+          <span className="ph2-watermark" aria-hidden="true">
+            Programs
+          </span>
+          <div className="ph2-overline">
+            <span className="live-dot" />
             {lang === "id" ? "Apa Yang Kami Lakukan" : "What We Do"}
           </div>
-          <h1>{lang === "id" ? "Program Kami" : "Our Programs"}</h1>
+          <h1 className="ph2-title">
+            {lang === "id" ? (
+              <>
+                Program <em>Kami</em>
+              </>
+            ) : (
+              <>
+                Our <em>Programs</em>
+              </>
+            )}
+          </h1>
+          <div className="ph2-rule">
+            <i />
+            <i />
+          </div>
         </div>
       </header>
 
       <section className="section">
         <div className="container">
-          <div className="program-grid">
+          <div className="pg-grid">
             {items.map((p, i) => (
-              <div key={p.id} className="program-card">
-                {/* Overlay Interaktif */}
-                <div className="program-overlay">
-                  <p style={{ color: "#94a3b8", fontSize: "0.9rem" }}>
-                    {t(p, "description")}
+              <div key={p.id} className="panel pg-card">
+                {/* Media atas: foto full-bleed atau emoji hero */}
+                <div className="pg-media">
+                  <span className="pg-index">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  {p.image ? (
+                    <img src={`${p.image}`} alt="" />
+                  ) : (
+                    <span className="emoji-hero">{p.emoji}</span>
+                  )}
+                </div>
+
+                {/* Judul + cuplikan singkat */}
+                <div className="pg-body">
+                  <h3>{t(p, "title")}</h3>
+                  <p className="pg-excerpt">
+                    {t(p, "description").substring(0, 80)}...
                   </p>
+                </div>
+
+                {/* Deskripsi lengkap + tombol Join
+                    (selalu tampak di HP, mengembang saat hover di desktop) */}
+                <div className="program-overlay">
+                  <p className="full-desc">{t(p, "description")}</p>
                   <a
                     href="https://chat.whatsapp.com/Fialpt9jLrCL0oLagStRTc"
                     className="join-btn"
                   >
                     {lang === "id" ? "Gabung Program" : "Join Program"}
                   </a>
-                </div>
-
-                <div
-                  className="program-card-top"
-                  style={
-                    i % 2 === 1
-                      ? {
-                          background:
-                            "linear-gradient(90deg,var(--gold),var(--gold-light))",
-                        }
-                      : {}
-                  }
-                />
-                <div className="program-card-body">
-                  {p.image ? (
-                    <img
-                      src={`${p.image}`}
-                      style={{
-                        width: "100%",
-                        height: 140,
-                        objectFit: "cover",
-                        borderRadius: 8,
-                        marginBottom: "1rem",
-                      }}
-                      alt=""
-                    />
-                  ) : (
-                    <span className="emoji">{p.emoji}</span>
-                  )}
-                  <h3>{t(p, "title")}</h3>
-                  <p style={{ color: "#64748b" }}>
-                    {t(p, "description").substring(0, 80)}...
-                  </p>
                 </div>
               </div>
             ))}

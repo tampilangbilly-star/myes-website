@@ -27,109 +27,136 @@ export default async function ContactPage() {
         /* Grid untuk kartu info di atas */
         .contact-top-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-          gap: 1.5rem;
-          margin-bottom: 4rem; /* Jarak bawah kartu ke form diperkecil */
+          grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+          gap: clamp(1rem, 2.5vw, 1.5rem);
+          margin-bottom: clamp(2.5rem, 6vw, 4rem);
         }
 
-        /* Desain kartu info */
+        /* Desain kartu info generasi baru */
         .info-card {
-          background: #050b14;
-          border: 1px solid rgba(255,255,255,0.05);
-          border-radius: 16px;
-          padding: 2.5rem 1.5rem;
+          padding: clamp(2rem, 5vw, 2.5rem) 1.5rem;
           text-align: center;
-          transition: all 0.4s ease;
           display: flex;
           flex-direction: column;
           align-items: center;
           text-decoration: none;
           color: inherit;
+          overflow: hidden;
         }
+        /* Tepi warna khas tiap kanal */
+        .info-card::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 22%; right: 22%;
+          height: 3px;
+          border-radius: 0 0 6px 6px;
+          background: var(--card-accent, linear-gradient(90deg, #1d4ed8, #60a5fa));
+        }
+        .info-card.ig    { --card-accent: linear-gradient(90deg, #f09433, #d6249f); }
+        .info-card.mail  { --card-accent: linear-gradient(90deg, #EA4335, #FBBC04); }
+        .info-card.wa    { --card-accent: linear-gradient(90deg, #128C7E, #25D366); }
+        .info-card.map   { --card-accent: linear-gradient(90deg, #ef4444, #f97316); }
 
-        /* Efek saat kursor diarahkan ke kartu */
-        .info-card:hover {
-          transform: translateY(-10px);
-          border-color: #3b82f6;
-          box-shadow: 0 15px 30px -5px rgba(59, 130, 246, 0.2);
+        .info-card h4 {
+          font-family: "Playfair Display", serif;
+          font-size: 1.3rem;
+          color: #fff;
+          margin: 0 0 0.5rem;
+        }
+        .info-card p {
+          color: #94a3b8;
+          font-size: 0.95rem;
+          line-height: 1.6;
+          margin: 0;
+          word-break: break-word;
         }
 
         /* Lingkaran pembungkus ikon */
         .info-icon-wrapper {
           width: 70px;
           height: 70px;
-          border-radius: 50%;
-          background: rgba(255,255,255,0.03);
+          border-radius: 20px;
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(148, 178, 224, 0.15);
           display: flex;
           align-items: center;
           justify-content: center;
           margin-bottom: 1.5rem;
-          transition: all 0.4s ease;
+          transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+                      background 0.4s ease;
         }
 
         .info-card:hover .info-icon-wrapper {
           background: rgba(59, 130, 246, 0.1);
-          transform: scale(1.15);
+          transform: translateY(-4px) scale(1.08);
         }
 
         /* Animasi Panah Memantul (Bounce) */
         .bounce-arrow {
           animation: bounce 2s infinite;
-          margin: 0 auto 1.5rem auto; /* Jarak panah dirapatkan */
-          width: 40px;
-          height: 40px;
+          margin: 0 auto 1.5rem auto;
+          width: 44px;
+          height: 44px;
           display: flex;
           align-items: center;
           justify-content: center;
           background: rgba(59, 130, 246, 0.1);
+          border: 1px solid rgba(96, 165, 250, 0.3);
           border-radius: 50%;
           color: #3b82f6;
         }
 
         @keyframes bounce {
           0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-          40% { transform: translateY(-10px); } /* Pantulan tidak terlalu tinggi */
+          40% { transform: translateY(-10px); }
           60% { transform: translateY(-5px); }
         }
 
         /* Bungkus formulir kontak agar full width elegan */
         .form-wrapper {
-          background: #050b14;
-          border: 1px solid rgba(255,255,255,0.05);
-          border-radius: 20px;
-          padding: 3.5rem;
+          padding: clamp(1.75rem, 6vw, 3.5rem);
           width: 100%;
-          box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
         }
-
-        @media (max-width: 768px) {
-          .form-wrapper { padding: 2rem 1.5rem; }
+        .form-wrapper::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0; right: 0;
+          height: 3px;
+          border-radius: 20px 20px 0 0;
+          background: linear-gradient(90deg, #1d4ed8, #60a5fa 55%, var(--gold));
         }
       `,
         }}
       />
 
-      {/* KUNCI: Menambahkan style inline untuk memaksa jarak atas mengecil */}
-      <header
-        className="page-header"
-        style={{
-          paddingTop: "7rem",
-          paddingBottom: "1.5rem",
-          minHeight: "auto",
-        }}
-      >
-        <div className="page-header-inner">
-          <div className="overline">
+      <header className="ph2">
+        <div className="ph2-inner">
+          <span className="ph2-watermark" aria-hidden="true">
+            Contact
+          </span>
+          <div className="ph2-overline">
+            <span className="live-dot" />
             {lang === "id" ? "Hubungi Kami" : "Get In Touch"}
           </div>
-          <h1 style={{ marginBottom: "0.5rem" }}>
-            {lang === "id" ? "Hubungi Kami" : "Contact Us"}
+          <h1 className="ph2-title">
+            {lang === "id" ? (
+              <>
+                Hubungi <em>Kami</em>
+              </>
+            ) : (
+              <>
+                Contact <em>Us</em>
+              </>
+            )}
           </h1>
+          <div className="ph2-rule">
+            <i />
+            <i />
+          </div>
         </div>
       </header>
 
-      {/* KUNCI: Mengurangi padding top pada section ini */}
-      <section className="section" style={{ paddingTop: "1rem" }}>
+      <section className="section">
         <div className="container" style={{ maxWidth: "1200px" }}>
           {/* BAGIAN ANIMASI PANAH & TEKS PETUNJUK */}
           <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
@@ -167,7 +194,7 @@ export default async function ContactPage() {
             {/* 1. INSTAGRAM */}
             <a
               href="https://www.instagram.com/myes_worship?igsh=MW5sa211OHN6eTJodg=="
-              className="info-card"
+              className="panel info-card ig"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -192,31 +219,14 @@ export default async function ContactPage() {
                   />
                 </svg>
               </div>
-              <h4
-                style={{
-                  fontSize: "1.3rem",
-                  color: "#fff",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                Instagram
-              </h4>
-              <p
-                style={{
-                  color: "#94a3b8",
-                  fontSize: "0.95rem",
-                  lineHeight: "1.6",
-                  margin: 0,
-                }}
-              >
-                @myes_worship
-              </p>
+              <h4>Instagram</h4>
+              <p>@myes_worship</p>
             </a>
 
             {/* 2. EMAIL */}
             <a
               href={`mailto:${s.contact_email || "myesworship@gmail.com"}`}
-              className="info-card"
+              className="panel info-card mail"
             >
               <div className="info-icon-wrapper">
                 <svg
@@ -243,25 +253,8 @@ export default async function ContactPage() {
                   />
                 </svg>
               </div>
-              <h4
-                style={{
-                  fontSize: "1.3rem",
-                  color: "#fff",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                Email
-              </h4>
-              <p
-                style={{
-                  color: "#94a3b8",
-                  fontSize: "0.95rem",
-                  lineHeight: "1.6",
-                  margin: 0,
-                }}
-              >
-                {s.contact_email || "myesworship@gmail.com"}
-              </p>
+              <h4>Email</h4>
+              <p>{s.contact_email || "myesworship@gmail.com"}</p>
             </a>
 
             {/* 3. WHATSAPP */}
@@ -269,7 +262,7 @@ export default async function ContactPage() {
               href={`https://wa.me/${cleanPhone}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="info-card"
+              className="panel info-card wa"
             >
               <div className="info-icon-wrapper">
                 <svg
@@ -282,25 +275,8 @@ export default async function ContactPage() {
                   <path d="M12.031 0C5.385 0 .004 5.38.004 12.02c0 2.124.551 4.195 1.6 6.015L.031 24l6.11-1.603a12.001 12.001 0 005.89 1.542h.005c6.643 0 12.025-5.381 12.025-12.022A12.016 12.016 0 0020.536 3.51 11.966 11.966 0 0012.031 0zM12.03 21.942h-.003a9.98 9.98 0 01-5.076-1.39l-.364-.216-3.774.99.999-3.68-.237-.377a9.957 9.957 0 01-1.523-5.305c0-5.498 4.475-9.972 9.981-9.972 2.664 0 5.168 1.039 7.051 2.924a9.927 9.927 0 012.918 7.054c-.002 5.498-4.477 9.972-9.972 9.972zm5.474-7.464c-.3-.15-1.774-.877-2.049-.978-.275-.101-.476-.15-.676.15-.2.301-.775.978-.95 1.178-.175.2-.35.226-.65.076-.3-.15-1.266-.466-2.411-1.488-.891-.794-1.493-1.775-1.668-2.076-.175-.301-.019-.464.131-.614.135-.135.3-.35.45-.526.15-.175.2-.3.3-.5s.05-.376-.025-.526c-.075-.15-.676-1.627-.926-2.228-.243-.585-.49-.505-.676-.514-.175-.008-.376-.01-.576-.01-.2 0-.525.075-.8.376-.275.3-1.05 1.026-1.05 2.503s1.075 2.9 1.225 3.1c.15.2 2.115 3.228 5.123 4.529.717.31 1.275.494 1.71.633.72.23 1.375.197 1.892.12.585-.088 1.774-.726 2.024-1.428.25-.701.25-1.302.175-1.428-.075-.125-.275-.2-.575-.35z" />
                 </svg>
               </div>
-              <h4
-                style={{
-                  fontSize: "1.3rem",
-                  color: "#fff",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                WhatsApp
-              </h4>
-              <p
-                style={{
-                  color: "#94a3b8",
-                  fontSize: "0.95rem",
-                  lineHeight: "1.6",
-                  margin: 0,
-                }}
-              >
-                {s.contact_phone || "+62 822 9065 8336"}
-              </p>
+              <h4>WhatsApp</h4>
+              <p>{s.contact_phone || "+62 822 9065 8336"}</p>
             </a>
 
             {/* 4. LOKASI */}
@@ -308,7 +284,7 @@ export default async function ContactPage() {
               href="https://maps.app.goo.gl/gqEXDHvSLFkn5LUc6"
               target="_blank"
               rel="noopener noreferrer"
-              className="info-card"
+              className="panel info-card map"
             >
               <div className="info-icon-wrapper">
                 <svg
@@ -321,23 +297,8 @@ export default async function ContactPage() {
                   <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
                 </svg>
               </div>
-              <h4
-                style={{
-                  fontSize: "1.3rem",
-                  color: "#fff",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                {lang === "id" ? "Lokasi" : "Location"}
-              </h4>
-              <p
-                style={{
-                  color: "#94a3b8",
-                  fontSize: "0.95rem",
-                  lineHeight: "1.6",
-                  margin: 0,
-                }}
-              >
+              <h4>{lang === "id" ? "Lokasi" : "Location"}</h4>
+              <p>
                 {s.contact_address ||
                   "Lorong Tuminting 1 A, Jalan Sea Malalayang 1 Barat, Manado"}
               </p>
@@ -350,7 +311,7 @@ export default async function ContactPage() {
           <div style={{ textAlign: "center", marginBottom: "3rem" }}>
             <h2
               style={{
-                fontSize: "2rem",
+                fontSize: "clamp(1.6rem, 1.2rem + 2vw, 2rem)",
                 color: "#fff",
                 fontWeight: "bold",
                 marginBottom: "0.5rem",
@@ -367,7 +328,7 @@ export default async function ContactPage() {
             </p>
           </div>
 
-          <div className="form-wrapper">
+          <div className="panel form-wrapper">
             <ContactForm lang={lang} />
           </div>
         </div>

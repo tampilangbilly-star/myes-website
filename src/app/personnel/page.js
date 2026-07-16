@@ -62,35 +62,38 @@ export default async function PersonnelPage() {
         dangerouslySetInnerHTML={{
           __html: `
         /* ==================== KELOMPOK & JUDUL ==================== */
-        .group-section { margin-bottom: 7rem; }
-        
+        .group-section { margin-bottom: clamp(4rem, 9vw, 7rem); }
+
         .group-title-wrapper {
-          text-align: center;
-          margin-bottom: 4rem;
-          position: relative;
+          display: flex;
+          align-items: center;
+          gap: 1.25rem;
+          margin-bottom: clamp(2.5rem, 6vw, 4rem);
+        }
+        .group-title-wrapper::before,
+        .group-title-wrapper::after {
+          content: '';
+          flex: 1;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(148, 178, 224, 0.3));
+        }
+        .group-title-wrapper::after {
+          background: linear-gradient(270deg, transparent, rgba(148, 178, 224, 0.3));
         }
 
         .group-title {
-          font-size: 2.2rem;
+          font-family: "Playfair Display", serif;
+          font-size: clamp(1.6rem, 1.2rem + 2vw, 2.2rem);
           color: #fff;
           font-weight: 800;
           text-transform: uppercase;
           letter-spacing: 3px;
-          display: inline-block;
-          position: relative;
-          padding-bottom: 1rem;
-        }
-
-        .group-title::after {
-          content: '';
-          position: absolute;
-          width: 60px;
-          height: 4px;
-          background: #3b82f6;
-          bottom: 0;
-          left: 50%;
-          transform: translateX(-50%);
-          border-radius: 2px;
+          margin: 0;
+          padding: 0.4rem 1.6rem;
+          border: 1px solid rgba(148, 178, 224, 0.18);
+          border-radius: 99px;
+          background: rgba(15, 26, 46, 0.6);
+          white-space: nowrap;
         }
 
         /* ==================== LAYOUT HIERARKI ==================== */
@@ -98,48 +101,47 @@ export default async function PersonnelPage() {
           display: flex;
           flex-wrap: wrap;
           justify-content: center;
-          gap: 3rem;
-          margin-bottom: 4rem;
+          gap: clamp(1.5rem, 4vw, 3rem);
+          margin-bottom: clamp(2.5rem, 5vw, 4rem);
         }
 
         .members-row {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-          gap: 2.5rem;
+          grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+          gap: clamp(1.25rem, 3vw, 2.5rem);
           max-width: 1100px;
           margin: 0 auto;
         }
 
-        /* ==================== KARTU PIMPINAN (KOTAK BESAR PORTRAIT) ==================== */
+        /* ==================== KARTU PIMPINAN (PORTRAIT PREMIUM) ==================== */
         .leader-card {
-          background: #050b14;
-          border: 1px solid rgba(255,255,255,0.05);
-          border-radius: 24px;
-          padding: 3rem 2rem;
+          padding: clamp(2rem, 5vw, 3rem) clamp(1.5rem, 4vw, 2rem);
           text-align: center;
-          transition: all 0.4s ease;
           width: 100%;
           max-width: 360px;
-          box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
-        .leader-card:hover {
-          transform: translateY(-8px);
-          border-color: rgba(59, 130, 246, 0.4);
-          box-shadow: 0 20px 40px -10px rgba(59, 130, 246, 0.2);
+        .leader-card::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 20%; right: 20%;
+          height: 3px;
+          border-radius: 0 0 6px 6px;
+          background: linear-gradient(90deg, #1d4ed8, #60a5fa);
         }
 
         .avatar-rect {
-          width: 200px; height: 260px;
+          width: min(200px, 60vw);
+          height: min(260px, 78vw);
           border-radius: 24px;
           padding: 4px;
-          background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(59, 130, 246, 0.1));
+          background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(232, 163, 61, 0.35));
           box-shadow: 0 0 25px rgba(59, 130, 246, 0.2);
           margin: 0 auto 1.5rem auto;
-          transition: all 0.4s ease;
+          transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
         }
         .leader-card:hover .avatar-rect {
           box-shadow: 0 0 35px rgba(59, 130, 246, 0.5);
-          transform: scale(1.05);
+          transform: scale(1.04);
         }
         .img-rect {
           width: 100%; height: 100%;
@@ -150,23 +152,16 @@ export default async function PersonnelPage() {
           background-color: #0f172a;
         }
 
-        /* ==================== KARTU ANGGOTA (BULAT LEBIH BESAR) ==================== */
+        /* ==================== KARTU ANGGOTA (BULAT) ==================== */
         .member-card {
-          background: rgba(5, 11, 20, 0.5);
-          border: 1px solid rgba(255,255,255,0.02);
-          border-radius: 24px;
-          padding: 3rem 1.5rem;
+          padding: clamp(2rem, 5vw, 3rem) 1.5rem;
           text-align: center;
-          transition: all 0.4s ease;
-        }
-        .member-card:hover {
-          background: #050b14;
-          transform: translateY(-5px);
-          border-color: rgba(255, 255, 255, 0.1);
+          background: linear-gradient(180deg, rgba(15, 26, 46, 0.5), rgba(7, 14, 27, 0.6));
         }
 
         .avatar-ring {
-          width: 180px; height: 180px; /* DIPERBESAR (sebelumnya 130px) */
+          width: min(180px, 52vw);
+          height: min(180px, 52vw);
           border-radius: 50%;
           padding: 4px;
           background: linear-gradient(135deg, rgba(148, 163, 184, 0.3), rgba(148, 163, 184, 0.05));
@@ -174,7 +169,7 @@ export default async function PersonnelPage() {
           transition: all 0.4s ease;
         }
         .member-card:hover .avatar-ring {
-          background: linear-gradient(135deg, rgba(59, 130, 246, 0.6), rgba(59, 130, 246, 0.1));
+          background: linear-gradient(135deg, rgba(59, 130, 246, 0.6), rgba(232, 163, 61, 0.25));
         }
         .img-circle {
           width: 100%; height: 100%;
@@ -188,13 +183,27 @@ export default async function PersonnelPage() {
         /* ==================== PUSAT PELAYANAN (YESUS) ==================== */
         .jesus-card {
           text-align: center;
-          margin: 0 auto 6rem auto;
+          margin: 0 auto clamp(3.5rem, 8vw, 6rem) auto;
           position: relative;
+          padding: 2rem 0;
+        }
+        /* Pancaran cahaya lembut di belakang */
+        .jesus-card::before {
+          content: '';
+          position: absolute;
+          top: 50%; left: 50%;
+          transform: translate(-50%, -50%);
+          width: min(520px, 90vw);
+          height: min(520px, 90vw);
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(255, 215, 0, 0.12) 0%, transparent 65%);
+          pointer-events: none;
         }
         .jesus-ring {
           position: relative;
           z-index: 1;
-          width: 260px; height: 260px;
+          width: min(260px, 68vw);
+          height: min(260px, 68vw);
           border-radius: 50%;
           padding: 5px;
           background: linear-gradient(135deg, #FFD700, #FDB931);
@@ -208,12 +217,27 @@ export default async function PersonnelPage() {
           object-position: top;
           border: 4px solid #050b14;
         }
+        /* Garis penghubung struktural ke bawah */
+        .jesus-card::after {
+          content: '';
+          position: absolute;
+          left: 50%;
+          bottom: calc(clamp(3.5rem, 8vw, 6rem) * -0.7);
+          transform: translateX(-50%);
+          width: 2px;
+          height: clamp(2rem, 5vw, 3.5rem);
+          background: linear-gradient(180deg, rgba(255, 215, 0, 0.5), transparent);
+        }
 
         /* ==================== TYPOGRAPHY ==================== */
-        .p-name { font-size: 1.4rem; color: #f8fafc; font-weight: 700; margin: 0 0 0.5rem 0; }
+        .p-name {
+          font-family: "Playfair Display", serif;
+          font-size: 1.4rem; color: #f8fafc; font-weight: 700;
+          margin: 0 0 0.5rem 0;
+        }
         .leader-name { font-size: 1.6rem; }
-        
-        .p-role { 
+
+        .p-role {
           color: #3b82f6; font-size: 0.9rem; font-weight: 700;
           text-transform: uppercase; letter-spacing: 1.5px; margin: 0;
         }
@@ -222,25 +246,41 @@ export default async function PersonnelPage() {
         }}
       />
 
-      <header className="page-header">
-        <div className="page-header-inner">
-          <div className="overline">
+      <header className="ph2">
+        <div className="ph2-inner">
+          <span className="ph2-watermark" aria-hidden="true">
+            Team
+          </span>
+          <div className="ph2-overline">
+            <span className="live-dot" />
             {lang === "id" ? "Tim Kami" : "Our Team"}
           </div>
-          <h1>
-            {lang === "id" ? "Personalia Organisasi" : "Organization Personnel"}
+          <h1 className="ph2-title">
+            {lang === "id" ? (
+              <>
+                Personalia <em>Organisasi</em>
+              </>
+            ) : (
+              <>
+                Organization <em>Personnel</em>
+              </>
+            )}
           </h1>
-          <p>
+          <p className="ph2-sub">
             {lang === "id"
               ? "Struktur pelayanan kami yang berpusat pada Kristus dan digerakkan oleh kasih."
               : "Our ministry structure, centered on Christ and driven by love."}
           </p>
+          <div className="ph2-rule">
+            <i />
+            <i />
+          </div>
         </div>
       </header>
 
       <section
         className="section"
-        style={{ minHeight: "60vh", padding: "4rem 1rem" }}
+        style={{ minHeight: "60vh", overflow: "hidden" }}
       >
         <div className="container">
           {/* 1. GAMBAR TUHAN YESUS (TOP CENTER) */}
@@ -252,7 +292,10 @@ export default async function PersonnelPage() {
                 className="jesus-img"
               />
             </div>
-            <h3 className="p-name leader-name" style={{ fontSize: "2.4rem" }}>
+            <h3
+              className="p-name leader-name"
+              style={{ fontSize: "clamp(1.8rem, 1.4rem + 2vw, 2.4rem)" }}
+            >
               Jesus Christ
             </h3>
             <p
@@ -276,7 +319,7 @@ export default async function PersonnelPage() {
               {pembina.leaders.length > 0 && (
                 <div className="leaders-row">
                   {pembina.leaders.map((p) => (
-                    <div key={p.id} className="leader-card">
+                    <div key={p.id} className="panel leader-card">
                       <div className="avatar-rect">
                         {p.photo ? (
                           <img
@@ -312,7 +355,7 @@ export default async function PersonnelPage() {
               {pembina.members.length > 0 && (
                 <div className="members-row">
                   {pembina.members.map((p) => (
-                    <div key={p.id} className="member-card">
+                    <div key={p.id} className="panel member-card">
                       <div className="avatar-ring">
                         {p.photo ? (
                           <img
@@ -356,7 +399,7 @@ export default async function PersonnelPage() {
               {pengurus.leaders.length > 0 && (
                 <div className="leaders-row">
                   {pengurus.leaders.map((p) => (
-                    <div key={p.id} className="leader-card">
+                    <div key={p.id} className="panel leader-card">
                       <div className="avatar-rect">
                         {p.photo ? (
                           <img
@@ -392,7 +435,7 @@ export default async function PersonnelPage() {
               {pengurus.members.length > 0 && (
                 <div className="members-row">
                   {pengurus.members.map((p) => (
-                    <div key={p.id} className="member-card">
+                    <div key={p.id} className="panel member-card">
                       <div className="avatar-ring">
                         {p.photo ? (
                           <img
@@ -433,7 +476,7 @@ export default async function PersonnelPage() {
               </div>
               <div className="members-row">
                 {lainnya.map((p) => (
-                  <div key={p.id} className="member-card">
+                  <div key={p.id} className="panel member-card">
                     <div className="avatar-ring">
                       {p.photo ? (
                         <img

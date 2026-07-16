@@ -23,28 +23,57 @@ export default async function ActivitiesPage() {
       <style
         dangerouslySetInnerHTML={{
           __html: `
+        /* ===== ALUR JUMAT (FRIDAY FLOW) ===== */
+        .friday-flow {
+          position: relative;
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+          gap: clamp(1.5rem, 4vw, 2.5rem);
+        }
+        /* Garis penghubung antar sesi di desktop */
+        @media (min-width: 761px) {
+          .friday-flow::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 45%;
+            right: 45%;
+            height: 2px;
+            background: linear-gradient(90deg, #3b82f6, var(--gold));
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
+            z-index: 3;
+          }
+        }
+
         .schedule-card {
           position: relative;
-          border: 1px solid rgba(255, 255, 255, 0.05);
           border-radius: 20px;
-          padding: 5rem 2rem;
+          padding: clamp(3rem, 7vw, 5rem) clamp(1.5rem, 4vw, 2rem);
           text-align: center;
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
           overflow: hidden;
           background-color: #050B14;
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                      box-shadow 0.45s ease, border-color 0.45s ease;
         }
         .schedule-card:hover {
-          transform: translateY(-10px);
+          transform: translateY(-8px);
+        }
+        .schedule-card.blue:hover {
           box-shadow: 0 20px 40px -10px rgba(59, 130, 246, 0.3);
           border-color: rgba(59, 130, 246, 0.4);
         }
-        
+        .schedule-card.goldcard:hover {
+          box-shadow: 0 20px 40px -10px rgba(232, 163, 61, 0.3);
+          border-color: rgba(232, 163, 61, 0.45);
+        }
+
         .card-bg-img {
           position: absolute;
           top: 0; left: 0; width: 100%; height: 100%;
           object-fit: cover;
           z-index: 0;
-          transition: transform 0.5s ease;
+          transition: transform 0.6s ease;
         }
         .schedule-card:hover .card-bg-img {
           transform: scale(1.05);
@@ -65,29 +94,71 @@ export default async function ActivitiesPage() {
           position: relative;
           z-index: 2;
         }
-        
+        .schedule-content h2 {
+          font-family: "Playfair Display", serif;
+          font-size: clamp(1.8rem, 1.3rem + 2.6vw, 2.5rem);
+          font-weight: 800;
+          margin: 0 0 1rem;
+          color: #fff;
+        }
+        .schedule-content p {
+          color: #cbd5e1;
+          line-height: 1.8;
+          font-size: 1.02rem;
+          max-width: 46ch;
+          margin: 0 auto;
+        }
+
+        /* Penanda sesi (Sesi 1 / Sesi 2) */
+        .session-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          font-family: "DM Sans", sans-serif;
+          font-size: 0.68rem;
+          font-weight: 700;
+          letter-spacing: 3px;
+          text-transform: uppercase;
+          margin-bottom: 1rem;
+        }
+        .schedule-card.blue .session-badge { color: #93c5fd; }
+        .schedule-card.goldcard .session-badge { color: var(--gold-light); }
+        .session-badge::before,
+        .session-badge::after {
+          content: '';
+          width: 18px;
+          height: 1.5px;
+          background: currentColor;
+          opacity: 0.6;
+        }
+
         .schedule-time {
           display: inline-block;
-          background-color: rgba(59, 130, 246, 0.2);
-          color: #3b82f6;
           padding: 0.5rem 1.5rem;
           border-radius: 30px;
           font-weight: bold;
-          font-size: 1.1rem;
+          font-size: 1.05rem;
           margin-bottom: 1.5rem;
+        }
+        .schedule-card.blue .schedule-time {
+          background-color: rgba(59, 130, 246, 0.2);
+          color: #3b82f6;
           border: 1px solid rgba(59, 130, 246, 0.3);
         }
+        .schedule-card.goldcard .schedule-time {
+          background-color: rgba(232, 163, 61, 0.14);
+          color: var(--gold-light);
+          border: 1px solid rgba(232, 163, 61, 0.35);
+        }
 
-        /* BAGIAN LOKASI DENGAN MAPS LANGSUNG */
+        /* ===== BAGIAN LOKASI DENGAN MAPS LANGSUNG ===== */
         .location-section {
-          margin-top: 4rem;
-          background: rgba(15, 23, 42, 0.4);
-          border: 1px solid rgba(255, 255, 255, 0.05);
+          margin-top: clamp(2.5rem, 6vw, 4rem);
           border-radius: 24px;
-          padding: 3rem;
+          padding: clamp(1.5rem, 5vw, 3rem);
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 3rem;
+          gap: clamp(2rem, 5vw, 3rem);
           align-items: center;
         }
 
@@ -101,8 +172,9 @@ export default async function ActivitiesPage() {
         }
 
         .maps-btn {
-          background: #3b82f6;
+          background: linear-gradient(135deg, #1d4ed8, #3b82f6);
           color: white;
+          min-height: 48px;
           padding: 0.8rem 1.8rem;
           border-radius: 30px;
           text-decoration: none;
@@ -110,29 +182,30 @@ export default async function ActivitiesPage() {
           display: inline-flex;
           align-items: center;
           gap: 0.5rem;
-          transition: background 0.3s ease;
+          box-shadow: 0 8px 22px rgba(59, 130, 246, 0.4);
+          transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                      box-shadow 0.35s ease;
         }
-
         .maps-btn:hover {
-          background: #2563eb;
+          transform: translateY(-2px);
+          box-shadow: 0 14px 32px rgba(59, 130, 246, 0.55);
         }
 
         @media (max-width: 992px) {
           .location-section {
             grid-template-columns: 1fr;
-            padding: 2rem;
-            gap: 2rem;
           }
+          .map-container { height: 300px; }
         }
-        
-        /* CSS GALERI */
+
+        /* ===== CSS GALERI ===== */
         .gallery-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+          grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
           gap: 15px;
           margin-top: 2rem;
         }
-        
+
         .gallery-img-wrapper {
           position: relative;
           height: 200px;
@@ -150,7 +223,7 @@ export default async function ActivitiesPage() {
         .gallery-img-wrapper:hover img {
           transform: scale(1.1);
         }
-        
+
         .zoom-overlay {
           position: absolute;
           top: 0; left: 0; right: 0; bottom: 0;
@@ -177,82 +250,45 @@ export default async function ActivitiesPage() {
       />
 
       {/* HEADER REBRANDING */}
-      <header
-        className="page-header"
-        style={{ borderBottom: "none", paddingBottom: "2rem" }}
-      >
-        <div className="page-header-inner">
-          <div
-            className="overline"
-            style={{
-              letterSpacing: "2px",
-              fontWeight: "bold",
-              color: "#3b82f6",
-            }}
-          >
+      <header className="ph2">
+        <div className="ph2-inner">
+          <span className="ph2-watermark" aria-hidden="true">
+            Friday
+          </span>
+          <div className="ph2-overline">
+            <span className="live-dot" />
             {lang === "id" ? "Setiap Jumat" : "Every Friday"}
           </div>
-          <h1
-            style={{
-              fontSize: "4.5rem",
-              fontWeight: "900",
-              color: "#fff",
-              margin: "0.5rem 0",
-              textTransform: "uppercase",
-              letterSpacing: "1px",
-            }}
-          >
-            M-YES Friday
+          <h1 className="ph2-title">
+            M-YES <em>Friday</em>
           </h1>
-          <p
-            style={{
-              color: "#cbd5e1",
-              fontSize: "1.2rem",
-              maxWidth: "650px",
-              margin: "1rem auto 0",
-              lineHeight: "1.6",
-            }}
-          >
+          <p className="ph2-sub">
             {lang === "id"
               ? "Akhiri pekanmu dengan bertumbuh bersama kami setiap hari Jumat melalui pembelajaran bahasa Inggris interaktif dan persekutuan rohani yang hangat."
               : "Wrap up your week and grow with us every Friday through interactive English learning and warm spiritual fellowship."}
           </p>
+          <div className="ph2-rule">
+            <i />
+            <i />
+          </div>
         </div>
       </header>
 
       {/* 1. BAGIAN JADWAL & LOKASI */}
-      <section className="section" style={{ paddingTop: "0" }}>
+      <section className="section">
         <div className="container" style={{ maxWidth: "1000px" }}>
-          {/* Kartu Jadwal */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-              gap: "2rem",
-            }}
-          >
-            <div className="schedule-card">
+          {/* Kartu Jadwal — Alur Jumat */}
+          <div className="friday-flow">
+            <div className="schedule-card blue">
               <img src="learn-img.jpeg" className="card-bg-img" alt="" />
               <div className="schedule-overlay" />
               <div className="schedule-content">
-                <h2
-                  style={{
-                    fontSize: "2.5rem",
-                    fontWeight: "800",
-                    marginBottom: "1rem",
-                    color: "#fff",
-                  }}
-                >
-                  English Learning
-                </h2>
+                <span className="session-badge">
+                  {lang === "id" ? "Sesi Pertama" : "First Session"}
+                </span>
+                <h2>English Learning</h2>
                 <div className="schedule-time">17:30 - 18:30 WITA</div>
-                <p
-                  style={{
-                    color: "#cbd5e1",
-                    lineHeight: "1.8",
-                    fontSize: "1.05rem",
-                  }}
-                >
+                <p>
                   {lang === "id"
                     ? "Sesi interaktif dan menyenangkan untuk mengasah kemampuan tata bahasa, kosakata, dan percakapan bahasa Inggris Anda."
                     : "An interactive and fun session to sharpen your English grammar, vocabulary, and conversation skills."}
@@ -260,28 +296,16 @@ export default async function ActivitiesPage() {
               </div>
             </div>
 
-            <div className="schedule-card">
+            <div className="schedule-card goldcard">
               <img src="worship-img.jpeg" className="card-bg-img" alt="" />
               <div className="schedule-overlay" />
               <div className="schedule-content">
-                <h2
-                  style={{
-                    fontSize: "2.5rem",
-                    fontWeight: "800",
-                    marginBottom: "1rem",
-                    color: "#fff",
-                  }}
-                >
-                  Youth Worship
-                </h2>
+                <span className="session-badge">
+                  {lang === "id" ? "Sesi Kedua" : "Second Session"}
+                </span>
+                <h2>Youth Worship</h2>
                 <div className="schedule-time">18:30 - Selesai</div>
-                <p
-                  style={{
-                    color: "#cbd5e1",
-                    lineHeight: "1.8",
-                    fontSize: "1.05rem",
-                  }}
-                >
+                <p>
                   {lang === "id"
                     ? "Waktu yang intim untuk memuji, menyembah, dan mendengarkan kebenaran Firman Tuhan bersama komunitas."
                     : "An intimate time to praise, worship, and listen to the truth of God's Word together with the community."}
@@ -291,8 +315,8 @@ export default async function ActivitiesPage() {
           </div>
 
           {/* MAPS LANGSUNG */}
-          <div className="location-section">
-            {/* Bagian Kiri: Google Maps iframe (DIPERBAIKI) */}
+          <div className="panel location-section">
+            {/* Bagian Kiri: Google Maps iframe */}
             <div className="map-container">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3453.6204589046138!2d124.80560197423821!3d1.4492102612499522!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x32877544d235223b%3A0x216b2b2a129e1930!2sMG.Maru.Home!5e1!3m2!1sen!2sus!4v1782539996785!5m2!1sen!2sus"
@@ -307,19 +331,12 @@ export default async function ActivitiesPage() {
 
             {/* Bagian Kanan: Detail Informasi */}
             <div>
-              <div
-                className="overline"
-                style={{
-                  color: "#3b82f6",
-                  marginBottom: "0.5rem",
-                  fontWeight: "bold",
-                }}
-              >
+              <div className="panel-kicker">
                 {lang === "id" ? "Lokasi Pertemuan" : "Meeting Point"}
               </div>
               <h3
                 style={{
-                  fontSize: "2.2rem",
+                  fontSize: "clamp(1.7rem, 1.3rem + 2vw, 2.2rem)",
                   marginBottom: "0.5rem",
                   color: "#fff",
                   fontWeight: "bold",
@@ -331,7 +348,7 @@ export default async function ActivitiesPage() {
                 style={{
                   width: "60px",
                   height: "4px",
-                  backgroundColor: "#3b82f6",
+                  background: "linear-gradient(90deg, #1d4ed8, #60a5fa)",
                   marginBottom: "1.5rem",
                   borderRadius: "2px",
                 }}
@@ -349,7 +366,7 @@ export default async function ActivitiesPage() {
                 style={{
                   color: "#94a3b8",
                   lineHeight: "1.8",
-                  marginBottom: "1rem" /* Margin disesuaikan */,
+                  marginBottom: "1rem",
                   fontSize: "1.05rem",
                 }}
               >
@@ -415,16 +432,16 @@ export default async function ActivitiesPage() {
       {/* 2. BAGIAN GALERI KEGIATAN MINGGUAN */}
       <section className="section section-alt">
         <div className="container">
-          <div style={{ textAlign: "center", marginBottom: "4rem" }}>
-            <div
-              className="overline"
-              style={{ color: "#3b82f6", marginBottom: "0.5rem" }}
-            >
-              {lang === "id" ? "Momen Kami" : "Our Moments"}
+          <div className="vh-heading">
+            <span className="bar" />
+            <div>
+              <span className="overline">
+                {lang === "id" ? "Momen Kami" : "Our Moments"}
+              </span>
+              <h2>
+                {lang === "id" ? "Galeri Kegiatan" : "Activities Gallery"}
+              </h2>
             </div>
-            <h2 style={{ fontSize: "2.5rem" }}>
-              {lang === "id" ? "Galeri Kegiatan" : "Activities Gallery"}
-            </h2>
           </div>
 
           <WeeklyGallery galleries={galleries} lang={lang} />
