@@ -9,7 +9,7 @@ export const metadata = {
   title: "M-YES | Manado Youth English Service",
   description: "Community for Youth English Service in Manado",
   icons: {
-    icon: "/icon1.png", // Ini adalah baris baru untuk memanggil gambar logo
+    icon: "/icon.png", // Ini adalah baris baru untuk memanggil gambar logo
   },
 };
 
