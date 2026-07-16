@@ -29,23 +29,7 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
     return () => clearInterval(timer);
   }, [next, total]);
 
-  // Dukungan geser (swipe) untuk pengguna Android / layar sentuh
-  const [touchStartX, setTouchStartX] = useState(null);
-
-  const onTouchStart = (e) => {
-    setTouchStartX(e.touches[0].clientX);
-  };
-
-  const onTouchEnd = (e) => {
-    if (touchStartX === null || total <= 1) return;
-    const deltaX = e.changedTouches[0].clientX - touchStartX;
-    if (Math.abs(deltaX) > 50) {
-      if (deltaX < 0) next();
-      else prev();
-    }
-    setTouchStartX(null);
-  };
-
+  /* ── Fallback jika belum ada slide di database ─────────────────── */
   if (total === 0) {
     return (
       <section className="hero-slider">
@@ -81,9 +65,13 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
 
   return (
     <section
-      className="hero-slider hs-slider"
-      onTouchStart={onTouchStart}
-      onTouchEnd={onTouchEnd}
+      className="hero-slider"
+      style={{
+        position: "relative",
+        minHeight: "100svh",
+        overflow: "hidden",
+        backgroundColor: "#030812",
+      }}
     >
       {slides.map((slide, i) => {
         const isActive = i === current;
@@ -92,54 +80,60 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
         return (
           <div
             key={slide.id}
-            className="hs-slide"
-            style={{
-              zIndex: isActive ? 2 : isPrev ? 1 : 0,
-              opacity: isActive || isPrev ? 1 : 0,
-              pointerEvents: isActive ? "auto" : "none",
-            }}
+            className={`hs-slide ${isActive ? "is-active" : ""} ${
+              !isActive && isPrev ? "is-prev" : ""
+            }`}
           >
-            {/* BACKGROUND IMAGE */}
+            {/* BACKGROUND IMAGE / GRADIENT */}
             {slide.backgroundImage ? (
               <div
                 className="hs-bg"
                 style={{
                   backgroundImage: `url(${slide.backgroundImage})`,
-                  transform: isActive ? "scale(1.05)" : "scale(1)",
                 }}
               />
             ) : (
               <div
                 className="hs-bg"
                 style={{
-                  background: `linear-gradient(135deg, ${slide.backgroundColor || "#0a1628"}, #030812)`,
+                  background: `linear-gradient(135deg, ${
+                    slide.backgroundColor || "#0a1628"
+                  }, #030812)`,
                 }}
               />
             )}
 
-            {/* CINEMATIC OVERLAY (responsif: gradasi berubah otomatis di HP via CSS) */}
+            {/* CINEMATIC OVERLAY */}
             <div className="hs-overlay" />
 
             {/* KONTEN UTAMA */}
-            <div className="hs-content">
-              <div className="hs-text">
+            <div className="hs-inner">
+              <div className="hs-text" key={isActive ? `txt-${i}` : `off-${i}`}>
                 {t(slide, "overline") && (
-                  <div className="hs-overline">{t(slide, "overline")}</div>
+                  <div className="hs-overline hs-anim hs-anim-1">
+                    {t(slide, "overline")}
+                  </div>
                 )}
-                <h2 className="hs-title">{t(slide, "title")}</h2>
+                <h2 className="hs-title hs-anim hs-anim-2">
+                  {t(slide, "title")}
+                </h2>
                 {t(slide, "description") && (
-                  <p className="hs-desc">{t(slide, "description")}</p>
+                  <p className="hs-desc hs-anim hs-anim-3">
+                    {t(slide, "description")}
+                  </p>
                 )}
                 {t(slide, "buttonText") && (
-                  <a href={slide.buttonLink || "#"} className="hs-btn">
-                    {t(slide, "buttonText")}
-                  </a>
+                  <div className="hs-anim hs-anim-4">
+                    <a href={slide.buttonLink || "#"} className="hs-btn">
+                      {t(slide, "buttonText")}
+                    </a>
+                  </div>
                 )}
               </div>
 
-              {/* Bagian Slide Image (Kanan di desktop, di bawah teks saat HP) */}
+              {/* Bagian Slide Image (Kanan) */}
               {slide.image && (
-                <div className="hs-image">
+                <div className="hs-image hs-anim hs-anim-3">
                   <img src={slide.image} alt={t(slide, "title")} />
                 </div>
               )}
@@ -147,6 +141,9 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
           </div>
         );
       })}
+
+      {/* Scroll cue elegan */}
+      <div className="hs-scroll-cue" aria-hidden="true" />
 
       {total > 1 && (
         <>

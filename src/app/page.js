@@ -95,21 +95,27 @@ export default async function Home() {
         }
 
         .cta-button {
-          display: inline-block;
-          background: #3b82f6;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 48px;
+          background: linear-gradient(135deg, #1d4ed8, #3b82f6);
           color: #fff;
           padding: 1rem 2.5rem;
           border-radius: 50px;
           text-decoration: none;
-          font-weight: bold;
-          font-size: 1.1rem;
-          transition: all 0.3s ease;
-          box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+          font-weight: 700;
+          font-size: 1.05rem;
+          letter-spacing: 0.3px;
+          transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                      box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+          box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4),
+                      inset 0 1px 0 rgba(255, 255, 255, 0.25);
         }
         .cta-button:hover {
-          background: #2563eb;
           transform: translateY(-3px);
-          box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6);
+          box-shadow: 0 16px 40px rgba(59, 130, 246, 0.55),
+                      inset 0 1px 0 rgba(255, 255, 255, 0.3);
         }
 
         .viva-social {
@@ -120,11 +126,16 @@ export default async function Home() {
           text-decoration: none;
           font-weight: 500;
           font-size: 1.05rem;
+          padding: 8px 14px;
+          border-radius: 12px;
+          border: 1px solid transparent;
           transition: all 0.3s ease;
         }
         .viva-social:hover {
           color: #fff;
           transform: translateY(-2px);
+          border-color: rgba(255, 255, 255, 0.1);
+          background: rgba(255, 255, 255, 0.04);
         }
 
         .modern-social-title {
@@ -154,7 +165,7 @@ export default async function Home() {
           60% { transform: translateX(5px); }
         }
 
-        /* --- KELAS CSS RESPONSIF BARU --- */
+        /* --- KELAS CSS RESPONSIF --- */
         .responsive-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
@@ -163,23 +174,24 @@ export default async function Home() {
         }
         
         .news-title {
-          font-size: 2.8rem;
+          font-size: clamp(2rem, 1.4rem + 2.6vw, 2.8rem);
           color: #fff;
           font-weight: 800;
           margin: 0.5rem 0 1.5rem 0;
           line-height: 1.2;
+          letter-spacing: -0.5px;
         }
         
         .location-title {
-          font-size: 2.2rem;
+          font-size: clamp(1.7rem, 1.3rem + 1.8vw, 2.2rem);
           margin-bottom: 0.5rem;
           color: #fff;
           font-weight: bold;
         }
         
         .section-padding {
-          padding-top: 6rem;
-          padding-bottom: 6rem;
+          padding-top: clamp(4rem, 8vw, 6rem);
+          padding-bottom: clamp(4rem, 8vw, 6rem);
         }
 
         @media (max-width: 992px) {
@@ -200,18 +212,21 @@ export default async function Home() {
           .responsive-grid {
             gap: 2.5rem; /* Jarak antar elemen dikurangi di HP */
           }
-          .news-title {
-            font-size: 2rem; /* Ukuran huruf dikecilkan di HP */
-          }
-          .location-title {
-            font-size: 1.8rem; /* Ukuran huruf dikecilkan di HP */
-          }
-          .section-padding {
-            padding-top: 4rem;
-            padding-bottom: 4rem;
-          }
           .map-container {
             height: 300px !important; /* Peta tidak terlalu panjang di HP */
+          }
+          .social-strip-inner {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 1.25rem !important;
+          }
+          .social-strip-links {
+            gap: 0.75rem !important;
+          }
+          .viva-social {
+            font-size: 0.95rem;
+            padding: 10px 12px;
+            width: 100%;
           }
         }
       `,
@@ -230,6 +245,7 @@ export default async function Home() {
         )}
       </div>
 
+      {/* ── STRIP MEDIA SOSIAL ─────────────────────────────────────── */}
       <div
         style={{
           backgroundColor: "#050B14",
@@ -238,7 +254,7 @@ export default async function Home() {
         }}
       >
         <div
-          className="container"
+          className="container social-strip-inner"
           style={{
             maxWidth: "1200px",
             margin: "0 auto",
@@ -271,6 +287,7 @@ export default async function Home() {
           </div>
 
           <div
+            className="social-strip-links"
             style={{
               display: "flex",
               flexWrap: "wrap",
@@ -335,15 +352,12 @@ export default async function Home() {
         </div>
       </div>
 
+      {/* ── SEKSI PROGRAM (background parallax dgn fix Android) ──────── */}
       {programs.length > 0 && (
         <section
-          className="section"
+          className="section bg-fixed"
           style={{
-            // KODE BARU (BENAR)
             backgroundImage: `linear-gradient(rgba(5, 11, 20, 0.85), rgba(5, 11, 20, 0.95)), url('${mainBg || ""}')`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundAttachment: "fixed",
           }}
         >
           <div className="container">
@@ -375,8 +389,8 @@ export default async function Home() {
                           width: "100%",
                           height: 140,
                           objectFit: "cover",
-                          borderRadius: 8,
-                          marginBottom: "1rem",
+                          borderRadius: 12,
+                          marginBottom: "1.2rem",
                         }}
                         alt=""
                       />
@@ -491,13 +505,11 @@ export default async function Home() {
         </section>
       )}
 
+      {/* ── SEKSI LOKASI (background parallax dgn fix Android) ───────── */}
       <section
-        className="section section-padding"
+        className="section section-padding bg-fixed"
         style={{
           backgroundImage: `linear-gradient(rgba(5, 11, 20, 0.85), rgba(5, 11, 20, 0.95)), url('home.png')`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundAttachment: "fixed",
           borderTop: "1px solid rgba(255,255,255,0.05)",
         }}
       >
@@ -518,7 +530,7 @@ export default async function Home() {
               style={{
                 width: "100%",
                 height: "400px",
-                borderRadius: "16px",
+                borderRadius: "18px",
                 overflow: "hidden",
                 border: "1px solid rgba(255,255,255,0.1)",
                 boxShadow: "0 10px 30px -10px rgba(0, 0, 0, 0.5)",
@@ -541,7 +553,8 @@ export default async function Home() {
                 style={{
                   width: "60px",
                   height: "4px",
-                  backgroundColor: "#3b82f6",
+                  borderRadius: "99px",
+                  background: "linear-gradient(90deg, #1d4ed8, #3b82f6)",
                   marginBottom: "1.5rem",
                 }}
               ></div>

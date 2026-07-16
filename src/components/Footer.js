@@ -12,16 +12,15 @@ export default function Footer({ lang = "en" }) {
 
   return (
     <footer
+      className="footer-cinema bg-fixed"
       style={{
-        /* KUNCI GRADASI HALUS (FADE TO BLACK) */
+        /* KUNCI GRADASI HALUS (FADE TO BLACK)
+           Catatan: background-attachment kini diatur oleh kelas .bg-fixed
+           di globals.css — parallax di desktop, scroll di HP (fix Android) */
         backgroundImage: `linear-gradient(to bottom, rgba(5, 11, 20, 0.4) 0%, rgba(5, 11, 20, 0.9) 55%, rgba(5, 11, 20, 1) 75%), url('bg-s.jpeg')`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
         color: "#94a3b8",
         fontFamily: "inherit",
         position: "relative",
-        minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
       }}
@@ -35,6 +34,7 @@ export default function Footer({ lang = "en" }) {
           text-decoration: none;
           transition: color 0.3s ease;
           display: inline-block;
+          padding: 2px 0;
         }
         .footer-link:hover {
           color: #fff;
@@ -44,30 +44,39 @@ export default function Footer({ lang = "en" }) {
           position: absolute;
           width: 0;
           height: 2px;
-          bottom: -4px;
+          bottom: -2px;
           left: 0;
-          background-color: #3b82f6; 
-          transition: width 0.3s ease;
+          border-radius: 99px;
+          background: linear-gradient(90deg, #3b82f6, #06b6d4);
+          transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
         }
         .footer-link:hover::after {
           width: 100%;
         }
         .cta-button {
-          display: inline-block;
-          background: #3b82f6;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 48px;
+          background: linear-gradient(135deg, #1d4ed8, #3b82f6);
           color: #fff;
           padding: 0.8rem 2.2rem;
           border-radius: 50px;
           text-decoration: none;
           font-weight: bold;
           font-size: 1rem;
-          transition: all 0.3s ease;
-          box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+          transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                      box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+          box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4),
+                      inset 0 1px 0 rgba(255, 255, 255, 0.25);
         }
         .cta-button:hover {
-          background: #2563eb;
           transform: translateY(-3px);
-          box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6);
+          box-shadow: 0 16px 40px rgba(59, 130, 246, 0.55);
+        }
+        .footer-cta-title {
+          font-size: clamp(1.9rem, 1.3rem + 3vw, 2.6rem);
+          letter-spacing: -0.5px;
         }
       `,
         }}
@@ -77,12 +86,13 @@ export default function Footer({ lang = "en" }) {
       {/* BAGIAN ATAS: READY TO GROW (Flex 1 agar mengisi ruang tengah) */}
       {/* ========================================== */}
       <div
+        className="footer-cta-zone"
         style={{
           flex: 1,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: "2rem 1rem" /* Jarak diperkecil agar muat di layar */,
+          padding: "6rem 1.25rem 4rem" /* Napas lebih lega */,
           borderBottom: "1px solid rgba(255,255,255,0.05)",
         }}
       >
@@ -91,8 +101,8 @@ export default function Footer({ lang = "en" }) {
           style={{ maxWidth: "800px", margin: "0 auto", textAlign: "center" }}
         >
           <h2
+            className="footer-cta-title"
             style={{
-              fontSize: "2.5rem",
               marginBottom: "1rem",
               color: "#fff",
               fontWeight: "bold",
@@ -107,7 +117,10 @@ export default function Footer({ lang = "en" }) {
               fontSize: "1.05rem",
               color: "#cbd5e1",
               marginBottom: "2rem",
-              lineHeight: "1.6",
+              lineHeight: "1.7",
+              maxWidth: "620px",
+              marginLeft: "auto",
+              marginRight: "auto",
             }}
           >
             {lang === "id"
@@ -128,7 +141,7 @@ export default function Footer({ lang = "en" }) {
         style={{
           maxWidth: "1200px",
           margin: "0 auto",
-          padding: "2rem 1.5rem 1rem 1.5rem" /* Jarak atas bawah dirapatkan */,
+          padding: "2.5rem 1.25rem 1.25rem" /* Jarak atas bawah dirapatkan */,
           width: "100%",
         }}
       >
@@ -155,10 +168,11 @@ export default function Footer({ lang = "en" }) {
             </h2>
             <p
               style={{
-                lineHeight: "1.5",
+                lineHeight: "1.6",
                 fontSize: "0.9rem",
                 margin: 0,
                 opacity: 0.9,
+                maxWidth: "280px",
               }}
             >
               {lang === "id"
@@ -258,7 +272,7 @@ export default function Footer({ lang = "en" }) {
             alignItems: "center",
             flexWrap: "wrap",
             gap: "1rem",
-            paddingTop: "1rem",
+            paddingTop: "1.25rem",
             borderTop: "1px solid rgba(255, 255, 255, 0.1)",
             fontSize: "0.8rem",
           }}

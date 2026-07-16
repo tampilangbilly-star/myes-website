@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Playfair+Display:wght@500;600;700;800;900&family=Source+Sans+3:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,600&family=Source+Sans+3:wght@300;400;500;600;700&family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap");
 
 /* ─── DESIGN TOKENS ───────────────────────────────────────────────── */
 :root {
@@ -13,9 +13,15 @@
   --accent-gold: #3b82f6;
   --accent-gold-glow: rgba(59, 130, 246, 0.3);
   --accent-blue: #1a5276;
+  /* Warm Gold — dipakai kartu program selang-seling & aksen "worship" */
+  --gold: #e8a33d;
+  --gold-light: #ffd98e;
+  --gold-glow: rgba(232, 163, 61, 0.28);
   --shadow-cinematic: 0 20px 40px rgba(0, 0, 0, 0.6);
   --transition-smooth: 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   --radius-elegant: 4px;
+  --radius-card: 18px;
+  --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 body {
@@ -2680,58 +2686,81 @@ ul {
 }
 
 /* ════════════════════════════════════════════════════════════════════
-   FINAL POLISH LAYER v2 — MOBILE / ANDROID PERFECTION
-   Lapisan ini diletakkan PALING BAWAH agar menjadi aturan final yang
-   memenangkan konflik antar media-query lama & menimpa inline-style
-   desktop yang membuat tampilan Android berantakan.
+   V2 DESIGN LAYER — Modern & Elegant Polish (M-YES Redesign 2026)
+   Blok ini sengaja diletakkan PALING BAWAH agar memenangkan cascade
+   dan menyelesaikan konflik media-query duplikat di atas.
    ════════════════════════════════════════════════════════════════════ */
 
-/* ── 1. Fondasi anti-geser horizontal (penyebab utama layout "lari" di HP) ── */
-html,
+/* ── 1. BACKGROUND PARALLAX FIX (Bug Android) ─────────────────────────
+   Gunakan className="bg-fixed" pada section ber-background foto.
+   Desktop (pointer presisi): efek parallax tetap hidup.
+   HP/Tablet (layar sentuh): attachment dimatikan agar gambar
+   tidak ter-zoom / terpotong di Android & iOS.                        */
+.bg-fixed {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  .bg-fixed {
+    background-attachment: scroll !important;
+    background-size: cover !important;
+    background-position: center top !important;
+  }
+}
+
+/* ── 2. TIPOGRAFI HALUS ─────────────────────────────────────────────── */
 body {
-  max-width: 100%;
-  overflow-x: hidden;
+  font-size: clamp(0.95rem, 0.9rem + 0.25vw, 1.0625rem);
+  text-rendering: optimizeLegibility;
 }
 
-img,
-video,
-iframe {
-  max-width: 100%;
+h1,
+h2,
+h3,
+h4 {
+  text-wrap: balance;
 }
 
-/* Area aman untuk HP dengan notch / gesture bar */
-body {
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
-}
-
-/* ── 2. Tipografi fluid & konsisten di semua perangkat ── */
-h1 {
-  font-size: clamp(2rem, 5vw + 0.5rem, 4rem);
-}
-h2 {
-  font-size: clamp(1.6rem, 3.5vw + 0.4rem, 2.6rem);
-}
-h3 {
-  font-size: clamp(1.2rem, 2vw + 0.4rem, 1.6rem);
+p {
+  text-wrap: pretty;
 }
 
 .section-header h2 {
-  font-size: clamp(1.7rem, 4vw, 2.8rem);
+  font-size: clamp(1.9rem, 1.4rem + 2.6vw, 3rem);
+  letter-spacing: -0.5px;
 }
 
-/* ── 3. Hero Slider baru (kelas hs-*) ── */
-.hs-slider {
-  position: relative;
-  min-height: 100svh;
-  overflow: hidden;
-  background-color: #030812;
+.section-header .overline {
+  font-size: 0.7rem;
+  letter-spacing: 4px;
+}
+
+/* ── 3. HERO SLIDER (kelas baru .hs-*, dipakai HeroSlider.js) ───────── */
+.hero-slider {
+  padding-top: 0;
 }
 
 .hs-slide {
   position: absolute;
   inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 0;
   transition: opacity 1.2s ease-in-out;
+}
+
+.hs-slide.is-active {
+  opacity: 1;
+  z-index: 2;
+  pointer-events: auto;
+}
+
+.hs-slide.is-prev {
+  opacity: 1;
+  z-index: 1;
 }
 
 .hs-bg {
@@ -2740,32 +2769,37 @@ h3 {
   z-index: 0;
   background-size: cover;
   background-position: center;
-  transition: transform 8s ease-out;
+  transform: scale(1);
   will-change: transform;
-  transform: translateZ(0);
   backface-visibility: hidden;
+}
+
+.hs-slide.is-active .hs-bg {
+  transform: scale(1.07);
+  transition: transform 9s ease-out;
 }
 
 .hs-overlay {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(
-    to right,
-    rgba(3, 8, 18, 0.95) 0%,
-    rgba(3, 8, 18, 0.7) 40%,
-    rgba(3, 8, 18, 0.3) 100%
-  );
+  background:
+    linear-gradient(
+      to right,
+      rgba(3, 8, 18, 0.94) 0%,
+      rgba(3, 8, 18, 0.68) 42%,
+      rgba(3, 8, 18, 0.25) 100%
+    ),
+    linear-gradient(to top, rgba(3, 8, 18, 0.9) 0%, transparent 35%);
 }
 
-.hs-content {
+.hs-inner {
   position: relative;
   z-index: 2;
   height: 100%;
-  min-height: 100svh;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 96px 2rem 3rem;
+  padding: 96px 2rem 72px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -2778,284 +2812,341 @@ h3 {
 }
 
 .hs-overline {
-  color: var(--accent-gold);
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--gold-light);
   letter-spacing: 4px;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-family: "DM Sans", sans-serif;
   text-transform: uppercase;
   margin-bottom: 1.2rem;
-  font-family: "DM Sans", sans-serif;
-  font-weight: 600;
-  animation: fadeInUp 1s ease forwards;
+}
+
+.hs-overline::before {
+  content: "";
+  width: 34px;
+  height: 2px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--gold), transparent);
 }
 
 .hs-title {
-  font-size: clamp(2rem, 4.5vw + 0.5rem, 4rem);
+  font-size: clamp(2.3rem, 1.5rem + 4.5vw, 4.2rem);
   color: #fff;
-  margin-bottom: 1.5rem;
-  text-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
-  animation: fadeInUp 1.2s ease forwards;
-  line-height: 1.15;
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.4rem;
+  text-shadow: 0 12px 40px rgba(0, 0, 0, 0.85);
 }
 
 .hs-desc {
-  color: var(--text-secondary);
-  font-size: clamp(0.98rem, 1.5vw, 1.1rem);
+  color: rgba(226, 236, 250, 0.78);
+  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.15rem);
   line-height: 1.8;
-  margin-bottom: 2.2rem;
-  animation: fadeInUp 1.4s ease forwards;
+  margin-bottom: 2.4rem;
+  max-width: 520px;
 }
 
 .hs-btn {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 10px;
+  padding: 15px 38px;
   min-height: 48px;
-  padding: 14px 36px;
-  background: var(--accent-gold);
+  background: linear-gradient(135deg, #1d4ed8, #3b82f6);
   color: #fff;
-  border-radius: 8px;
+  border-radius: 99px;
   font-size: 0.9rem;
   font-weight: 700;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
   text-decoration: none;
+  box-shadow:
+    0 10px 30px rgba(37, 99, 235, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
   transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease,
-    background 0.3s ease;
-  box-shadow: 0 8px 25px var(--accent-gold-glow);
-  animation: fadeInUp 1.6s ease forwards;
-  touch-action: manipulation;
+    transform 0.35s var(--ease-spring),
+    box-shadow 0.35s var(--ease-spring);
+}
+
+.hs-btn::after {
+  content: "→";
+  font-size: 1rem;
+  transition: transform 0.35s var(--ease-spring);
 }
 
 .hs-btn:hover {
-  background: #2563eb;
   transform: translateY(-3px);
-  box-shadow: 0 12px 30px var(--accent-gold-glow);
+  box-shadow: 0 18px 45px rgba(37, 99, 235, 0.6);
+}
+
+.hs-btn:hover::after {
+  transform: translateX(5px);
 }
 
 .hs-image {
   flex: 0 0 auto;
   max-width: 42%;
-  animation: fadeInUp 1.5s ease forwards;
 }
 
 .hs-image img {
   width: 100%;
   max-height: 500px;
   object-fit: cover;
-  border-radius: 16px;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-card);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 40px 90px rgba(0, 0, 0, 0.75),
+    0 0 60px rgba(37, 99, 235, 0.15);
   transform: rotate(-2deg);
-  transition: transform 0.5s ease;
+  transition: transform 0.6s var(--ease-spring);
 }
 
-.hs-image img:hover {
+.hs-slide.is-active .hs-image img:hover {
   transform: rotate(0deg) scale(1.02);
 }
 
-/* Tablet: hero jadi kolom, teks di atas gambar */
-@media (max-width: 992px) {
-  .hs-content {
+/* Entrance animation — di-retrigger tiap ganti slide */
+.hs-slide.is-active .hs-anim {
+  animation: hsRise 0.9s var(--ease-spring) both;
+}
+.hs-slide.is-active .hs-anim-1 {
+  animation-delay: 0.15s;
+}
+.hs-slide.is-active .hs-anim-2 {
+  animation-delay: 0.3s;
+}
+.hs-slide.is-active .hs-anim-3 {
+  animation-delay: 0.45s;
+}
+.hs-slide.is-active .hs-anim-4 {
+  animation-delay: 0.6s;
+}
+
+@keyframes hsRise {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scroll cue kecil di bawah hero */
+.hs-scroll-cue {
+  position: absolute;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  width: 24px;
+  height: 40px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-radius: 14px;
+  pointer-events: none;
+}
+
+.hs-scroll-cue::before {
+  content: "";
+  position: absolute;
+  top: 7px;
+  left: 50%;
+  width: 4px;
+  height: 8px;
+  margin-left: -2px;
+  border-radius: 99px;
+  background: var(--gold-light);
+  animation: cueDrop 2s ease-in-out infinite;
+}
+
+@keyframes cueDrop {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  60% {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+}
+
+/* ── 4. RESPONSIVE HERO (menang atas blok duplikat lama) ────────────── */
+@media (max-width: 900px) {
+  .hs-inner {
     flex-direction: column;
     justify-content: center;
     text-align: center;
     gap: 2rem;
-    padding: 100px 1.5rem 3rem;
-  }
-
-  .hs-overlay {
-    background: linear-gradient(
-      to bottom,
-      rgba(3, 8, 18, 0.92) 0%,
-      rgba(3, 8, 18, 0.65) 55%,
-      rgba(3, 8, 18, 0.85) 100%
-    );
+    padding: 110px 1.25rem 84px;
   }
 
   .hs-text {
-    max-width: 640px;
+    max-width: 100%;
+  }
+
+  .hs-overline {
+    justify-content: center;
+  }
+
+  .hs-overline::before {
+    display: none;
   }
 
   .hs-desc {
     margin-left: auto;
     margin-right: auto;
-    max-width: 520px;
   }
 
   .hs-image {
-    max-width: min(380px, 78vw);
+    max-width: min(78%, 340px);
   }
 
   .hs-image img {
     max-height: 320px;
     transform: rotate(0deg);
   }
-}
 
-/* HP: lebih ringkas & rapi */
-@media (max-width: 600px) {
-  .hs-content {
-    padding: 92px 1.25rem 2.5rem;
-    gap: 1.5rem;
-  }
-
-  .hs-overline {
-    letter-spacing: 3px;
-    font-size: 0.75rem;
-    margin-bottom: 0.9rem;
-  }
-
-  .hs-title {
-    margin-bottom: 1rem;
-  }
-
-  .hs-btn {
-    width: 100%;
-    max-width: 320px;
-  }
-
-  .hs-image img {
-    max-height: 240px;
+  .hs-overlay {
+    background: linear-gradient(
+      to bottom,
+      rgba(3, 8, 18, 0.88) 0%,
+      rgba(3, 8, 18, 0.55) 55%,
+      rgba(3, 8, 18, 0.92) 100%
+    ) !important;
   }
 }
 
-/* ── 4. Kartu Guest Speaker: tidak lagi overflow di HP sempit ── */
-.speaker-glass-card {
-  width: min(360px, calc(100vw - 2.5rem)) !important;
-}
-
-@media (max-width: 992px) {
-  .guest-speaker-overlay {
-    position: relative !important;
-    top: auto !important;
-    right: auto !important;
-    transform: none !important;
-    margin: -70px auto 2.5rem auto !important;
-    display: flex;
-    justify-content: center;
-    padding: 0 1rem;
-    z-index: 40;
-  }
-}
-
-@media (max-width: 600px) {
-  .speaker-glass-card {
-    padding: 1rem 1.1rem !important;
-  }
-}
-
-/* ── 5. Header halaman (About, News, Mission, dll.):
-       menimpa inline font-size 4.5rem yang kebesaran di HP ── */
-.page-header h1 {
-  font-size: clamp(2.1rem, 6.5vw + 0.5rem, 4.5rem) !important;
-  line-height: 1.12 !important;
-  overflow-wrap: break-word;
-}
-
-.page-header-inner {
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-
-/* ── 6. Perbaikan khusus Android:
-       background-attachment fixed menyebabkan patah-patah / gambar zoom
-       aneh di Chrome Android — matikan paksa termasuk yang inline ── */
-@media (max-width: 1024px) {
-  section,
-  footer,
-  .section,
-  .hero-wrapper {
-    background-attachment: scroll !important;
-  }
-}
-
-/* ── 7. Judul & spacing seksi beranda di HP ── */
 @media (max-width: 768px) {
-  .news-title {
-    font-size: clamp(1.7rem, 6vw, 2rem) !important;
+  /* Menyelesaikan tabrakan 65svh!important vs 100svh di blok lama */
+  .hero-slider {
+    min-height: 100svh !important;
+    height: auto;
+    padding-bottom: 0;
   }
 
-  .location-title {
-    font-size: clamp(1.5rem, 5.5vw, 1.8rem) !important;
-  }
-
-  .modern-social-title {
-    font-size: 1.15rem !important;
-  }
-
-  .viva-social {
-    font-size: 0.95rem !important;
-  }
-
-  .map-container {
-    height: 300px !important;
-  }
-
-  .responsive-grid {
-    gap: 2rem !important;
-  }
-
-  .section-padding {
-    padding-top: 3.5rem !important;
-    padding-bottom: 3.5rem !important;
+  .hs-scroll-cue {
+    bottom: 58px;
   }
 }
 
-/* ── 8. Sentuhan nyaman: semua tombol & link penting mudah di-tap ── */
-.cta-button,
-.slide-btn,
-.hs-btn,
-.btn-submit,
-.tab-btn,
-.lang-btn,
-.hamburger {
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
+/* ── 5. SEKSI & KARTU: napas lebih lega, hover lebih hidup ──────────── */
+.section {
+  padding: clamp(3.5rem, 9vw, 6.5rem) 0;
 }
 
-.hamburger {
-  min-width: 44px;
-  min-height: 44px;
-  align-items: center;
-  justify-content: center;
+.program-card,
+.news-card,
+.person-card,
+.about-card,
+.mission-item {
+  border-radius: var(--radius-card);
 }
 
-/* ── 9. Navbar di HP: logo & kontrol tetap proporsional ── */
-@media (max-width: 600px) {
-  .nav-inner {
-    padding: 0 0.9rem !important;
-    height: 64px;
+.program-card {
+  transition:
+    transform 0.45s var(--ease-spring),
+    border-color 0.45s ease,
+    box-shadow 0.45s ease;
+}
+
+.program-card:hover {
+  transform: translateY(-8px) scale(1.01);
+}
+
+/* Kartu emas selang-seling: ikut menyalakan glow emas saat hover */
+.program-card:has(.program-card-top[style*="--gold"]):hover {
+  border-color: var(--gold);
+  box-shadow: 0 20px 50px var(--gold-glow);
+}
+
+.program-card img {
+  transition: transform 0.7s var(--ease-spring);
+}
+
+.program-card:hover img {
+  transform: scale(1.04);
+}
+
+/* ── 6. FOOTER SINEMATIK RESPONSIF (dipakai Footer.js) ──────────────── */
+.footer-cinema {
+  min-height: 100svh;
+}
+
+@media (max-width: 768px) {
+  .footer-cinema {
+    min-height: auto;
   }
 
-  .nav-logo-image {
-    height: 38px;
-  }
-
-  .nav-logo-text {
-    font-size: 0.95rem;
-  }
-
-  .nav-links {
-    top: 0;
-  }
-
-  .lang-toggle {
-    margin-left: 0.25rem;
+  .footer-cinema .footer-cta-zone {
+    padding: 4.5rem 1.25rem 3rem !important;
   }
 }
 
-/* ── 10. Footer & seksi gelap: teks tak menempel tepi layar ── */
-@media (max-width: 600px) {
-  footer .container,
-  footer > div {
+/* ── 7. SENTUHAN MOBILE GLOBAL ──────────────────────────────────────── */
+@media (max-width: 768px) {
+  .container {
     padding-left: 1.25rem;
     padding-right: 1.25rem;
   }
+
+  .section-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .program-card-body {
+    padding: 1.8rem 1.4rem;
+  }
+
+  .mission-item {
+    padding: 1.8rem 1.4rem;
+  }
+
+  .mission-timeline {
+    padding-left: 38px;
+  }
+
+  .mission-item::before {
+    left: -30px;
+    width: 16px;
+    height: 16px;
+  }
+
+  .news-body {
+    padding: 1.4rem;
+  }
 }
 
-/* ── 11. Hormati preferensi aksesibilitas pengguna ── */
+/* FAB media sosial: hormati safe-area iPhone & jempol Android */
+.social-float {
+  right: max(16px, env(safe-area-inset-right));
+  bottom: calc(20px + env(safe-area-inset-bottom));
+}
+
+@media (max-width: 480px) {
+  .social-fab {
+    width: 52px;
+    height: 52px;
+  }
+}
+
+/* Fokus keyboard terlihat jelas (aksesibilitas) */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--gold-light);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ── 8. REDUCED MOTION ──────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -3063,17 +3154,13 @@ h3 {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
   }
-}
 
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
+  html {
+    scroll-behavior: auto;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .hs-slide.is-active .hs-bg {
+    transform: none;
   }
 }
