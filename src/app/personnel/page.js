@@ -529,7 +529,6 @@ export default async function PersonnelPage() {
           )}
         </div>
       </section>
-      <Footer />
       <SocialFloat />
     </>
   );
