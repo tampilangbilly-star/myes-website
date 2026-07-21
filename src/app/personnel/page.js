@@ -23,7 +23,7 @@ export default async function PersonnelPage() {
   // LOGIKA BARU: BERDASARKAN KATEGORI DROPDOWN ADMIN
   // ========================================================
   const pembina = { leaders: [], members: [] };
-  const pengurus = { leaders: [], members: [] };
+  const pengurus = []; // Pengurus digabung jadi 1 array agar semuanya kotak
   const bidang = { members: [] };
   const lainnya = [];
 
@@ -38,12 +38,8 @@ export default async function PersonnelPage() {
       if (isPembinaLeader) pembina.leaders.push(memberData);
       else pembina.members.push(memberData);
     } else if (category === "Pengurus Inti") {
-      // Pengurus Inti tetap menggunakan deteksi ketua/wakil/sekretaris/bendahara agar tetap ada yang kotak
-      const isPengurusLeader = /(ketua|wakil|sekretaris|bendahara)/i.test(
-        displayRole,
-      );
-      if (isPengurusLeader) pengurus.leaders.push(memberData);
-      else pengurus.members.push(memberData);
+      // Sesuai instruksi: Seluruh Pengurus Inti dijadikan kotak
+      pengurus.push(memberData);
     } else if (category === "Bidang-Bidang") {
       // Semua bidang masuk ke bulat
       bidang.members.push(memberData);
@@ -90,7 +86,8 @@ export default async function PersonnelPage() {
           background: rgba(15, 26, 46, 0.6);
           white-space: nowrap;
         }
-        /* ==================== LAYOUT HIERARKI ==================== */
+        
+        /* ==================== LAYOUT HIERARKI (DESKTOP) ==================== */
         .leaders-row {
           display: flex;
           flex-wrap: wrap;
@@ -105,7 +102,8 @@ export default async function PersonnelPage() {
           max-width: 1100px;
           margin: 0 auto;
         }
-        /* ==================== KARTU PIMPINAN (PORTRAIT PREMIUM) ==================== */
+
+        /* ==================== KARTU PIMPINAN (PORTRAIT PREMIUM / KOTAK) ==================== */
         .leader-card {
           padding: clamp(2rem, 5vw, 3rem) clamp(1.5rem, 4vw, 2rem);
           text-align: center;
@@ -138,10 +136,11 @@ export default async function PersonnelPage() {
           width: 100%; height: 100%;
           border-radius: 20px;
           object-fit: cover;
-          object-position: top; /* Anti Terpotong */
+          object-position: top;
           border: 4px solid #050b14;
           background-color: #0f172a;
         }
+
         /* ==================== KARTU ANGGOTA (BULAT) ==================== */
         .member-card {
           padding: clamp(2rem, 5vw, 3rem) 1.5rem;
@@ -164,10 +163,11 @@ export default async function PersonnelPage() {
           width: 100%; height: 100%;
           border-radius: 50%;
           object-fit: cover;
-          object-position: top; /* Anti Terpotong */
+          object-position: top;
           border: 4px solid #0a0f1a;
           background-color: #0f172a;
         }
+
         /* ==================== PUSAT PELAYANAN (YESUS) ==================== */
         .jesus-card {
           text-align: center;
@@ -175,7 +175,6 @@ export default async function PersonnelPage() {
           position: relative;
           padding: 2rem 0;
         }
-        /* Pancaran cahaya lembut di belakang */
         .jesus-card::before {
           content: '';
           position: absolute;
@@ -205,7 +204,6 @@ export default async function PersonnelPage() {
           object-position: top;
           border: 4px solid #050b14;
         }
-        /* Garis penghubung struktural ke bawah */
         .jesus-card::after {
           content: '';
           position: absolute;
@@ -216,6 +214,7 @@ export default async function PersonnelPage() {
           height: clamp(2rem, 5vw, 3.5rem);
           background: linear-gradient(180deg, rgba(255, 215, 0, 0.5), transparent);
         }
+
         /* ==================== TYPOGRAPHY ==================== */
         .p-name {
           font-family: "Playfair Display", serif;
@@ -228,6 +227,53 @@ export default async function PersonnelPage() {
           text-transform: uppercase; letter-spacing: 1.5px; margin: 0;
         }
         .p-bio { color: #94a3b8; font-size: 0.95rem; line-height: 1.6; margin: 1rem 0 0 0; }
+
+        /* ==================== RESPONSIVE KHUSUS ANDROID/MOBILE ==================== */
+        @media (max-width: 768px) {
+          .group-section { margin-bottom: 3.5rem; }
+          .group-title { font-size: 1.1rem; padding: 0.3rem 1.2rem; }
+          
+          /* Merubah flex/grid lama menjadi sistem Grid Mobile */
+          .leaders-row, .members-row {
+            display: grid !important;
+            gap: 0.5rem !important;
+            margin-bottom: 1.5rem !important;
+            padding: 0 0.25rem;
+          }
+
+          /* KELAS 2 KOLOM (Untuk Pimpinan & Pengurus) */
+          .grid-2-mobile { grid-template-columns: repeat(2, 1fr) !important; }
+          
+          /* KELAS 3 KOLOM (Untuk Anggota Pembina & Bidang) */
+          .grid-3-mobile { grid-template-columns: repeat(3, 1fr) !important; gap: 0.35rem !important; }
+
+          /* ------------------- STYLING KOTAK DI MOBILE (2 Kolom) ------------------- */
+          .grid-2-mobile .leader-card { padding: 0.75rem 0.25rem; }
+          .grid-2-mobile .avatar-rect {
+            width: 100%; max-width: 140px; height: 160px;
+            border-radius: 12px; margin-bottom: 0.75rem;
+          }
+          .grid-2-mobile .img-rect { border-width: 2px; border-radius: 10px; }
+          .grid-2-mobile .p-name { font-size: 0.85rem; line-height: 1.2; margin-bottom: 0.25rem; }
+          .grid-2-mobile .p-role { font-size: 0.6rem; letter-spacing: 0.5px; }
+
+          /* ------------------- STYLING BULAT DI MOBILE (3 Kolom) ------------------- */
+          .grid-3-mobile .member-card { padding: 0.5rem 0.15rem; }
+          .grid-3-mobile .avatar-ring {
+            width: clamp(50px, 25vw, 85px); height: clamp(50px, 25vw, 85px);
+            margin-bottom: 0.5rem; padding: 2px; border-radius: 50%;
+          }
+          .grid-3-mobile .img-circle { border-width: 2px; }
+          .grid-3-mobile .p-name { font-size: 0.65rem; line-height: 1.1; margin-bottom: 0.2rem; }
+          .grid-3-mobile .p-role { font-size: 0.5rem; letter-spacing: 0; }
+          
+          /* Sembunyikan biografi di layar kecil agar tidak memanjang */
+          .p-bio { display: none; }
+          
+          /* Kecilkan gambar Yesus */
+          .jesus-ring { width: 140px; height: 140px; }
+          .jesus-card h3 { font-size: 1.5rem !important; }
+        }
       `,
         }}
       />
@@ -298,9 +344,9 @@ export default async function PersonnelPage() {
               <div className="group-title-wrapper">
                 <h2 className="group-title">Dewan Pembina</h2>
               </div>
-              {/* Baris Pimpinan Pembina (Kotak) */}
+              {/* Baris Pimpinan Pembina (Kotak - 2 Kolom di Android) */}
               {pembina.leaders.length > 0 && (
-                <div className="leaders-row">
+                <div className="leaders-row grid-2-mobile">
                   {pembina.leaders.map((p) => (
                     <div key={p.id} className="panel leader-card">
                       <div className="avatar-rect">
@@ -333,9 +379,9 @@ export default async function PersonnelPage() {
                   ))}
                 </div>
               )}
-              {/* Baris Anggota Pembina (Bulat Besar) */}
+              {/* Baris Anggota Pembina (Bulat Besar - 3 Kolom di Android) */}
               {pembina.members.length > 0 && (
-                <div className="members-row">
+                <div className="members-row grid-3-mobile">
                   {pembina.members.map((p) => (
                     <div key={p.id} className="panel member-card">
                       <div className="avatar-ring">
@@ -371,80 +417,44 @@ export default async function PersonnelPage() {
           )}
 
           {/* 3. PENGURUS INTI SECTION */}
-          {(pengurus.leaders.length > 0 || pengurus.members.length > 0) && (
+          {pengurus.length > 0 && (
             <div className="group-section">
               <div className="group-title-wrapper">
                 <h2 className="group-title">Pengurus Inti</h2>
               </div>
-              {/* Baris Pimpinan Pengurus (Kotak) */}
-              {pengurus.leaders.length > 0 && (
-                <div className="leaders-row">
-                  {pengurus.leaders.map((p) => (
-                    <div key={p.id} className="panel leader-card">
-                      <div className="avatar-rect">
-                        {p.photo ? (
-                          <img
-                            src={`${p.photo}`}
-                            alt={p.fullName || p.name}
-                            className="img-rect"
-                          />
-                        ) : (
-                          <div
-                            className="img-rect"
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              fontSize: "4rem",
-                            }}
-                          >
-                            👤
-                          </div>
-                        )}
-                      </div>
-                      <h3 className="p-name leader-name">
-                        {p.fullName || p.name}
-                      </h3>
-                      <p className="p-role">{p.displayRole}</p>
-                      {t(p, "bio") && <p className="p-bio">{t(p, "bio")}</p>}
+              {/* Sesuai Request: Seluruh Pengurus Dibuat Kotak (2 Kolom di Android) */}
+              <div className="leaders-row grid-2-mobile">
+                {pengurus.map((p) => (
+                  <div key={p.id} className="panel leader-card">
+                    <div className="avatar-rect">
+                      {p.photo ? (
+                        <img
+                          src={`${p.photo}`}
+                          alt={p.fullName || p.name}
+                          className="img-rect"
+                        />
+                      ) : (
+                        <div
+                          className="img-rect"
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: "4rem",
+                          }}
+                        >
+                          👤
+                        </div>
+                      )}
                     </div>
-                  ))}
-                </div>
-              )}
-              {/* Baris Anggota Pengurus (Bulat Besar) */}
-              {pengurus.members.length > 0 && (
-                <div className="members-row">
-                  {pengurus.members.map((p) => (
-                    <div key={p.id} className="panel member-card">
-                      <div className="avatar-ring">
-                        {p.photo ? (
-                          <img
-                            src={`${p.photo}`}
-                            alt={p.fullName || p.name}
-                            className="img-circle"
-                          />
-                        ) : (
-                          <div
-                            className="img-circle"
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              fontSize: "3rem",
-                            }}
-                          >
-                            👤
-                          </div>
-                        )}
-                      </div>
-                      <h3 className="p-name">{p.fullName || p.name}</h3>
-                      <p className="p-role" style={{ color: "#94a3b8" }}>
-                        {p.displayRole}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    <h3 className="p-name leader-name">
+                      {p.fullName || p.name}
+                    </h3>
+                    <p className="p-role">{p.displayRole}</p>
+                    {t(p, "bio") && <p className="p-bio">{t(p, "bio")}</p>}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
@@ -454,7 +464,8 @@ export default async function PersonnelPage() {
               <div className="group-title-wrapper">
                 <h2 className="group-title">Bidang-Bidang</h2>
               </div>
-              <div className="members-row">
+              {/* Bidang (Bulat - 3 Kolom di Android) */}
+              <div className="members-row grid-3-mobile">
                 {bidang.members.map((p) => (
                   <div key={p.id} className="panel member-card">
                     <div className="avatar-ring">
@@ -494,7 +505,7 @@ export default async function PersonnelPage() {
               <div className="group-title-wrapper">
                 <h2 className="group-title">Lainnya</h2>
               </div>
-              <div className="members-row">
+              <div className="members-row grid-3-mobile">
                 {lainnya.map((p) => (
                   <div key={p.id} className="panel member-card">
                     <div className="avatar-ring">

@@ -22,29 +22,43 @@ export default function WeeklyGallery({ galleries, lang }) {
 
   return (
     <>
-      <div style={{ display: "flex", flexDirection: "column", gap: "4rem" }}>
+      <style>
+        {`
+          /* Penyesuaian jarak container galeri untuk Mobile */
+          .gallery-container {
+             display: flex; 
+             flex-direction: column; 
+             gap: 4rem;
+          }
+          .gallery-box {
+             background-color: rgba(255,255,255,0.02);
+             padding: 2rem;
+             border-radius: 16px;
+             border: 1px solid rgba(255,255,255,0.05);
+          }
+          @media (max-width: 768px) {
+            .gallery-container { gap: 2rem; } /* Jarak antar event diperkecil di HP */
+            .gallery-box { padding: 1rem; border-radius: 12px; } /* Kotak event lebih padat di HP */
+          }
+        `}
+      </style>
+
+      <div className="gallery-container">
         {galleries.map((gallery) => (
-          <div
-            key={gallery.id}
-            style={{
-              backgroundColor: "rgba(255,255,255,0.02)",
-              padding: "2rem",
-              borderRadius: "16px",
-              border: "1px solid rgba(255,255,255,0.05)",
-            }}
-          >
+          <div key={gallery.id} className="gallery-box">
             <div
               style={{
                 borderBottom: "1px solid rgba(255,255,255,0.1)",
                 paddingBottom: "1rem",
-                marginBottom: "2rem",
+                marginBottom: "1.5rem",
               }}
             >
               <h3
                 style={{
-                  fontSize: "1.5rem",
+                  fontSize: "clamp(1.2rem, 1rem + 2vw, 1.5rem)",
                   color: "#fff",
                   margin: "0 0 0.5rem 0",
+                  lineHeight: "1.3",
                 }}
               >
                 {lang === "id"
@@ -54,7 +68,7 @@ export default function WeeklyGallery({ galleries, lang }) {
               <span
                 style={{
                   color: "#3b82f6",
-                  fontSize: "0.95rem",
+                  fontSize: "0.9rem",
                   fontWeight: "bold",
                 }}
               >
@@ -68,12 +82,12 @@ export default function WeeklyGallery({ galleries, lang }) {
 
             {/* --- BAGIAN PLAYER YOUTUBE --- */}
             {gallery.video && (
-              <div style={{ marginBottom: "3rem" }}>
+              <div style={{ marginBottom: "2rem" }}>
                 <h4
                   style={{
                     color: "#e2e8f0",
                     marginBottom: "1rem",
-                    fontSize: "1.2rem",
+                    fontSize: "1.1rem",
                     display: "flex",
                     alignItems: "center",
                     gap: "8px",
@@ -118,7 +132,7 @@ export default function WeeklyGallery({ galleries, lang }) {
                   style={{
                     color: "#e2e8f0",
                     marginBottom: "1rem",
-                    fontSize: "1.2rem",
+                    fontSize: "1.1rem",
                     display: "flex",
                     alignItems: "center",
                     gap: "8px",
@@ -126,6 +140,8 @@ export default function WeeklyGallery({ galleries, lang }) {
                 >
                   📸 {lang === "id" ? "Galeri Foto" : "Photo Gallery"}
                 </h4>
+
+                {/* CLASS 'gallery-grid' INI YANG AKAN DISULAP MENJADI 3 KOLOM OLEH FILE PAGE.JS DI HP */}
                 <div className="gallery-grid">
                   {gallery.photos.map((photo, index) => (
                     <div
@@ -133,7 +149,11 @@ export default function WeeklyGallery({ galleries, lang }) {
                       className="gallery-img-wrapper"
                       onClick={() => setSelectedImage(photo.image)}
                     >
-                      <img src={`${photo.image}`} alt={`Moment ${index + 1}`} />
+                      <img
+                        src={`${photo.image}`}
+                        alt={`Moment ${index + 1}`}
+                        loading="lazy"
+                      />
                       <div className="zoom-overlay">
                         <span>🔍</span>
                       </div>
@@ -172,7 +192,7 @@ export default function WeeklyGallery({ galleries, lang }) {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            padding: "2rem",
+            padding: "1rem",
             backdropFilter: "blur(5px)",
           }}
           onClick={closeModal}
@@ -181,12 +201,12 @@ export default function WeeklyGallery({ galleries, lang }) {
             onClick={closeModal}
             style={{
               position: "absolute",
-              top: "20px",
-              right: "30px",
+              top: "15px",
+              right: "20px",
               background: "none",
               border: "none",
               color: "#fff",
-              fontSize: "4rem",
+              fontSize: "3rem",
               cursor: "pointer",
               zIndex: 10000,
               lineHeight: "1",
@@ -198,8 +218,8 @@ export default function WeeklyGallery({ galleries, lang }) {
             src={`${selectedImage}`}
             alt="Full size"
             style={{
-              maxWidth: "95%",
-              maxHeight: "75vh",
+              maxWidth: "100%",
+              maxHeight: "80vh",
               objectFit: "contain",
               borderRadius: "8px",
               boxShadow: "0 20px 50px rgba(0,0,0,0.5)",
@@ -211,24 +231,22 @@ export default function WeeklyGallery({ galleries, lang }) {
             download
             onClick={(e) => e.stopPropagation()}
             style={{
-              marginTop: "2rem",
-              padding: "1rem 2.5rem",
+              marginTop: "1.5rem",
+              padding: "0.8rem 2rem",
               backgroundColor: "#3b82f6",
               color: "#fff",
               textDecoration: "none",
               borderRadius: "30px",
               fontWeight: "bold",
-              fontSize: "1.1rem",
+              fontSize: "1rem",
               display: "flex",
               alignItems: "center",
               gap: "0.5rem",
               transition: "all 0.3s ease",
               boxShadow: "0 10px 15px -3px rgba(59, 130, 246, 0.3)",
             }}
-            onMouseOver={(e) => (e.target.style.transform = "translateY(-3px)")}
-            onMouseOut={(e) => (e.target.style.transform = "translateY(0)")}
           >
-            📥 {lang === "id" ? "Unduh Gambar Asli" : "Download Original Image"}
+            📥 {lang === "id" ? "Unduh" : "Download"}
           </a>
         </div>
       )}

@@ -171,14 +171,39 @@ export default async function AboutPage() {
           font-size: 0.95rem;
         }
 
-        @media (max-width: 640px) {
+        /* ==================== RESPONSIVE KHUSUS ANDROID/MOBILE ==================== */
+        @media (max-width: 768px) {
           .story-panel {
             grid-template-columns: 1fr;
             text-align: center;
+            padding: 1.5rem !important;
           }
-          .story-icon { margin: 0 auto; }
+          .story-icon { margin: 0 auto; width: 50px; height: 50px; font-size: 1.5rem; }
+          .vm-card { padding: 1.25rem !important; }
+          .vm-icon { width: 44px; height: 44px; font-size: 1.3rem; margin-bottom: 1rem; }
+          
+          /* Memaksa Core Values menjadi 2 kolom berdampingan di HP */
+          .value-strip {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          .value-cell {
+            padding: 1.25rem 0.75rem !important;
+          }
+          .value-cell .v-emoji {
+            font-size: 2rem !important;
+            margin-bottom: 0.5rem !important;
+          }
+          .value-cell h4 {
+            font-size: 1rem !important;
+            margin-bottom: 0.3rem !important;
+          }
+          .value-cell p {
+            font-size: 0.75rem !important;
+            line-height: 1.4 !important;
+          }
+          /* Ubah garis pemisah vertikal antar cell menjadi horizontal di HP */
           .value-cell + .value-cell::before {
-            left: 15%; right: 15%; top: 0; bottom: auto;
+            left: 10%; right: 10%; top: 0; bottom: auto;
             width: auto; height: 1px;
             background: linear-gradient(90deg, transparent, rgba(148, 178, 224, 0.25), transparent);
           }

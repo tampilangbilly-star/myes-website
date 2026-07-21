@@ -29,7 +29,7 @@ export default async function NewsPage() {
       <style
         dangerouslySetInnerHTML={{
           __html: `
-        /* Tata letak Grid: 3 Kolom di Laptop, 2 di Tablet, 1 di HP */
+        /* Tata letak Grid: 3 Kolom di Laptop, 2 di Tablet/HP */
         .news-grid-page {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
@@ -144,6 +144,53 @@ export default async function NewsPage() {
           font-size: 0.8rem;
           border-top: 1px solid rgba(255,255,255,0.06);
           padding-top: 0.8rem;
+        }
+
+        /* ==================== RESPONSIVE KHUSUS ANDROID/MOBILE ==================== */
+        @media (max-width: 768px) {
+          /* Memaksa grid berita menjadi 2 kolom berdampingan di HP */
+          .news-grid-page {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 0.6rem !important;
+            margin-top: 1rem !important;
+          }
+          .news-card-page {
+            border-radius: 12px !important;
+          }
+          .news-date-chip {
+            top: 6px !important;
+            right: 6px !important;
+            padding: 3px 6px !important;
+            font-size: 0.55rem !important;
+          }
+          .news-card-content {
+            padding: 0.75rem !important;
+          }
+          .news-tag {
+            font-size: 0.55rem !important;
+            padding: 2px 6px !important;
+            margin-bottom: 0.4rem !important;
+            letter-spacing: 0.5px !important;
+          }
+          .news-title {
+            font-size: 0.85rem !important;
+            line-height: 1.2 !important;
+            margin-bottom: 0.3rem !important;
+          }
+          .news-desc {
+            font-size: 0.7rem !important;
+            line-height: 1.3 !important;
+            margin-bottom: 0.5rem !important;
+          }
+          .news-date {
+            font-size: 0.65rem !important;
+            padding-top: 0.5rem !important;
+            gap: 0.3rem !important;
+          }
+          .news-date svg {
+            width: 10px !important;
+            height: 10px !important;
+          }
         }
       `,
         }}

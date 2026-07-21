@@ -101,9 +101,7 @@ export default async function ProgramPage() {
           margin: 0;
         }
 
-        /* ====== FOOTER AKSI KARTU ======
-           Deskripsi lengkap + tombol Join.
-           Di layar sentuh (Android/iOS) SELALU terlihat — bukan hover. */
+        /* ====== FOOTER AKSI KARTU ====== */
         .program-overlay {
           padding: 0 1.5rem 1.5rem;
           display: flex;
@@ -149,8 +147,7 @@ export default async function ProgramPage() {
           transform: translateX(4px);
         }
 
-        /* Di perangkat dengan hover (desktop): deskripsi lengkap
-           muncul mengembang saat kursor menyentuh kartu */
+        /* Di perangkat dengan hover (desktop) */
         @media (hover: hover) and (pointer: fine) {
           .program-overlay .full-desc {
             max-height: 0;
@@ -167,6 +164,54 @@ export default async function ProgramPage() {
             opacity: 1;
             padding-top: 0.9rem;
             border-top-color: rgba(148, 178, 224, 0.2);
+          }
+        }
+
+        /* ==================== RESPONSIVE KHUSUS ANDROID/MOBILE ==================== */
+        @media (max-width: 768px) {
+          /* Memaksa grid program menjadi 2 kolom berdampingan di HP */
+          .pg-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 0.6rem !important;
+            margin-top: 1rem !important;
+          }
+          .pg-card {
+            border-radius: 12px !important;
+          }
+          .pg-index {
+            top: 8px !important;
+            left: 8px !important;
+            font-size: 0.7rem !important;
+            padding: 2px 8px !important;
+          }
+          .pg-media .emoji-hero {
+            font-size: 2.5rem !important;
+          }
+          .pg-body {
+            padding: 0.75rem !important;
+          }
+          .pg-body h3 {
+            font-size: 0.95rem !important;
+            margin-bottom: 0.3rem !important;
+            line-height: 1.2 !important;
+          }
+          .pg-body .pg-excerpt {
+            font-size: 0.75rem !important;
+            line-height: 1.4 !important;
+          }
+          /* Di HP, teks lengkap di-hidden dan tombol diperkecil agar rapi */
+          .program-overlay {
+            padding: 0 0.75rem 0.75rem !important;
+            gap: 0.5rem !important;
+          }
+          .program-overlay .full-desc {
+            display: none !important;
+          }
+          .join-btn {
+            min-height: 36px !important;
+            padding: 0.4rem 1rem !important;
+            font-size: 0.75rem !important;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
           }
         }
       `,
@@ -225,8 +270,7 @@ export default async function ProgramPage() {
                   </p>
                 </div>
 
-                {/* Deskripsi lengkap + tombol Join
-                    (selalu tampak di HP, mengembang saat hover di desktop) */}
+                {/* Deskripsi lengkap + tombol Join */}
                 <div className="program-overlay">
                   <p className="full-desc">{t(p, "description")}</p>
                   <a

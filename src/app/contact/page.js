@@ -125,6 +125,37 @@ export default async function ContactPage() {
           border-radius: 20px 20px 0 0;
           background: linear-gradient(90deg, #1d4ed8, #60a5fa 55%, var(--gold));
         }
+
+        /* ==================== RESPONSIVE KHUSUS ANDROID/MOBILE ==================== */
+        @media (max-width: 768px) {
+          /* Memaksa bagian kartu kontak atas menjadi 2 kolom berdampingan di HP */
+          .contact-top-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 0.5rem !important;
+          }
+          .info-card {
+            padding: 1.25rem 0.75rem !important;
+            border-radius: 12px !important;
+          }
+          .info-icon-wrapper {
+            width: 50px !important;
+            height: 50px !important;
+            border-radius: 14px !important;
+            margin-bottom: 0.75rem !important;
+          }
+          .info-icon-wrapper svg {
+            width: 24px !important;
+            height: 24px !important;
+          }
+          .info-card h4 {
+            font-size: 0.95rem !important;
+            margin-bottom: 0.25rem !important;
+          }
+          .info-card p {
+            font-size: 0.75rem !important;
+            line-height: 1.3 !important;
+          }
+        }
       `,
         }}
       />

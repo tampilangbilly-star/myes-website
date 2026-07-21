@@ -198,7 +198,7 @@ export default async function ActivitiesPage() {
           .map-container { height: 300px; }
         }
 
-        /* ===== CSS GALERI ===== */
+        /* ===== CSS GALERI (DESKTOP) ===== */
         .gallery-grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
@@ -244,6 +244,52 @@ export default async function ActivitiesPage() {
         }
         .gallery-img-wrapper:hover .zoom-overlay span {
           transform: scale(1);
+        }
+
+        /* ==================== RESPONSIVE KHUSUS ANDROID/MOBILE ==================== */
+        @media (max-width: 768px) {
+          /* 1. JADWAL JUMAT (FRIDAY FLOW) DIBUAT 2 KOLOM BERDAMPINGAN */
+          .friday-flow {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 0.5rem !important; /* Jarak dirapatkan */
+          }
+          .schedule-card {
+            padding: 1.5rem 0.5rem !important; /* Kurangi area kosong dalam kartu */
+            border-radius: 12px !important;
+          }
+          .session-badge {
+            font-size: 0.5rem !important;
+            letter-spacing: 1px !important;
+            gap: 4px !important;
+            margin-bottom: 0.5rem !important;
+          }
+          .session-badge::before, .session-badge::after {
+            width: 10px !important; /* Garis kecil penanda sesi diperpendek */
+          }
+          .schedule-content h2 {
+            font-size: 1.1rem !important;
+            margin-bottom: 0.5rem !important;
+          }
+          .schedule-time {
+            font-size: 0.75rem !important;
+            padding: 0.3rem 0.6rem !important;
+            margin-bottom: 0 !important;
+          }
+          .schedule-content p {
+            display: none !important; /* Sembunyikan paragraf agar 2 kolom tidak memanjang berantakan */
+          }
+
+          /* 2. GALERI DIBUAT 3 KOLOM BERDAMPINGAN */
+          .gallery-grid {
+             grid-template-columns: repeat(3, 1fr) !important;
+             gap: 0.35rem !important;
+             margin-top: 1rem !important;
+          }
+          .gallery-img-wrapper {
+            height: clamp(85px, 28vw, 120px) !important;
+            border-radius: 8px !important;
+          }
+          .zoom-overlay { display: none !important; }
         }
       `,
         }}
