@@ -71,33 +71,33 @@ export default function HolySpiritAmbient() {
            PENYESUAIAN KHUSUS LAYAR HP (MOBILE)
            ========================================= */
         @media (max-width: 768px) {
-          /* Animasi Masuk HP */
+          /* [V4.4] Merpati kini MENDARAT DI ZONA TEKS (panel bawah foto):
+             terbang masuk dari kiri melintasi foto, hinggap manis di
+             kanan-atas panel — dekat overline, tidak menutupi judul. */
           @keyframes flyInMobile {
             0% { 
-              transform: translate(-40vw, 30vh) scale(0.5) rotate(25deg); 
+              transform: translate(-40vw, 26vh) scale(0.5) rotate(25deg); 
               opacity: 0; 
             }
             100% { 
-              transform: translate(10vw, 15vh) rotate(-2deg); 
+              transform: translate(66vw, 54vh) rotate(-4deg); 
               opacity: 1; 
             }
           }
 
-          /* Hover HP */
           @keyframes gentleHover {
-            0%, 100% { transform: translate(10vw, 15vh) rotate(-2deg); }
-            50% { transform: translate(12vw, 13vh) rotate(3deg); }
+            0%, 100% { transform: translate(66vw, 54vh) rotate(-4deg); }
+            50% { transform: translate(67vw, 52.5vh) rotate(2deg); }
           }
           
           .real-dove-container {
-            /* Pastikan di HP pakai flyInMobile agar titik akhirnya pas */
             animation: 
-              flyInMobile 2.5s ease-out forwards,
-              gentleHover 8s ease-in-out 2.5s infinite;
+              flyInMobile 2.8s ease-out forwards,
+              gentleHover 8s ease-in-out 2.8s infinite;
           }
 
           .real-dove-img {
-            width: 120px;
+            width: 92px;   /* lebih mungil di zona teks agar elegan */
           }
         }
       `,

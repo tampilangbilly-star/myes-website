@@ -3509,3 +3509,969 @@ select:focus-visible {
   background: rgba(232, 163, 61, 0.12);
   color: var(--gold-light);
 }
+/* ================================================================
+   HERO SLIDER — MOBILE BACKGROUND
+   [V4] Blok lama (background-size: 100% auto) DIHAPUS karena
+   menghasilkan letterbox hitam atas-bawah di layar HP yang tinggi.
+   Treatment mobile kini di layer V4 bagian 10: full-bleed cover
+   dengan scrim 3 zona yang menjaga wajah tetap terlihat.
+   ================================================================ */
+
+/* ════════════════════════════════════════════════════════════════════
+   V4 — HOMEPAGE CINEMATIC (perombakan besar halaman utama)
+   Layer append-only: menang di cascade, TIDAK mengubah blok lama,
+   sehingga halaman lain tetap aman. Berisi:
+   1. Pindahan CSS inline lama page.js (hero-wrapper, cta-button, dst)
+   2. Sistem reveal-on-scroll (.hm-reveal, dipakai komponen Reveal.js)
+   3. Section baru: strip sosial, Who We Are, Programs, News, Location,
+      Join Us (kelas hm-*)
+   4. Polish hero mobile + navbar drawer kaca full-screen
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. PINDAHAN INLINE LAMA ────────────────────────────────────────── */
+.hero-wrapper {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.guest-speaker-overlay {
+  position: absolute;
+  top: 50%;
+  right: 8%;
+  transform: translateY(-50%);
+  z-index: 40;
+}
+@media (max-width: 992px) {
+  .guest-speaker-overlay {
+    position: relative;
+    top: auto;
+    right: auto;
+    transform: none;
+    margin: -100px auto 3rem;
+    display: flex;
+    justify-content: center;
+    padding: 0 1rem;
+    z-index: 40;
+  }
+}
+
+.cta-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  padding: 1rem 2.5rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.02rem;
+  letter-spacing: 0.3px;
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow:
+    0 8px 24px rgba(59, 130, 246, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.cta-button:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 16px 40px rgba(59, 130, 246, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+.hm-cta-sm {
+  padding: 0.85rem 2rem;
+  font-size: 0.98rem;
+}
+
+/* ── 2. REVEAL ON SCROLL ────────────────────────────────────────────── */
+.hm-reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition:
+    opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--hm-d, 0s),
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--hm-d, 0s);
+  will-change: opacity, transform;
+}
+.hm-reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ── 3. TIPOGRAFI & UTIL BERSAMA ────────────────────────────────────── */
+.hm-h2 {
+  font-size: clamp(1.9rem, 1.3rem + 2.6vw, 2.8rem);
+  color: #fff;
+  font-weight: 800;
+  line-height: 1.18;
+  letter-spacing: -0.5px;
+  margin: 0.6rem 0 1.2rem;
+}
+.hm-gold {
+  background: linear-gradient(
+    120deg,
+    var(--gold, #d4a941),
+    var(--gold-light, #f0cf7e)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.hm-lead {
+  color: #94a3b8;
+  line-height: 1.75;
+  font-size: 1.05rem;
+  margin-bottom: 1.8rem;
+  max-width: 52ch;
+}
+.hm-center {
+  text-align: center;
+  margin-top: 2.6rem;
+}
+.hm-left {
+  text-align: left;
+  margin-bottom: 3rem;
+}
+
+.hm-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: clamp(2.5rem, 5vw, 4rem);
+  align-items: center;
+}
+
+.hm-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  padding: 0.9rem 2.2rem;
+  border-radius: 999px;
+  color: #e2e8f0;
+  text-decoration: none;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(6px);
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.hm-btn-ghost:hover {
+  border-color: var(--gold, #d4a941);
+  color: var(--gold-light, #f0cf7e);
+  transform: translateY(-2px);
+  background: rgba(212, 169, 65, 0.06);
+}
+
+.hm-link-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--gold-light, #f0cf7e);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: gap 0.3s ease;
+}
+.hm-link-more:hover {
+  gap: 0.9rem;
+}
+
+/* ── 4. SOCIAL STRIP ────────────────────────────────────────────────── */
+.hm-strip {
+  background: #050b14;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 1.4rem 0;
+}
+.hm-strip-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.25rem;
+}
+.hm-strip-title {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #f8fafc;
+  letter-spacing: 0.4px;
+}
+.hm-strip-arrow {
+  display: inline-flex;
+  padding: 6px;
+  border-radius: 50%;
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+  animation: hmBounceX 1.6s infinite;
+}
+@keyframes hmBounceX {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateX(0);
+  }
+  40% {
+    transform: translateX(8px);
+  }
+  60% {
+    transform: translateX(4px);
+  }
+}
+.hm-strip-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+.hm-strip-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: #e2e8f0;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.98rem;
+  padding: 9px 16px 9px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.hm-strip-link:hover {
+  transform: translateY(-2px);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.06);
+}
+.hm-strip-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.hm-strip-icon.ig {
+  color: #e1306c;
+  background: rgba(225, 48, 108, 0.12);
+}
+.hm-strip-icon.wa {
+  color: #25d366;
+  background: rgba(37, 211, 102, 0.12);
+}
+.hm-strip-icon.tk {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+@media (max-width: 768px) {
+  .hm-strip-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .hm-strip-links {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+  .hm-strip-link {
+    width: 100%;
+  }
+}
+
+/* ── 5. WHO WE ARE ──────────────────────────────────────────────────── */
+.hm-about {
+  position: relative;
+  overflow: hidden;
+  background: #060c16;
+  padding: clamp(4.5rem, 9vw, 7rem) 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+.hm-about-glow {
+  position: absolute;
+  top: -30%;
+  right: -15%;
+  width: 60%;
+  height: 120%;
+  pointer-events: none;
+  background: radial-gradient(
+    circle,
+    rgba(212, 169, 65, 0.06) 0%,
+    rgba(6, 12, 22, 0) 65%
+  );
+}
+.hm-about-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: clamp(2.5rem, 5vw, 4.5rem);
+  align-items: center;
+}
+.hm-pillars {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.hm-pillar {
+  display: flex;
+  gap: 1.1rem;
+  align-items: flex-start;
+  padding: 1.35rem 1.5rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.35s ease,
+    background 0.35s ease;
+}
+.hm-pillar:hover {
+  transform: translateX(8px);
+  border-color: rgba(212, 169, 65, 0.35);
+  background: rgba(212, 169, 65, 0.04);
+}
+.hm-pillar-emoji {
+  font-size: 1.7rem;
+  line-height: 1;
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.15);
+}
+.hm-pillar h3 {
+  color: #f1f5f9;
+  font-size: 1.08rem;
+  margin: 0 0 0.35rem;
+  font-weight: 700;
+}
+.hm-pillar p {
+  color: #8ea0b8;
+  font-size: 0.93rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .hm-about-grid {
+    grid-template-columns: 1fr;
+  }
+  .hm-about-text {
+    text-align: center;
+  }
+  .hm-about-text .hm-lead {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .hm-pillar:hover {
+    transform: translateY(-4px);
+  }
+}
+
+/* ── 6. PROGRAMS ────────────────────────────────────────────────────── */
+.hm-prog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 1.6rem;
+}
+.hm-prog-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  background: rgba(10, 18, 30, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(8px);
+  transition:
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.4s ease,
+    box-shadow 0.4s ease;
+}
+.hm-prog-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(212, 169, 65, 0.35);
+  box-shadow: 0 24px 48px -18px rgba(0, 0, 0, 0.6);
+}
+.hm-prog-media {
+  position: relative;
+  height: 190px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0b1830, #142c52);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.hm-prog-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.hm-prog-card:hover .hm-prog-media img {
+  transform: scale(1.07);
+}
+.hm-prog-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(10, 18, 30, 0.85) 0%,
+    rgba(10, 18, 30, 0) 55%
+  );
+  pointer-events: none;
+}
+.hm-prog-emoji {
+  font-size: 3.2rem;
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.4));
+}
+.hm-prog-num {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  z-index: 1;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.85);
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: rgba(3, 8, 18, 0.55);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.hm-prog-body {
+  padding: 1.4rem 1.5rem 1.7rem;
+}
+.hm-prog-body h3 {
+  color: #f8fafc;
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0 0 0.55rem;
+}
+.hm-prog-body p {
+  color: #8ea0b8;
+  font-size: 0.94rem;
+  line-height: 1.65;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.hm-prog-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--gold, #d4a941),
+    var(--gold-light, #f0cf7e)
+  );
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.hm-prog-card:hover .hm-prog-line {
+  transform: scaleX(1);
+}
+
+/* ── 7. NEWS ────────────────────────────────────────────────────────── */
+.hm-news {
+  position: relative;
+  overflow: hidden;
+  background: #080e17;
+  padding: clamp(4rem, 8vw, 6rem) 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+}
+.hm-news-glow-l,
+.hm-news-glow-r {
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+.hm-news-glow-l {
+  top: -20%;
+  left: -10%;
+  background: radial-gradient(
+    circle,
+    rgba(59, 130, 246, 0.08) 0%,
+    rgba(8, 14, 23, 0) 70%
+  );
+}
+.hm-news-glow-r {
+  bottom: -20%;
+  right: -10%;
+  background: radial-gradient(
+    circle,
+    rgba(234, 67, 53, 0.05) 0%,
+    rgba(8, 14, 23, 0) 70%
+  );
+}
+.hm-news .container {
+  position: relative;
+  z-index: 1;
+}
+.hm-news-text {
+  text-align: left;
+}
+
+/* ── 8. LOCATION ────────────────────────────────────────────────────── */
+.hm-map {
+  width: 100%;
+  height: 400px;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+}
+@media (max-width: 768px) {
+  .hm-map {
+    height: 300px;
+  }
+}
+.hm-loc-title {
+  font-size: clamp(1.7rem, 1.3rem + 1.8vw, 2.2rem);
+  margin: 0 0 0.6rem;
+  color: #fff;
+  font-weight: 800;
+}
+.hm-loc-bar {
+  display: block;
+  width: 60px;
+  height: 4px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #1d4ed8, #3b82f6);
+  margin-bottom: 1.4rem;
+}
+.hm-loc-area {
+  color: #3b82f6;
+  font-size: 1.25rem;
+  margin: 0 0 1rem;
+}
+.hm-loc-contacts {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+.hm-contact-chip {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+}
+.hm-chip-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.hm-chip-icon.wa {
+  color: #25d366;
+  background: rgba(37, 211, 102, 0.15);
+}
+.hm-chip-icon.mail {
+  color: #ea4335;
+  background: rgba(234, 67, 53, 0.15);
+}
+.hm-chip-label {
+  display: block;
+  font-size: 0.8rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 3px;
+}
+.hm-contact-chip a {
+  color: #e2e8f0;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.05rem;
+  transition: color 0.25s ease;
+}
+.hm-contact-chip a:hover {
+  color: var(--gold-light, #f0cf7e);
+}
+
+/* ── 9. JOIN US (CTA PENUTUP) ───────────────────────────────────────── */
+.hm-join {
+  position: relative;
+  overflow: hidden;
+  background: #050b14;
+  padding: clamp(5rem, 10vw, 8rem) 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+.hm-join-glow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(900px, 120vw);
+  height: 130%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse at 50% 45%,
+      rgba(59, 130, 246, 0.14) 0%,
+      rgba(5, 11, 20, 0) 60%
+    ),
+    radial-gradient(
+      ellipse at 50% 60%,
+      rgba(212, 169, 65, 0.08) 0%,
+      rgba(5, 11, 20, 0) 55%
+    );
+}
+.hm-join-inner {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto;
+}
+.hm-join-title {
+  font-size: clamp(2.1rem, 1.4rem + 3.4vw, 3.4rem);
+  color: #fff;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.5px;
+  margin: 0.7rem 0 1.2rem;
+}
+.hm-join-lead {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+.hm-join-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2.2rem;
+}
+@media (max-width: 520px) {
+  .hm-join-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .hm-join-actions .cta-button,
+  .hm-join-actions .hm-btn-ghost {
+    width: 100%;
+  }
+}
+
+/* ── 10. HERO POLISH (desktop lebih megah, mobile dirancang ulang) ──── */
+.hs-bg {
+  will-change: transform;
+}
+.hs-slide.is-active .hs-bg {
+  animation: hmKenBurns 7s ease-out forwards;
+}
+@keyframes hmKenBurns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.07);
+  }
+}
+
+/* ── STRUKTUR MEDIA HERO (V4.3) ─────────────────────────────────────
+   Desktop: .hs-media membungkus background lama secara transparan —
+   absolute inset 0, visual desktop TIDAK berubah sedikit pun.
+   Mobile: .hs-slide menjadi KOLOM ALUR NORMAL — foto <img> utuh di
+   atas, panel konten solid di bawahnya. Karena keduanya elemen flow
+   terpisah, teks menimpa wajah mustahil secara struktur. */
+
+.hs-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.hs-photo {
+  display: none;
+}
+.hs-bg-blur {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .hero-slider {
+    min-height: 100svh;
+  }
+
+  /* Slide jadi kolom flow: [media] lalu [panel konten] */
+  .hs-slide {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── ZONA FOTO: gambar UTUH + ambient blur di belakangnya ── */
+  .hs-media {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    margin-top: 64px; /* tinggi navbar fixed */
+    flex: 0 0 auto;
+    overflow: hidden;
+  }
+  .hs-media:not(.has-photo) {
+    display: none;
+  } /* slide gradien = panel penuh */
+
+  .hs-bg {
+    display: none !important;
+  } /* background desktop mati di mobile */
+
+  .hs-bg-blur {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-size: cover;
+    background-position: center;
+    filter: blur(24px) brightness(0.55) saturate(1.15);
+    transform: scale(1.12);
+  }
+  .hs-photo {
+    display: block;
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: auto;
+    max-height: 56svh;
+    object-fit: contain; /* seluruh jemaat terlihat, tanpa crop */
+    /* Film grade dasar: warna lebih kaya, highlight diredam */
+    filter: saturate(1.12) contrast(1.08) brightness(0.9);
+  }
+  /* Lapisan color-grade sinematik teal–gold (blend overlay) di atas foto */
+  .hs-media.has-photo::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: linear-gradient(
+      165deg,
+      rgba(29, 78, 216, 0.24) 0%,
+      rgba(3, 8, 18, 0.04) 46%,
+      rgba(212, 169, 65, 0.18) 100%
+    );
+    mix-blend-mode: overlay;
+  }
+  /* Vignette sinematik + kaki foto melebur mulus ke panel konten */
+  .hs-media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(
+        125% 95% at 50% 38%,
+        transparent 56%,
+        rgba(3, 8, 18, 0.52) 100%
+      ),
+      linear-gradient(to top, #050b14 3%, transparent 30%);
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  /* Overlay absolut lama tidak diperlukan pada struktur flow */
+  .hs-overlay {
+    display: none !important;
+  }
+
+  /* ── PANEL KONTEN: solid, DI BAWAH foto dalam alur dokumen ── */
+  .hs-inner {
+    position: relative;
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 1.5rem 1.35rem 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    text-align: center;
+    gap: 0;
+    background:
+      radial-gradient(
+        130% 90% at 50% 0%,
+        rgba(37, 99, 235, 0.12),
+        transparent 62%
+      ),
+      #050b14;
+  }
+  .hs-text {
+    max-width: 100%;
+  }
+  .hs-overline {
+    justify-content: center;
+    font-size: 0.76rem;
+    letter-spacing: 3px;
+    margin-bottom: 0.9rem;
+  }
+  .hs-overline::before {
+    display: none;
+  }
+  .hs-title {
+    font-size: clamp(1.8rem, 8vw, 2.4rem);
+    line-height: 1.12;
+    margin-bottom: 0.9rem;
+    text-shadow: none;
+  }
+  .hs-desc {
+    font-size: 0.96rem;
+    line-height: 1.62;
+    color: #b9c6da;
+    margin: 0 auto 1.5rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .hs-btn {
+    width: 100%;
+    max-width: 340px;
+    justify-content: center;
+  }
+  .hs-image {
+    display: none;
+  } /* gambar sekunder tidak dipakai di layout poster */
+
+  /* ── Navigasi ── */
+  .slider-arrow {
+    display: none !important;
+  }
+  .hs-scroll-cue {
+    display: none;
+  }
+  .slider-dots {
+    bottom: 26px;
+    gap: 9px;
+  }
+  .slider-dots .dot {
+    width: 26px;
+    height: 5px;
+    border-radius: 99px;
+  }
+
+  /* Kartu Guest Speaker BERSIH di bawah hero — tidak menimpa tombol/dots */
+  .guest-speaker-overlay {
+    margin: 16px auto 2.5rem;
+  }
+}
+
+/* ── 11. NAVBAR DRAWER KACA (mobile) — kompatibel semua halaman ─────── */
+@media (max-width: 992px) {
+  .nav-links {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    background: rgba(3, 8, 18, 0.82);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 998;
+  }
+  .nav-links.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+  .nav-links a {
+    font-size: 1.25rem;
+    padding: 0.8rem 1.6rem;
+    width: auto;
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 0.4s ease,
+      transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+      color 0.25s ease;
+  }
+  .nav-links.open a {
+    opacity: 1;
+    transform: none;
+  }
+  .nav-links.open a:nth-child(1) {
+    transition-delay: 0.05s;
+  }
+  .nav-links.open a:nth-child(2) {
+    transition-delay: 0.1s;
+  }
+  .nav-links.open a:nth-child(3) {
+    transition-delay: 0.15s;
+  }
+  .nav-links.open a:nth-child(4) {
+    transition-delay: 0.2s;
+  }
+  .nav-links.open a:nth-child(5) {
+    transition-delay: 0.25s;
+  }
+  .nav-links.open a:nth-child(6) {
+    transition-delay: 0.3s;
+  }
+  .nav-links.open a:nth-child(7) {
+    transition-delay: 0.35s;
+  }
+  .hamburger {
+    position: relative;
+    z-index: 999;
+  }
+  body.nav-open {
+    overflow: hidden;
+  }
+}
+
+/* ── 12. REDUCED MOTION ─────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .hm-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .hs-slide.is-active .hs-bg {
+    animation: none !important;
+  }
+  .hm-strip-arrow {
+    animation: none !important;
+  }
+  .hm-prog-media img,
+  .hm-prog-card,
+  .hm-pillar {
+    transition: none !important;
+  }
+}

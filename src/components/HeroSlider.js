@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 export default function HeroSlider({ slides, socials, lang = "en" }) {
   const [current, setCurrent] = useState(0);
@@ -18,14 +18,31 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
     setCurrent((c) => (c + 1) % total);
   }, [current, total]);
 
-  const prev = () => {
+  const prev = useCallback(() => {
     setPrevIndex(current);
     setCurrent((c) => (c - 1 + total) % total);
+  }, [current, total]);
+
+  /* ── Swipe gesture (mobile UX — panah disembunyikan di layar kecil) ── */
+  const touchX = useRef(null);
+  const onTouchStart = (e) => {
+    touchX.current = e.touches[0].clientX;
+  };
+  const onTouchEnd = (e) => {
+    if (touchX.current === null) return;
+    const delta = e.changedTouches[0].clientX - touchX.current;
+    touchX.current = null;
+    if (Math.abs(delta) < 45) return; // abaikan tap/geser kecil
+    if (delta < 0) next();
+    else prev();
   };
 
   useEffect(() => {
     if (total <= 1) return;
-    const timer = setInterval(next, 5000);
+    const timer = setInterval(() => {
+      // Hemat baterai & hindari lompatan slide saat tab tidak terlihat
+      if (document.visibilityState === "visible") next();
+    }, 5000);
     return () => clearInterval(timer);
   }, [next, total]);
 
@@ -72,6 +89,8 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
         overflow: "hidden",
         backgroundColor: "#030812",
       }}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
     >
       {slides.map((slide, i) => {
         const isActive = i === current;
@@ -84,24 +103,40 @@ export default function HeroSlider({ slides, socials, lang = "en" }) {
               !isActive && isPrev ? "is-prev" : ""
             }`}
           >
-            {/* BACKGROUND IMAGE / GRADIENT */}
-            {slide.backgroundImage ? (
-              <div
-                className="hs-bg"
-                style={{
-                  backgroundImage: `url(${slide.backgroundImage})`,
-                }}
-              />
-            ) : (
-              <div
-                className="hs-bg"
-                style={{
-                  background: `linear-gradient(135deg, ${
-                    slide.backgroundColor || "#0a1628"
-                  }, #030812)`,
-                }}
-              />
-            )}
+            {/* ZONA MEDIA — desktop: background cover seperti biasa;
+                mobile: <img> foto UTUH dalam alur dokumen + ambient blur.
+                Struktur flow membuat teks TIDAK MUNGKIN menimpa foto. */}
+            <div
+              className={`hs-media ${slide.backgroundImage ? "has-photo" : ""}`}
+            >
+              {slide.backgroundImage ? (
+                <>
+                  <div
+                    className="hs-bg-blur"
+                    aria-hidden="true"
+                    style={{ backgroundImage: `url(${slide.backgroundImage})` }}
+                  />
+                  <img
+                    className="hs-photo"
+                    src={slide.backgroundImage}
+                    alt={t(slide, "title") || "M-YES"}
+                  />
+                  <div
+                    className="hs-bg"
+                    style={{ backgroundImage: `url(${slide.backgroundImage})` }}
+                  />
+                </>
+              ) : (
+                <div
+                  className="hs-bg"
+                  style={{
+                    background: `linear-gradient(135deg, ${
+                      slide.backgroundColor || "#0a1628"
+                    }, #030812)`,
+                  }}
+                />
+              )}
+            </div>
 
             {/* CINEMATIC OVERLAY */}
             <div className="hs-overlay" />

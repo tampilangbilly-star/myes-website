@@ -1,13 +1,22 @@
 import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
 import HeroSlider from "@/components/HeroSlider";
-import SocialFloat from "@/components/SocialFloat";
 import GuestSpeakerSlider from "@/components/GuestSpeakerSlider";
 import NewsHomeSlider from "@/components/NewsHomeSlider";
 import VirtualGreeter from "@/components/VirtualGreeter";
 import HolySpiritAmbient from "@/components/HolySpiritAmbient";
+import Reveal from "@/components/Reveal";
+
+/**
+ * HOMEPAGE M-YES — V4 "Cinematic"
+ * Alur cerita: Hero → Social → Who We Are → Programs → News → Location → Join Us.
+ * Catatan arsitektur:
+ * • Navbar & SocialFloat TIDAK diimpor di sini — sudah dirender global oleh
+ *   layout.js (memperbaiki bug render ganda pada versi sebelumnya).
+ * • Seluruh styling di globals.css layer "V4 — HOMEPAGE CINEMATIC" (kelas hm-*),
+ *   tanpa CSS inline besar — clean & maintainable.
+ */
 
 async function getData() {
   const [
@@ -18,6 +27,7 @@ async function getData() {
     mainBgSetting,
     speakers,
     contactItems,
+    aboutItems,
   ] = await Promise.all([
     prisma.slide.findMany({
       where: { isActive: true },
@@ -40,22 +50,39 @@ async function getData() {
       orderBy: { dateServed: "desc" },
     }),
     prisma.setting.findMany({ where: { group: "contact" } }),
+    prisma.setting.findMany({ where: { group: "about" } }),
   ]);
 
   const socials = {};
   socialItems.forEach((s) => {
     socials[s.key.replace("social_", "")] = s.valueEn;
   });
-  const mainBg = mainBgSetting?.valueEn;
 
-  return { slides, programs, news, socials, mainBg, speakers, contactItems };
+  return {
+    slides,
+    programs,
+    news,
+    socials,
+    mainBg: mainBgSetting?.valueEn,
+    speakers,
+    contactItems,
+    aboutItems,
+  };
 }
 
 export default async function Home() {
   const cookieStore = cookies();
   const lang = cookieStore.get("lang")?.value || "en";
-  const { slides, programs, news, socials, mainBg, speakers, contactItems } =
-    await getData();
+  const {
+    slides,
+    programs,
+    news,
+    socials,
+    mainBg,
+    speakers,
+    contactItems,
+    aboutItems,
+  } = await getData();
 
   const t = (item, field) => {
     if (!item) return "";
@@ -69,175 +96,72 @@ export default async function Home() {
     contactData[i.key] = lang === "id" ? i.valueId || i.valueEn : i.valueEn;
   });
 
+  const aboutData = {};
+  aboutItems.forEach((i) => {
+    aboutData[i.key] = lang === "id" ? i.valueId || i.valueEn : i.valueEn;
+  });
+
   const rawPhone = contactData.contact_phone || "+62 822 9065 8336";
   const cleanPhone = rawPhone.replace(/\D/g, "");
   const displayEmail = contactData.contact_email || "myesworship@gmail.com";
 
+  const igUrl =
+    socials.instagram ||
+    "https://www.instagram.com/myes_worship?igsh=MW5sa211OHN6eTJodg==";
+  const waGroupUrl =
+    socials.whatsapp || "https://chat.whatsapp.com/Fialpt9jLrCL0oLagStRTc";
+  const tiktokUrl =
+    socials.tiktok ||
+    "https://www.tiktok.com/@myes_fellowship?_r=1&_t=ZS-97MYyNQj1Rl";
+
+  const aboutText =
+    aboutData.about_description ||
+    (lang === "id"
+      ? "Komunitas berbasis gereja yang memberdayakan pemuda melalui pendidikan Bahasa Inggris gratis dan pertumbuhan rohani."
+      : "A church-based community empowering youth through free English education and spiritual growth.");
+
+  const pillars = [
+    {
+      emoji: "🗣️",
+      en: [
+        "English Service",
+        "Learn and worship in English — grow your fluency naturally, week by week.",
+      ],
+      id: [
+        "English Service",
+        "Belajar dan beribadah dalam Bahasa Inggris — kefasihanmu tumbuh alami tiap minggu.",
+      ],
+    },
+    {
+      emoji: "🙏",
+      en: [
+        "Worship & Faith",
+        "Rooted in faith. Every gathering starts and ends with worship together.",
+      ],
+      id: [
+        "Worship & Iman",
+        "Berakar dalam iman. Setiap pertemuan dibuka dan ditutup dengan penyembahan bersama.",
+      ],
+    },
+    {
+      emoji: "🤝",
+      en: [
+        "Fellowship",
+        "A warm youth family — games, sharing, mission trips, and real friendship.",
+      ],
+      id: [
+        "Fellowship",
+        "Keluarga muda yang hangat — games, sharing, mission trip, dan persahabatan sejati.",
+      ],
+    },
+  ];
+
   return (
     <>
-      <Navbar lang={lang} />
-
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-        .hero-wrapper {
-          position: relative;
-          width: 100%;
-          overflow: hidden;
-        }
-        
-        .guest-speaker-overlay {
-          position: absolute;
-          top: 50%;
-          right: 8%;
-          transform: translateY(-50%);
-          z-index: 40;
-        }
-
-        .cta-button {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          min-height: 48px;
-          background: linear-gradient(135deg, #1d4ed8, #3b82f6);
-          color: #fff;
-          padding: 1rem 2.5rem;
-          border-radius: 50px;
-          text-decoration: none;
-          font-weight: 700;
-          font-size: 1.05rem;
-          letter-spacing: 0.3px;
-          transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-                      box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-          box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.25);
-        }
-        .cta-button:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 16px 40px rgba(59, 130, 246, 0.55),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.3);
-        }
-
-        .viva-social {
-          display: flex;
-          align-items: center;
-          gap: 0.8rem;
-          color: #e2e8f0;
-          text-decoration: none;
-          font-weight: 500;
-          font-size: 1.05rem;
-          padding: 8px 14px;
-          border-radius: 12px;
-          border: 1px solid transparent;
-          transition: all 0.3s ease;
-        }
-        .viva-social:hover {
-          color: #fff;
-          transform: translateY(-2px);
-          border-color: rgba(255, 255, 255, 0.1);
-          background: rgba(255, 255, 255, 0.04);
-        }
-
-        .modern-social-title {
-          margin: 0;
-          font-size: 1.4rem;
-          font-weight: 700;
-          color: #f8fafc;
-          letter-spacing: 0.5px;
-          display: flex;
-          align-items: center;
-        }
-
-        .bounce-right-arrow {
-          animation: bounceRight 1.5s infinite;
-          color: #3b82f6;
-          display: flex;
-          align-items: center;
-          margin-left: 1rem;
-          background: rgba(59, 130, 246, 0.1);
-          padding: 6px;
-          border-radius: 50%;
-        }
-
-        @keyframes bounceRight {
-          0%, 20%, 50%, 80%, 100% { transform: translateX(0); }
-          40% { transform: translateX(10px); }
-          60% { transform: translateX(5px); }
-        }
-
-        /* --- KELAS CSS RESPONSIF --- */
-        .responsive-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
-          gap: 4rem;
-          align-items: center;
-        }
-        
-        .news-title {
-          font-size: clamp(2rem, 1.4rem + 2.6vw, 2.8rem);
-          color: #fff;
-          font-weight: 800;
-          margin: 0.5rem 0 1.5rem 0;
-          line-height: 1.2;
-          letter-spacing: -0.5px;
-        }
-        
-        .location-title {
-          font-size: clamp(1.7rem, 1.3rem + 1.8vw, 2.2rem);
-          margin-bottom: 0.5rem;
-          color: #fff;
-          font-weight: bold;
-        }
-        
-        .section-padding {
-          padding-top: clamp(4rem, 8vw, 6rem);
-          padding-bottom: clamp(4rem, 8vw, 6rem);
-        }
-
-        @media (max-width: 992px) {
-          .guest-speaker-overlay {
-            position: relative;
-            top: auto;
-            right: auto;
-            transform: none;
-            margin: -100px auto 3rem auto;
-            display: flex;
-            justify-content: center;
-            padding: 0 1rem;
-            z-index: 40;
-          }
-        }
-        
-        @media (max-width: 768px) {
-          .responsive-grid {
-            gap: 2.5rem; /* Jarak antar elemen dikurangi di HP */
-          }
-          .map-container {
-            height: 300px !important; /* Peta tidak terlalu panjang di HP */
-          }
-          .social-strip-inner {
-            flex-direction: column;
-            align-items: flex-start !important;
-            gap: 1.25rem !important;
-          }
-          .social-strip-links {
-            gap: 0.75rem !important;
-          }
-          .viva-social {
-            font-size: 0.95rem;
-            padding: 10px 12px;
-            width: 100%;
-          }
-        }
-      `,
-        }}
-      />
-
+      {/* ══ 1. HERO ═══════════════════════════════════════════════════ */}
       <div className="hero-wrapper">
         <HolySpiritAmbient />
-
         <HeroSlider slides={slides} socials={socials} lang={lang} />
-
         {speakers && speakers.length > 0 && (
           <div className="guest-speaker-overlay">
             <GuestSpeakerSlider speakers={speakers} lang={lang} />
@@ -245,34 +169,15 @@ export default async function Home() {
         )}
       </div>
 
-      {/* ── STRIP MEDIA SOSIAL ─────────────────────────────────────── */}
-      <div
-        style={{
-          backgroundColor: "#050B14",
-          borderBottom: "1px solid rgba(255,255,255,0.05)",
-          padding: "1.5rem 0",
-        }}
-      >
-        <div
-          className="container social-strip-inner"
-          style={{
-            maxWidth: "1200px",
-            margin: "0 auto",
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: "2rem",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <h3 className="modern-social-title">
-              {lang === "id" ? "Media Sosial" : "Social Media"}
-            </h3>
-            <div className="bounce-right-arrow">
+      {/* ══ 2. SOCIAL STRIP ═══════════════════════════════════════════ */}
+      <div className="hm-strip">
+        <div className="hm-strip-inner">
+          <p className="hm-strip-title">
+            {lang === "id" ? "Terhubung Dengan Kami" : "Stay Connected"}
+            <span className="hm-strip-arrow" aria-hidden="true">
               <svg
-                width="20"
-                height="20"
+                width="18"
+                height="18"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -280,443 +185,351 @@ export default async function Home() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
               </svg>
-            </div>
-          </div>
-
-          <div
-            className="social-strip-links"
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "2.5rem",
-              alignItems: "center",
-            }}
-          >
+            </span>
+          </p>
+          <div className="hm-strip-links">
             <a
-              href="https://www.instagram.com/myes_worship?igsh=MW5sa211OHN6eTJodg=="
-              className="viva-social"
+              href={igUrl}
+              className="hm-strip-link"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <svg width="28" height="28" viewBox="0 0 24 24">
-                <defs>
-                  <linearGradient
-                    id="ig-grad-top"
-                    x1="0%"
-                    y1="100%"
-                    x2="100%"
-                    y2="0%"
-                  >
-                    <stop offset="0%" stopColor="#fd5949" />
-                    <stop offset="50%" stopColor="#d6249f" />
-                    <stop offset="100%" stopColor="#285AEB" />
-                  </linearGradient>
-                </defs>
-                <path
-                  fill="url(#ig-grad-top)"
-                  d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"
-                />
-              </svg>
-              <span>
-                {lang === "id" ? "Ikuti Instagram" : "Follow on Instagram"}
+              <span className="hm-strip-icon ig" aria-hidden="true">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+                </svg>
               </span>
+              <span>{lang === "id" ? "Instagram" : "Instagram"}</span>
             </a>
             <a
-              href="https://chat.whatsapp.com/Fialpt9jLrCL0oLagStRTc"
-              className="viva-social"
+              href={waGroupUrl}
+              className="hm-strip-link"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <svg width="28" height="28" fill="#25D366" viewBox="0 0 24 24">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
-              </svg>
-              <span>{lang === "id" ? "Grup WhatsApp" : "Join WhatsApp"}</span>
+              <span className="hm-strip-icon wa" aria-hidden="true">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+                </svg>
+              </span>
+              <span>{lang === "id" ? "Grup WhatsApp" : "WhatsApp Group"}</span>
             </a>
             <a
-              href="https://www.tiktok.com/@myes_fellowship?_r=1&_t=ZS-97MYyNQj1Rl"
-              className="viva-social"
+              href={tiktokUrl}
+              className="hm-strip-link"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <svg width="28" height="28" fill="#fff" viewBox="0 0 24 24">
-                <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 15.68a6.34 6.34 0 0011.14 4.43v-7.4a8.27 8.27 0 004.86 1.52v-3.45a4.8 4.8 0 01-1.41-4.09z" />
-              </svg>
-              <span>
-                {lang === "id" ? "Ikuti TikTok Kami" : "Follow Our TikTok"}
+              <span className="hm-strip-icon tk" aria-hidden="true">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 15.68a6.34 6.34 0 0011.14 4.43v-7.4a8.27 8.27 0 004.86 1.52v-3.45a4.8 4.8 0 01-1.41-4.09z" />
+                </svg>
               </span>
+              <span>TikTok</span>
             </a>
           </div>
         </div>
       </div>
 
-      {/* ── SEKSI PROGRAM (background parallax dgn fix Android) ──────── */}
+      {/* ══ 3. WHO WE ARE ═════════════════════════════════════════════ */}
+      <section className="hm-about">
+        <div className="hm-about-glow" aria-hidden="true" />
+        <div className="container">
+          <div className="hm-about-grid">
+            <Reveal className="hm-about-text">
+              <div className="overline">
+                {lang === "id" ? "Siapa Kami" : "Who We Are"}
+              </div>
+              <h2 className="hm-h2">
+                {lang === "id" ? (
+                  <>
+                    Generasi Muda, <span className="hm-gold">Satu Iman</span>,
+                    Satu Bahasa
+                  </>
+                ) : (
+                  <>
+                    Young Hearts, <span className="hm-gold">One Faith</span>,
+                    One Language
+                  </>
+                )}
+              </h2>
+              <p className="hm-lead">{aboutText}</p>
+              <Link href="/about" className="hm-link-more">
+                {lang === "id" ? "Kenali kami lebih dekat" : "Get to know us"}
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+              </Link>
+            </Reveal>
+
+            <div className="hm-pillars">
+              {pillars.map((p, i) => {
+                const [title, desc] = lang === "id" ? p.id : p.en;
+                return (
+                  <Reveal
+                    key={title}
+                    delay={0.1 + i * 0.12}
+                    className="hm-pillar"
+                  >
+                    <span className="hm-pillar-emoji" aria-hidden="true">
+                      {p.emoji}
+                    </span>
+                    <div>
+                      <h3>{title}</h3>
+                      <p>{desc}</p>
+                    </div>
+                  </Reveal>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══ 4. PROGRAMS — WHAT WE DO ══════════════════════════════════ */}
       {programs.length > 0 && (
         <section
-          className="section bg-fixed"
+          className="section bg-fixed hm-programs"
           style={{
-            backgroundImage: `linear-gradient(rgba(5, 11, 20, 0.85), rgba(5, 11, 20, 0.95)), url('${mainBg || ""}')`,
+            backgroundImage: `linear-gradient(rgba(5, 11, 20, 0.88), rgba(5, 11, 20, 0.96)), url('${mainBg || ""}')`,
           }}
         >
           <div className="container">
-            <div className="section-header">
+            <Reveal className="section-header">
               <div className="overline">
                 {lang === "id" ? "Apa Yang Kami Lakukan" : "What We Do"}
               </div>
               <h2>{lang === "id" ? "Program Kami" : "Our Programs"}</h2>
-            </div>
-            <div className="program-grid">
+            </Reveal>
+            <div className="hm-prog-grid">
               {programs.map((p, i) => (
-                <div key={p.id} className="program-card">
-                  <div
-                    className="program-card-top"
-                    style={
-                      i % 2 === 1
-                        ? {
-                            background:
-                              "linear-gradient(90deg,var(--gold),var(--gold-light))",
-                          }
-                        : {}
-                    }
-                  />
-                  <div className="program-card-body">
+                <Reveal
+                  key={p.id}
+                  delay={(i % 3) * 0.1}
+                  className="hm-prog-card"
+                >
+                  <div className="hm-prog-media">
                     {p.image ? (
                       <img
                         src={`${p.image}`}
-                        style={{
-                          width: "100%",
-                          height: 140,
-                          objectFit: "cover",
-                          borderRadius: 12,
-                          marginBottom: "1.2rem",
-                        }}
-                        alt=""
+                        alt={t(p, "title")}
+                        loading="lazy"
                       />
                     ) : (
-                      <span className="emoji">{p.emoji}</span>
+                      <span className="hm-prog-emoji" aria-hidden="true">
+                        {p.emoji}
+                      </span>
                     )}
+                    <span className="hm-prog-num" aria-hidden="true">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                  </div>
+                  <div className="hm-prog-body">
                     <h3>{t(p, "title")}</h3>
                     <p>{t(p, "description")}</p>
                   </div>
-                </div>
+                  <span className="hm-prog-line" aria-hidden="true" />
+                </Reveal>
               ))}
             </div>
+            <Reveal className="hm-center" delay={0.15}>
+              <Link href="/program" className="hm-btn-ghost">
+                {lang === "id" ? "Semua Program" : "Explore All Programs"}
+              </Link>
+            </Reveal>
           </div>
         </section>
       )}
 
-      {/* ======================================================== */}
-      {/* 2. SEKSI BERITA TERBARU (DENGAN AMBIENT GLOW EFFECT)      */}
-      {/* ======================================================== */}
+      {/* ══ 5. NEWS — WEEKLY UPDATE ═══════════════════════════════════ */}
       {news.length > 0 && (
-        <section
-          className="section section-alt section-padding"
-          style={{
-            position: "relative",
-            overflow: "hidden",
-            backgroundColor: "#080e17",
-            borderTop: "1px solid rgba(255,255,255,0.02)",
-            borderBottom: "1px solid rgba(255,255,255,0.02)",
-          }}
-        >
-          {/* Efek Kabut Cahaya Biru di Kiri */}
-          <div
-            style={{
-              position: "absolute",
-              top: "-20%",
-              left: "-10%",
-              width: "50%",
-              height: "100%",
-              background:
-                "radial-gradient(circle, rgba(59,130,246,0.08) 0%, rgba(8,14,23,0) 70%)",
-              zIndex: 0,
-            }}
-          ></div>
-
-          {/* Efek Kabut Cahaya Jingga di Kanan Bawah */}
-          <div
-            style={{
-              position: "absolute",
-              bottom: "-20%",
-              right: "-10%",
-              width: "50%",
-              height: "100%",
-              background:
-                "radial-gradient(circle, rgba(234,67,53,0.05) 0%, rgba(8,14,23,0) 70%)",
-              zIndex: 0,
-            }}
-          ></div>
-
-          <div
-            className="container"
-            style={{
-              position: "relative",
-              zIndex: 1,
-              maxWidth: "1200px",
-              margin: "0 auto",
-            }}
-          >
-            <div className="responsive-grid">
-              <div style={{ textAlign: "left" }}>
-                <div
-                  className="overline"
-                  style={{
-                    color: "#3b82f6",
-                    fontWeight: "bold",
-                    textTransform: "uppercase",
-                    letterSpacing: "1.5px",
-                  }}
-                >
+        <section className="hm-news">
+          <div className="hm-news-glow-l" aria-hidden="true" />
+          <div className="hm-news-glow-r" aria-hidden="true" />
+          <div className="container">
+            <div className="hm-grid-2">
+              <Reveal className="hm-news-text">
+                <div className="overline">
                   {lang === "id" ? "Warta Mingguan" : "Weekly Update"}
                 </div>
-                <h2 className="news-title">
+                <h2 className="hm-h2">
                   {lang === "id"
                     ? "Berita & Flyer Kegiatan"
                     : "Latest Event Flyers"}
                 </h2>
-                <p
-                  style={{
-                    color: "#94a3b8",
-                    lineHeight: "1.7",
-                    fontSize: "1.05rem",
-                    marginBottom: "2rem",
-                  }}
-                >
+                <p className="hm-lead">
                   {lang === "id"
-                    ? "Jangan lewatkan persekutuan ibadah, kelas pembelajaran bahasa Inggris, dan berbagai aktivitas seru M-YES setiap minggunya. Cek berkala deck kartu di samping untuk info terbaru!"
-                    : "Stay tuned for our weekly youth worship services, English classes, and exciting fellowship events. Check out our dynamic card deck on the right!"}
+                    ? "Jangan lewatkan persekutuan ibadah, kelas Bahasa Inggris, dan berbagai aktivitas seru M-YES setiap minggunya. Cek deck kartu di samping untuk info terbaru!"
+                    : "Stay tuned for our weekly youth worship services, English classes, and exciting fellowship events. Check out the dynamic card deck for the latest updates!"}
                 </p>
-                <Link
-                  href="/news"
-                  className="cta-button"
-                  style={{ padding: "0.8rem 2rem", fontSize: "1rem" }}
-                >
+                <Link href="/news" className="cta-button hm-cta-sm">
                   {lang === "id" ? "Lihat Semua Berita" : "View All News"}
                 </Link>
-              </div>
-
-              <div>
+              </Reveal>
+              <Reveal delay={0.15}>
                 <NewsHomeSlider items={news} lang={lang} />
-              </div>
+              </Reveal>
             </div>
           </div>
         </section>
       )}
 
-      {/* ── SEKSI LOKASI (background parallax dgn fix Android) ───────── */}
+      {/* ══ 6. LOCATION — VISIT US ════════════════════════════════════ */}
       <section
-        className="section section-padding bg-fixed"
+        className="section section-padding bg-fixed hm-location"
         style={{
           backgroundImage: `linear-gradient(rgba(5, 11, 20, 0.85), rgba(5, 11, 20, 0.95)), url('home.png')`,
-          borderTop: "1px solid rgba(255,255,255,0.05)",
         }}
       >
         <div className="container">
-          <div
-            className="section-header"
-            style={{ textAlign: "left", marginBottom: "3rem" }}
-          >
+          <Reveal className="section-header hm-left">
             <div className="overline">
               {lang === "id" ? "Kunjungi Kami" : "Visit Us"}
             </div>
             <h2>{lang === "id" ? "Lokasi Kami" : "Our Location"}</h2>
-          </div>
+          </Reveal>
 
-          <div className="responsive-grid">
-            <div
-              className="map-container"
-              style={{
-                width: "100%",
-                height: "400px",
-                borderRadius: "18px",
-                overflow: "hidden",
-                border: "1px solid rgba(255,255,255,0.1)",
-                boxShadow: "0 10px 30px -10px rgba(0, 0, 0, 0.5)",
-              }}
-            >
+          <div className="hm-grid-2">
+            <Reveal className="hm-map">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3453.6204589046138!2d124.80560197423821!3d1.4492102612499522!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x32877544d235223b%3A0x216b2b2a129e1930!2sMG.Maru.Home!5e1!3m2!1sen!2sus!4v1782539996785!5m2!1sen!2sus"
                 width="100%"
-                height="450"
+                height="100%"
                 style={{ border: 0 }}
                 allowFullScreen=""
                 loading="lazy"
                 referrerPolicy="strict-origin-when-cross-origin"
-              ></iframe>
-            </div>
+                title="M-YES Basecamp Map"
+              />
+            </Reveal>
 
-            <div className="location-info">
-              <h3 className="location-title">M-YES Basecamp</h3>
-              <div
-                style={{
-                  width: "60px",
-                  height: "4px",
-                  borderRadius: "99px",
-                  background: "linear-gradient(90deg, #1d4ed8, #3b82f6)",
-                  marginBottom: "1.5rem",
-                }}
-              ></div>
-              <h4
-                style={{
-                  color: "#3b82f6",
-                  fontSize: "1.3rem",
-                  marginBottom: "1rem",
-                }}
-              >
-                KEL. MARU - KIMBAL
-              </h4>
-              <p
-                style={{
-                  color: "#94a3b8",
-                  lineHeight: "1.8",
-                  marginBottom: "2.5rem",
-                  fontSize: "1.05rem",
-                }}
-              >
+            <Reveal delay={0.12} className="hm-loc-info">
+              <h3 className="hm-loc-title">M-YES Basecamp</h3>
+              <span className="hm-loc-bar" aria-hidden="true" />
+              <h4 className="hm-loc-area">KEL. MARU - KIMBAL</h4>
+              <p className="hm-lead">
                 {contactData.contact_address ||
                   "Lorong Tuminting 1 A, Jalan Sea Malalayang 1 Barat, Manado, Sulawesi Utara, Indonesia"}
               </p>
 
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "1.5rem",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "1.2rem",
-                  }}
-                >
-                  <div
-                    style={{
-                      background: "rgba(37, 211, 102, 0.15)",
-                      padding: "12px",
-                      borderRadius: "12px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
+              <div className="hm-loc-contacts">
+                <div className="hm-contact-chip">
+                  <span className="hm-chip-icon wa" aria-hidden="true">
                     <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      fill="#25D366"
+                      width="22"
+                      height="22"
                       viewBox="0 0 24 24"
+                      fill="currentColor"
                     >
                       <path d="M12.031 0C5.385 0 .004 5.38.004 12.02c0 2.124.551 4.195 1.6 6.015L.031 24l6.11-1.603a12.001 12.001 0 005.89 1.542h.005c6.643 0 12.025-5.381 12.025-12.022A12.016 12.016 0 0020.536 3.51 11.966 11.966 0 0012.031 0zM12.03 21.942h-.003a9.98 9.98 0 01-5.076-1.39l-.364-.216-3.774.99.999-3.68-.237-.377a9.957 9.957 0 01-1.523-5.305c0-5.498 4.475-9.972 9.981-9.972 2.664 0 5.168 1.039 7.051 2.924a9.927 9.927 0 012.918 7.054c-.002 5.498-4.477 9.972-9.972 9.972zm5.474-7.464c-.3-.15-1.774-.877-2.049-.978-.275-.101-.476-.15-.676.15-.2.301-.775.978-.95 1.178-.175.2-.35.226-.65.076-.3-.15-1.266-.466-2.411-1.488-.891-.794-1.493-1.775-1.668-2.076-.175-.301-.019-.464.131-.614.135-.135.3-.35.45-.526.15-.175.2-.3.3-.5s.05-.376-.025-.526c-.075-.15-.676-1.627-.926-2.228-.243-.585-.49-.505-.676-.514-.175-.008-.376-.01-.576-.01-.2 0-.525.075-.8.376-.275.3-1.05 1.026-1.05 2.503s1.075 2.9 1.225 3.1c.15.2 2.115 3.228 5.123 4.529.717.31 1.275.494 1.71.633.72.23 1.375.197 1.892.12.585-.088 1.774-.726 2.024-1.428.25-.701.25-1.302.175-1.428-.075-.125-.275-.2-.575-.35z" />
                     </svg>
-                  </div>
+                  </span>
                   <div>
-                    <span
-                      style={{
-                        display: "block",
-                        fontSize: "0.85rem",
-                        color: "#64748b",
-                        textTransform: "uppercase",
-                        letterSpacing: "1px",
-                        marginBottom: "4px",
-                      }}
-                    >
-                      WhatsApp
-                    </span>
+                    <span className="hm-chip-label">WhatsApp</span>
                     <a
                       href={`https://wa.me/${cleanPhone}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      style={{
-                        color: "#e2e8f0",
-                        textDecoration: "none",
-                        fontWeight: "bold",
-                        fontSize: "1.1rem",
-                      }}
                     >
                       {rawPhone}
                     </a>
                   </div>
                 </div>
 
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "1.2rem",
-                  }}
-                >
-                  <div
-                    style={{
-                      background: "rgba(234, 67, 53, 0.15)",
-                      padding: "12px",
-                      borderRadius: "12px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
+                <div className="hm-contact-chip">
+                  <span className="hm-chip-icon mail" aria-hidden="true">
                     <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
+                      width="22"
+                      height="22"
                       viewBox="0 0 24 24"
+                      fill="currentColor"
                     >
-                      <path
-                        d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"
-                        fill="#EA4335"
-                      />
-                      <path
-                        d="M0 5.457v13.909c0 .904.732 1.636 1.636 1.636h3.819V11.73l-6.545-4.91z"
-                        fill="#34A853"
-                      />
-                      <path
-                        d="M12 16.64l6.545-4.91v9.273H22.364A1.636 1.636 0 0 0 24 19.366V5.457c0-2.023-2.309-3.178-3.927-1.964L12 9.548 5.455 4.64C3.836 3.425 1.528 4.58 1.528 6.603V19.366A1.636 1.636 0 0 0 3.164 21h3.818V11.73L12 16.64z"
-                        fill="#FBBC04"
-                      />
-                      <path
-                        d="M12 16.64l6.545-4.91v9.273h-3.819V11.73L12 16.64z"
-                        fill="#4285F4"
-                      />
+                      <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z" />
                     </svg>
-                  </div>
+                  </span>
                   <div>
-                    <span
-                      style={{
-                        display: "block",
-                        fontSize: "0.85rem",
-                        color: "#64748b",
-                        textTransform: "uppercase",
-                        letterSpacing: "1px",
-                        marginBottom: "4px",
-                      }}
-                    >
-                      Email
-                    </span>
-                    <a
-                      href={`mailto:${displayEmail}`}
-                      style={{
-                        color: "#e2e8f0",
-                        textDecoration: "none",
-                        fontWeight: "bold",
-                        fontSize: "1.1rem",
-                      }}
-                    >
-                      {displayEmail}
-                    </a>
+                    <span className="hm-chip-label">Email</span>
+                    <a href={`mailto:${displayEmail}`}>{displayEmail}</a>
                   </div>
                 </div>
               </div>
-            </div>
+            </Reveal>
           </div>
         </div>
       </section>
 
+      {/* ══ 7. JOIN US — CTA PENUTUP ══════════════════════════════════ */}
+      <section className="hm-join">
+        <div className="hm-join-glow" aria-hidden="true" />
+        <div className="container">
+          <Reveal className="hm-join-inner">
+            <div className="overline">
+              {lang === "id" ? "Bergabunglah" : "Join Us"}
+            </div>
+            <h2 className="hm-join-title">
+              {lang === "id" ? (
+                <>
+                  Perjalananmu Dimulai{" "}
+                  <span className="hm-gold">Minggu Ini</span>
+                </>
+              ) : (
+                <>
+                  Your Journey Starts <span className="hm-gold">This Week</span>
+                </>
+              )}
+            </h2>
+            <p className="hm-lead hm-join-lead">
+              {lang === "id"
+                ? "Datang, belajar Bahasa Inggris, dan bertumbuh dalam iman bersama keluarga muda M-YES. Semua gratis — kamu hanya perlu hadir."
+                : "Come learn English and grow in faith with the M-YES youth family. Everything is free — all you need to do is show up."}
+            </p>
+            <div className="hm-join-actions">
+              <a
+                href={waGroupUrl}
+                className="cta-button"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {lang === "id" ? "Gabung Grup WhatsApp" : "Join Our WhatsApp"}
+              </a>
+              <Link href="/contact" className="hm-btn-ghost">
+                {lang === "id" ? "Hubungi Kami" : "Contact Us"}
+              </Link>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
       <VirtualGreeter lang={lang} />
-      <SocialFloat />
     </>
   );
 }

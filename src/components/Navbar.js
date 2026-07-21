@@ -15,6 +15,17 @@ export default function Navbar({ lang = "en" }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Tutup drawer otomatis saat berpindah halaman
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
+  // Kunci scroll body saat drawer mobile terbuka (kelas di layer V4 CSS)
+  useEffect(() => {
+    document.body.classList.toggle("nav-open", open);
+    return () => document.body.classList.remove("nav-open");
+  }, [open]);
+
   const links = [
     { href: "/about", en: "About Us", id: "Tentang Kami" },
     { href: "/personnel", en: "Personnel", id: "Personalia" },
@@ -84,6 +95,8 @@ export default function Navbar({ lang = "en" }) {
           <button
             className={`hamburger ${open ? "open" : ""}`}
             onClick={() => setOpen(!open)}
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
           >
             <span />
             <span />
