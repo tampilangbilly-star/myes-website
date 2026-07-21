@@ -24,7 +24,6 @@ model Setting {
   group     String   @default("general")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   @@map("settings")
 }
 
@@ -47,13 +46,13 @@ model Slide {
   isActive        Boolean  @default(true) @map("is_active")
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-
   @@map("slides")
 }
 
 model Personnel {
   id        Int      @id @default(autoincrement())
   name      String
+  category  String   @default("Lainnya") // <-- KOLOM BARU UNTUK DROPDOWN ADMIN
   roleEn    String   @map("role_en")
   roleId    String?  @map("role_id")
   bioEn     String?  @db.Text @map("bio_en")
@@ -63,7 +62,6 @@ model Personnel {
   isActive  Boolean  @default(true) @map("is_active")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   @@map("personnel")
 }
 
@@ -79,7 +77,6 @@ model Program {
   isActive      Boolean  @default(true) @map("is_active")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-
   @@map("programs")
 }
 
@@ -94,7 +91,6 @@ model Activity {
   sortOrder     Int      @default(0) @map("sort_order")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-
   @@map("activities")
 }
 
@@ -111,7 +107,6 @@ model Mission {
   isActive      Boolean  @default(true) @map("is_active")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-
   @@map("missions")
 }
 
@@ -128,19 +123,17 @@ model News {
   isActive    Boolean   @default(true) @map("is_active")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-
   @@map("news")
 }
 
 model GuestSpeaker {
   id         Int      @id @default(autoincrement())
   name       String
-  origin     String?  // Untuk menyimpan asal gereja, pelayanan, atau profesi
-  image      String   // Untuk menyimpan foto pembicara
-  dateServed DateTime // Tanggal saat melayani di M-YES
+  origin     String?  
+  image      String   
+  dateServed DateTime 
   isActive   Boolean  @default(true)
   createdAt  DateTime @default(now())
-
   @@map("guest_speakers")
 }
 
@@ -149,26 +142,25 @@ model ContactMessage {
   name      String
   email     String
   message   String   @db.Text
-  isRead    Boolean  @default(false) // Penanda apakah pesan sudah dibaca admin
+  isRead    Boolean  @default(false) 
   createdAt DateTime @default(now())
-
   @@map("contact_messages")
 }
 
-// --- BAGIAN YANG DIPERBAIKI ---
 model ActivityPhoto {
   id        Int             @id @default(autoincrement())
   image     String
   galleryId Int
   gallery   ActivityGallery @relation(fields: [galleryId], references: [id], onDelete: Cascade)
 }
+
 model ActivityGallery {
   id           Int             @id @default(autoincrement())
   titleEn      String
   titleId      String?
   activityDate DateTime
   isActive     Boolean         @default(true)
-  video        String?         // Fitur video sudah siap
+  video        String?         
   photos       ActivityPhoto[]
   createdAt    DateTime        @default(now())
 }

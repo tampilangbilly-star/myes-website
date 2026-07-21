@@ -20,35 +20,33 @@ export default async function PersonnelPage() {
     lang === "id" ? item[f + "Id"] || item[f + "En"] : item[f + "En"];
 
   // ========================================================
-  // LOGIKA SMART HIERARCHY (Membaca Jabatan Ketua/Wakil)
+  // LOGIKA BARU: BERDASARKAN KATEGORI DROPDOWN ADMIN
   // ========================================================
   const pembina = { leaders: [], members: [] };
   const pengurus = { leaders: [], members: [] };
+  const bidang = { members: [] };
   const lainnya = [];
 
   items.forEach((p) => {
-    const rawRole = t(p, "role") || "ANGGOTA";
-    let groupName = rawRole.toUpperCase();
-    let displayRole = rawRole;
-
-    // Memecah teks jika ada tanda "-" (Misal: "PEMBINA - Ketua Pembina")
-    if (rawRole.includes("-")) {
-      const parts = rawRole.split("-");
-      groupName = parts[0].trim().toUpperCase();
-      displayRole = parts[1].trim();
-    }
-
+    const displayRole = t(p, "role") || "ANGGOTA";
+    const category = p.category || "Lainnya";
     const memberData = { ...p, displayRole };
 
-    // Deteksi apakah ini level pimpinan (Ketua / Wakil / Penanggung Jawab)
-    const isLeader = /(KETUA|WAKIL|PENANGGUNG)/i.test(displayRole);
-
-    if (groupName.includes("PEMBINA")) {
-      if (isLeader) pembina.leaders.push(memberData);
+    if (category === "Pembina") {
+      // Pembina HANYA menjadikan Ketua dan Sekretaris sebagai kotak (leaders)
+      const isPembinaLeader = /(ketua|sekretaris)/i.test(displayRole);
+      if (isPembinaLeader) pembina.leaders.push(memberData);
       else pembina.members.push(memberData);
-    } else if (groupName.includes("PENGURUS")) {
-      if (isLeader) pengurus.leaders.push(memberData);
+    } else if (category === "Pengurus Inti") {
+      // Pengurus Inti tetap menggunakan deteksi ketua/wakil/sekretaris/bendahara agar tetap ada yang kotak
+      const isPengurusLeader = /(ketua|wakil|sekretaris|bendahara)/i.test(
+        displayRole,
+      );
+      if (isPengurusLeader) pengurus.leaders.push(memberData);
       else pengurus.members.push(memberData);
+    } else if (category === "Bidang-Bidang") {
+      // Semua bidang masuk ke bulat
+      bidang.members.push(memberData);
     } else {
       lainnya.push(memberData);
     }
@@ -57,13 +55,11 @@ export default async function PersonnelPage() {
   return (
     <>
       <Navbar lang={lang} />
-
       <style
         dangerouslySetInnerHTML={{
           __html: `
         /* ==================== KELOMPOK & JUDUL ==================== */
         .group-section { margin-bottom: clamp(4rem, 9vw, 7rem); }
-
         .group-title-wrapper {
           display: flex;
           align-items: center;
@@ -80,7 +76,6 @@ export default async function PersonnelPage() {
         .group-title-wrapper::after {
           background: linear-gradient(270deg, transparent, rgba(148, 178, 224, 0.3));
         }
-
         .group-title {
           font-family: "Playfair Display", serif;
           font-size: clamp(1.6rem, 1.2rem + 2vw, 2.2rem);
@@ -95,7 +90,6 @@ export default async function PersonnelPage() {
           background: rgba(15, 26, 46, 0.6);
           white-space: nowrap;
         }
-
         /* ==================== LAYOUT HIERARKI ==================== */
         .leaders-row {
           display: flex;
@@ -104,7 +98,6 @@ export default async function PersonnelPage() {
           gap: clamp(1.5rem, 4vw, 3rem);
           margin-bottom: clamp(2.5rem, 5vw, 4rem);
         }
-
         .members-row {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
@@ -112,7 +105,6 @@ export default async function PersonnelPage() {
           max-width: 1100px;
           margin: 0 auto;
         }
-
         /* ==================== KARTU PIMPINAN (PORTRAIT PREMIUM) ==================== */
         .leader-card {
           padding: clamp(2rem, 5vw, 3rem) clamp(1.5rem, 4vw, 2rem);
@@ -128,7 +120,6 @@ export default async function PersonnelPage() {
           border-radius: 0 0 6px 6px;
           background: linear-gradient(90deg, #1d4ed8, #60a5fa);
         }
-
         .avatar-rect {
           width: min(200px, 60vw);
           height: min(260px, 78vw);
@@ -151,14 +142,12 @@ export default async function PersonnelPage() {
           border: 4px solid #050b14;
           background-color: #0f172a;
         }
-
         /* ==================== KARTU ANGGOTA (BULAT) ==================== */
         .member-card {
           padding: clamp(2rem, 5vw, 3rem) 1.5rem;
           text-align: center;
           background: linear-gradient(180deg, rgba(15, 26, 46, 0.5), rgba(7, 14, 27, 0.6));
         }
-
         .avatar-ring {
           width: min(180px, 52vw);
           height: min(180px, 52vw);
@@ -179,7 +168,6 @@ export default async function PersonnelPage() {
           border: 4px solid #0a0f1a;
           background-color: #0f172a;
         }
-
         /* ==================== PUSAT PELAYANAN (YESUS) ==================== */
         .jesus-card {
           text-align: center;
@@ -228,7 +216,6 @@ export default async function PersonnelPage() {
           height: clamp(2rem, 5vw, 3.5rem);
           background: linear-gradient(180deg, rgba(255, 215, 0, 0.5), transparent);
         }
-
         /* ==================== TYPOGRAPHY ==================== */
         .p-name {
           font-family: "Playfair Display", serif;
@@ -236,7 +223,6 @@ export default async function PersonnelPage() {
           margin: 0 0 0.5rem 0;
         }
         .leader-name { font-size: 1.6rem; }
-
         .p-role {
           color: #3b82f6; font-size: 0.9rem; font-weight: 700;
           text-transform: uppercase; letter-spacing: 1.5px; margin: 0;
@@ -245,7 +231,6 @@ export default async function PersonnelPage() {
       `,
         }}
       />
-
       <header className="ph2">
         <div className="ph2-inner">
           <span className="ph2-watermark" aria-hidden="true">
@@ -277,7 +262,6 @@ export default async function PersonnelPage() {
           </div>
         </div>
       </header>
-
       <section
         className="section"
         style={{ minHeight: "60vh", overflow: "hidden" }}
@@ -312,9 +296,8 @@ export default async function PersonnelPage() {
           {(pembina.leaders.length > 0 || pembina.members.length > 0) && (
             <div className="group-section">
               <div className="group-title-wrapper">
-                <h2 className="group-title">Pembina</h2>
+                <h2 className="group-title">Dewan Pembina</h2>
               </div>
-
               {/* Baris Pimpinan Pembina (Kotak) */}
               {pembina.leaders.length > 0 && (
                 <div className="leaders-row">
@@ -350,7 +333,6 @@ export default async function PersonnelPage() {
                   ))}
                 </div>
               )}
-
               {/* Baris Anggota Pembina (Bulat Besar) */}
               {pembina.members.length > 0 && (
                 <div className="members-row">
@@ -388,13 +370,12 @@ export default async function PersonnelPage() {
             </div>
           )}
 
-          {/* 3. PENGURUS SECTION */}
+          {/* 3. PENGURUS INTI SECTION */}
           {(pengurus.leaders.length > 0 || pengurus.members.length > 0) && (
             <div className="group-section">
               <div className="group-title-wrapper">
-                <h2 className="group-title">Pengurus</h2>
+                <h2 className="group-title">Pengurus Inti</h2>
               </div>
-
               {/* Baris Pimpinan Pengurus (Kotak) */}
               {pengurus.leaders.length > 0 && (
                 <div className="leaders-row">
@@ -430,7 +411,6 @@ export default async function PersonnelPage() {
                   ))}
                 </div>
               )}
-
               {/* Baris Anggota Pengurus (Bulat Besar) */}
               {pengurus.members.length > 0 && (
                 <div className="members-row">
@@ -468,7 +448,47 @@ export default async function PersonnelPage() {
             </div>
           )}
 
-          {/* 4. LAINNYA (JIKA ADA) */}
+          {/* 4. BIDANG-BIDANG SECTION */}
+          {bidang.members.length > 0 && (
+            <div className="group-section">
+              <div className="group-title-wrapper">
+                <h2 className="group-title">Bidang-Bidang</h2>
+              </div>
+              <div className="members-row">
+                {bidang.members.map((p) => (
+                  <div key={p.id} className="panel member-card">
+                    <div className="avatar-ring">
+                      {p.photo ? (
+                        <img
+                          src={`${p.photo}`}
+                          alt={p.fullName || p.name}
+                          className="img-circle"
+                        />
+                      ) : (
+                        <div
+                          className="img-circle"
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: "3rem",
+                          }}
+                        >
+                          👤
+                        </div>
+                      )}
+                    </div>
+                    <h3 className="p-name">{p.fullName || p.name}</h3>
+                    <p className="p-role" style={{ color: "#94a3b8" }}>
+                      {p.displayRole}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 5. LAINNYA (JIKA ADA) */}
           {lainnya.length > 0 && (
             <div className="group-section">
               <div className="group-title-wrapper">
@@ -509,7 +529,7 @@ export default async function PersonnelPage() {
           )}
         </div>
       </section>
-
+      <Footer />
       <SocialFloat />
     </>
   );
