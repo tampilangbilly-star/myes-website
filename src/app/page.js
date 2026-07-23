@@ -486,49 +486,6 @@ export default async function Home() {
           </div>
         </div>
       </section>
-
-      {/* ══ 7. JOIN US — CTA PENUTUP ══════════════════════════════════ */}
-      <section className="hm-join">
-        <div className="hm-join-glow" aria-hidden="true" />
-        <div className="container">
-          <Reveal className="hm-join-inner">
-            <div className="overline">
-              {lang === "id" ? "Bergabunglah" : "Join Us"}
-            </div>
-            <h2 className="hm-join-title">
-              {lang === "id" ? (
-                <>
-                  Perjalananmu Dimulai{" "}
-                  <span className="hm-gold">Minggu Ini</span>
-                </>
-              ) : (
-                <>
-                  Your Journey Starts <span className="hm-gold">This Week</span>
-                </>
-              )}
-            </h2>
-            <p className="hm-lead hm-join-lead">
-              {lang === "id"
-                ? "Datang, belajar Bahasa Inggris, dan bertumbuh dalam iman bersama keluarga muda M-YES. Semua gratis — kamu hanya perlu hadir."
-                : "Come learn English and grow in faith with the M-YES youth family. Everything is free — all you need to do is show up."}
-            </p>
-            <div className="hm-join-actions">
-              <a
-                href={waGroupUrl}
-                className="cta-button"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {lang === "id" ? "Gabung Grup WhatsApp" : "Join Our WhatsApp"}
-              </a>
-              <Link href="/contact" className="hm-btn-ghost">
-                {lang === "id" ? "Hubungi Kami" : "Contact Us"}
-              </Link>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
       <VirtualGreeter lang={lang} />
     </>
   );
