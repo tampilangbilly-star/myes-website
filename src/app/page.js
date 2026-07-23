@@ -117,41 +117,41 @@ export default async function Home() {
   const aboutText =
     aboutData.about_description ||
     (lang === "id"
-      ? "Komunitas berbasis gereja yang memberdayakan pemuda melalui pendidikan Bahasa Inggris gratis dan pertumbuhan rohani."
-      : "A church-based community empowering youth through free English education and spiritual growth.");
+      ? "Wadah bagi pemuda untuk mengasah kemampuan bahasa Inggris dalam komunitas yang penuh kasih, membangun fondasi rohani yang kuat di dalam Kristus, dan bersiap menjadi berkat bagi sesama."
+      : "A platform for youth to hone their English skills in a loving community, build a strong spiritual foundation in Christ, and prepare to be a blessing to others.");
 
   const pillars = [
     {
       emoji: "🗣️",
       en: [
-        "English Service",
-        "Learn and worship in English — grow your fluency naturally, week by week.",
+        "Learn",
+        "Developing your potential and English fluency naturally in an interactive and fun environment.",
       ],
       id: [
-        "English Service",
-        "Belajar dan beribadah dalam Bahasa Inggris — kefasihanmu tumbuh alami tiap minggu.",
+        "Belajar",
+        "Mengembangkan potensi diri dan kefasihan Bahasa Inggris secara alami dalam lingkungan yang interaktif dan menyenangkan.",
       ],
     },
     {
       emoji: "🙏",
       en: [
-        "Worship & Faith",
-        "Rooted in faith. Every gathering starts and ends with worship together.",
+        "Grow",
+        "Deeply rooted in faith and God's word. Building Christ-like character through fellowship and corporate worship.",
       ],
       id: [
-        "Worship & Iman",
-        "Berakar dalam iman. Setiap pertemuan dibuka dan ditutup dengan penyembahan bersama.",
+        "Bertumbuh",
+        "Berakar kuat dalam iman dan firman Tuhan. Membangun karakter serupa Kristus melalui persekutuan dan penyembahan bersama.",
       ],
     },
     {
       emoji: "🤝",
       en: [
-        "Fellowship",
-        "A warm youth family — games, sharing, mission trips, and real friendship.",
+        "Impact",
+        "Preparing a generation ready to serve with love, bring positive influence, and be a blessing to the community.",
       ],
       id: [
-        "Fellowship",
-        "Keluarga muda yang hangat — games, sharing, mission trip, dan persahabatan sejati.",
+        "Berdampak",
+        "Mempersiapkan generasi yang siap melayani dengan kasih, membawa pengaruh positif, dan menjadi berkat bagi masyarakat.",
       ],
     },
   ];
@@ -261,13 +261,13 @@ export default async function Home() {
               <h2 className="hm-h2">
                 {lang === "id" ? (
                   <>
-                    Generasi Muda, <span className="hm-gold">Satu Iman</span>,
-                    Satu Bahasa
+                    Generasi Muda yang <span className="hm-gold">Belajar</span>,
+                    Bertumbuh, & <span className="hm-gold">Berdampak</span>
                   </>
                 ) : (
                   <>
-                    Young Hearts, <span className="hm-gold">One Faith</span>,
-                    One Language
+                    Young Hearts that <span className="hm-gold">Learn</span>,
+                    Grow, & <span className="hm-gold">Impact</span>
                   </>
                 )}
               </h2>

@@ -273,18 +273,44 @@ export default async function AboutPage() {
           style={{ position: "relative", zIndex: 1, maxWidth: "1200px" }}
         >
           {/* Cerita Kami */}
-          <div className="panel story-panel">
-            <div className="story-icon">📖</div>
+          <div className="panel story-panel" style={{ marginBottom: "3rem" }}>
+            <div
+              className="story-icon"
+              style={{ fontSize: "2.5rem", marginBottom: "0.5rem" }}
+            >
+              📖
+            </div>
             <div>
-              <div className="panel-kicker">
+              <div
+                className="panel-kicker"
+                style={{
+                  color: "#60a5fa",
+                  fontSize: "0.85rem",
+                  fontWeight: "700",
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                  marginBottom: "0.5rem",
+                }}
+              >
                 {lang === "id" ? "Awal Mula" : "Where It Began"}
               </div>
-              <h2>{lang === "id" ? "Cerita Kami" : "Our Story"}</h2>
+              <h2
+                style={{
+                  color: "#fff",
+                  marginBottom: "1.25rem",
+                  fontSize: "2rem",
+                }}
+              >
+                {lang === "id" ? "Cerita Kami" : "Our Story"}
+              </h2>
               <div
                 style={{
                   display: "flex",
                   flexDirection: "column",
                   gap: "1.2rem",
+                  color: "#cbd5e1",
+                  lineHeight: "1.7",
+                  fontSize: "1.05rem",
                 }}
               >
                 <p>
@@ -302,27 +328,108 @@ export default async function AboutPage() {
           </div>
 
           {/* Visi & Misi */}
-          <div className="vm-grid">
-            <div className="panel vm-card blue">
-              <div className="vm-icon">👁️</div>
-              <div className="panel-kicker">
+          <div
+            className="vm-grid"
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+              gap: "1.5rem",
+            }}
+          >
+            {/* VISI CARD */}
+            <div
+              className="panel vm-card blue"
+              style={{
+                background: "rgba(59, 130, 246, 0.05)",
+                border: "1px solid rgba(59, 130, 246, 0.2)",
+                borderRadius: "16px",
+                padding: "2rem",
+              }}
+            >
+              <div
+                className="vm-icon"
+                style={{ fontSize: "2.5rem", marginBottom: "1rem" }}
+              >
+                👁️
+              </div>
+              <div
+                className="panel-kicker"
+                style={{
+                  color: "#60a5fa",
+                  fontSize: "0.8rem",
+                  fontWeight: "700",
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                  marginBottom: "0.5rem",
+                }}
+              >
                 {lang === "id" ? "Arah Kami" : "Our Direction"}
               </div>
-              <h3>{lang === "id" ? "Visi" : "Vision"}</h3>
-              <p>
+              <h3
+                style={{
+                  color: "#fff",
+                  marginBottom: "1rem",
+                  fontSize: "1.5rem",
+                }}
+              >
+                {lang === "id" ? "Visi" : "Vision"}
+              </h3>
+              <p style={{ color: "#cbd5e1", lineHeight: "1.7" }}>
                 {lang === "id"
-                  ? "Menjadi komunitas pemuda yang bertumbuh dalam iman, melayani dengan kasih, dan mengembangkan kemampuan bahasa Inggris untuk memberikan dampak positif bagi masyarakat dan menjawab tantangan global."
-                  : "To become a youth community that grows in faith, serves with love, and develops English proficiency to make a positive impact on society and respond to global challenges."}
+                  ? "Menjadi komunitas pemuda yang bertumbuh dalam iman, melayani dengan kasih, dan mengembangkan kemampuan bahasa Inggris untuk memberikan dampak positif bagi masyarakat."
+                  : "To become a youth community that grows in faith, serves with love, and develops English proficiency to make a positive impact on society."}
               </p>
             </div>
 
-            <div className="panel panel--gold vm-card goldline">
-              <div className="vm-icon">🎯</div>
-              <div className="panel-kicker gold">
+            {/* MISI CARD */}
+            <div
+              className="panel panel--gold vm-card goldline"
+              style={{
+                background: "rgba(234, 179, 8, 0.05)",
+                border: "1px solid rgba(234, 179, 8, 0.2)",
+                borderRadius: "16px",
+                padding: "2rem",
+              }}
+            >
+              <div
+                className="vm-icon"
+                style={{ fontSize: "2.5rem", marginBottom: "1rem" }}
+              >
+                🎯
+              </div>
+              <div
+                className="panel-kicker gold"
+                style={{
+                  color: "#eab308",
+                  fontSize: "0.8rem",
+                  fontWeight: "700",
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                  marginBottom: "0.5rem",
+                }}
+              >
                 {lang === "id" ? "Langkah Kami" : "Our Steps"}
               </div>
-              <h3>{lang === "id" ? "Misi" : "Mission"}</h3>
-              <ul>
+              <h3
+                style={{
+                  color: "#fff",
+                  marginBottom: "1rem",
+                  fontSize: "1.5rem",
+                }}
+              >
+                {lang === "id" ? "Misi" : "Mission"}
+              </h3>
+              <ul
+                style={{
+                  color: "#cbd5e1",
+                  lineHeight: "1.6",
+                  paddingLeft: "1.2rem",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.75rem",
+                  margin: 0,
+                }}
+              >
                 <li>
                   {lang === "id"
                     ? "Memperdalam kehidupan spiritual anggota melalui persekutuan, pemuridan, doa, dan pendalaman firman Tuhan."
@@ -366,33 +473,36 @@ export default async function AboutPage() {
           </div>
 
           <div className="value-strip">
+            {/* PRINSIP 1: BELAJAR */}
             <div className="value-cell">
-              <span className="v-emoji">🙏</span>
-              <h4>Faith</h4>
+              <span className="v-emoji">📚</span>
+              <h4>{lang === "id" ? "Belajar" : "Learn"}</h4>
               <p>
                 {lang === "id"
-                  ? "Berakar kuat dalam kebenaran Firman Tuhan."
-                  : "Deeply rooted in the truth of God's Word."}
+                  ? "Mengembangkan potensi diri melalui proses belajar bahasa Inggris secara berkelanjutan."
+                  : "Developing our potential through continuous English learning."}
               </p>
             </div>
 
+            {/* PRINSIP 2: BERTUMBUH */}
             <div className="value-cell">
-              <span className="v-emoji">🤝</span>
-              <h4>Fellowship</h4>
+              <span className="v-emoji">🌱</span>
+              <h4>{lang === "id" ? "Bertumbuh" : "Grow"}</h4>
               <p>
                 {lang === "id"
-                  ? "Membangun persaudaraan yang hangat dan saling mendukung."
-                  : "Building a warm and supportive brotherhood."}
+                  ? "Bertumbuh bersama dalam karakter, iman, dan kemampuan sebagai generasi muda."
+                  : "Growing together in character, faith, and skills as the younger generation."}
               </p>
             </div>
 
+            {/* PRINSIP 3: BERDAMPAK */}
             <div className="value-cell">
-              <span className="v-emoji">⭐</span>
-              <h4>Excellence</h4>
+              <span className="v-emoji">🌟</span>
+              <h4>{lang === "id" ? "Berdampak" : "Impact"}</h4>
               <p>
                 {lang === "id"
-                  ? "Berusaha memberikan yang terbaik dalam proses belajar."
-                  : "Striving to give the best in our learning process."}
+                  ? "Memberikan pengaruh positif dan menjadi berkat bagi komunitas serta lingkungan sekitar."
+                  : "Making a positive influence and becoming a blessing to our community and surroundings."}
               </p>
             </div>
           </div>

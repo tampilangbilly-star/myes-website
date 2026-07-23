@@ -71,33 +71,32 @@ export default function HolySpiritAmbient() {
            PENYESUAIAN KHUSUS LAYAR HP (MOBILE)
            ========================================= */
         @media (max-width: 768px) {
-          /* [V4.4] Merpati kini MENDARAT DI ZONA TEKS (panel bawah foto):
-             terbang masuk dari kiri melintasi foto, hinggap manis di
-             kanan-atas panel — dekat overline, tidak menutupi judul. */
+          /* Merpati kini MENDARAT DI ZONA JUDUL UTAMA (Lebih ke atas): */
           @keyframes flyInMobile {
             0% { 
-              transform: translate(-40vw, 26vh) scale(0.5) rotate(25deg); 
+              transform: translate(-40vw, 15vh) scale(0.5) rotate(25deg); 
               opacity: 0; 
             }
             100% { 
-              transform: translate(66vw, 54vh) rotate(-4deg); 
+              /* Mengubah dari 54vh menjadi 32vh agar posisinya naik */
+              transform: translate(62vw, 32vh) rotate(-4deg); 
               opacity: 1; 
             }
           }
 
-          @keyframes gentleHover {
-            0%, 100% { transform: translate(66vw, 54vh) rotate(-4deg); }
-            50% { transform: translate(67vw, 52.5vh) rotate(2deg); }
+          @keyframes gentleHoverMobile {
+            0%, 100% { transform: translate(62vw, 32vh) rotate(-4deg); }
+            50% { transform: translate(63vw, 30.5vh) rotate(2deg); }
           }
           
           .real-dove-container {
             animation: 
               flyInMobile 2.8s ease-out forwards,
-              gentleHover 8s ease-in-out 2.8s infinite;
+              gentleHoverMobile 8s ease-in-out 2.8s infinite;
           }
 
           .real-dove-img {
-            width: 92px;   /* lebih mungil di zona teks agar elegan */
+            width: 92px;  /* lebih mungil di zona teks agar elegan */
           }
         }
       `,
