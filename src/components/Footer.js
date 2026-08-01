@@ -28,7 +28,7 @@ export default function Footer({ lang = "en" }) {
         dangerouslySetInnerHTML={{
           __html: `
         /* ==========================================
-           POLA GRID BACKGROUND
+            POLA GRID BACKGROUND
         ========================================== */
         .footer-grid-pattern {
           position: absolute;
@@ -42,7 +42,7 @@ export default function Footer({ lang = "en" }) {
         }
 
         /* ==========================================
-           WATERMARK M-YES
+            WATERMARK M-YES
         ========================================== */
         .footer-watermark {
           position: absolute;
@@ -65,7 +65,7 @@ export default function Footer({ lang = "en" }) {
         }
 
         /* ==========================================
-           GARIS CAHAYA
+            GARIS CAHAYA
         ========================================== */
         .footer-glow-line {
           width: 100%;
@@ -82,7 +82,7 @@ export default function Footer({ lang = "en" }) {
         }
 
         /* ==========================================
-           FOOTER LINK
+            FOOTER LINK
         ========================================== */
         .footer-link {
           position: relative;
@@ -114,7 +114,7 @@ export default function Footer({ lang = "en" }) {
         }
 
         /* ==========================================
-           CTA BUTTON
+            CTA BUTTON
         ========================================== */
         .cta-button {
           display: inline-flex;
@@ -142,7 +142,7 @@ export default function Footer({ lang = "en" }) {
         }
 
         /* ==========================================
-           JUDUL CTA
+            JUDUL CTA
         ========================================== */
         .footer-cta-title {
           font-family: "Playfair Display", serif;
@@ -151,7 +151,7 @@ export default function Footer({ lang = "en" }) {
         }
 
         /* ==========================================
-           DESKTOP FOOTER LAYOUT
+            DESKTOP FOOTER LAYOUT
         ========================================== */
         .desktop-footer-layout {
           max-width: 750px;
@@ -162,11 +162,28 @@ export default function Footer({ lang = "en" }) {
           justify-items: center;
         }
 
+        /* Kolom brand: HANYA tampil di desktop.
+            Default disembunyikan agar tampilan Android benar-benar
+            tidak berubah sedikit pun. */
+        .footer-brand-col {
+          display: none;
+        }
+
         /* ==========================================
-           PERBAIKAN KHUSUS DESKTOP
-           Tidak mengubah tampilan Android/Mobile
+            PERBAIKAN KHUSUS DESKTOP
+            Tidak mengubah tampilan Android/Mobile
         ========================================== */
         @media (min-width: 769px) {
+          /* Menyembunyikan bagian CTA (Ready to Grow) khusus di Desktop */
+          .footer-cta-zone {
+            display: none !important;
+          }
+
+          /* Menyembunyikan garis cahaya pemisah bagian CTA jika diperlukan kerapian */
+          .footer-glow-container {
+            display: none !important;
+          }
+
           .footer-cinema {
             height: auto;
             min-height: 0;
@@ -177,32 +194,107 @@ export default function Footer({ lang = "en" }) {
             height: auto;
           }
 
-          .footer-cta-zone {
-            padding-top: 1.6rem !important;
-            padding-bottom: 1rem !important;
-          }
-
+          /* — Container utama dilebarkan mengikuti layar besar — */
           .footer-main-container {
-            padding-top: 0 !important;
-            padding-bottom: 0.65rem !important;
+            max-width: 1180px !important;
+            padding: 2.5rem 2.5rem 1.1rem !important;
           }
 
+          /* — Layout 3 kolom: Brand | Tautan Cepat | Jelajahi — */
           .desktop-footer-layout {
-            margin-bottom: 0.65rem !important;
+            max-width: none !important;
+            grid-template-columns: 2.1fr 1fr 1fr !important;
+            gap: 3.5rem !important;
+            justify-items: start !important;
+            align-items: start !important;
+            margin-bottom: 2.2rem !important;
+          }
+
+          .desktop-footer-layout > div {
+            text-align: left !important;
+            width: 100%;
+          }
+
+          .footer-brand-col {
+            display: block !important;
+            max-width: 420px;
+          }
+
+          .footer-brand-name {
+            font-family: "Playfair Display", serif;
+            font-size: 1.75rem;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: 1px;
+            margin: 0 0 0.35rem 0;
+            line-height: 1;
+          }
+
+          .footer-brand-tagline {
+            font-size: 0.72rem;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: #60a5fa;
+            margin: 0 0 1rem 0;
+            font-weight: 600;
+          }
+
+          .footer-brand-desc {
+            font-size: 0.9rem;
+            line-height: 1.75;
+            color: #94a3b8;
+            margin: 0 0 1rem 0;
+          }
+
+          .footer-brand-place {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            font-size: 0.82rem;
+            color: #64748b;
+            margin: 0;
+          }
+
+          .footer-grid-links h3 {
+            font-size: 0.95rem !important;
+            margin: 0 0 0.4rem 0 !important;
+            color: #fff !important;
+            text-transform: uppercase;
+            letter-spacing: 1.2px !important;
+          }
+
+          /* Aksen garis kecil di bawah judul kolom */
+          .footer-col-title::after {
+            content: '';
+            display: block;
+            width: 30px;
+            height: 2px;
+            margin-top: 0.6rem;
+            margin-bottom: 1rem;
+            border-radius: 99px;
+            background: linear-gradient(90deg, #3b82f6, var(--gold, #e8a33d));
+          }
+
+          .footer-grid-links ul {
+            font-size: 0.92rem !important;
+            gap: 0.65rem !important;
           }
 
           .footer-bottom-flex {
-            padding-top: 0.4rem !important;
+            padding-top: 1.3rem !important;
+            font-size: 0.8rem !important;
           }
 
           .footer-watermark {
+            bottom: -6px;
+            right: 40px;
             pointer-events: none;
           }
         }
 
         /* ==========================================
-           RESPONSIVE KHUSUS ANDROID/MOBILE
-           TIDAK DIUBAH
+            RESPONSIF KHUSUS ANDROID/MOBILE
+            TIDAK DIUBAH
         ========================================== */
         @media (max-width: 768px) {
           .footer-cta-zone {
@@ -279,7 +371,7 @@ export default function Footer({ lang = "en" }) {
 
       <div className="footer-content-wrapper">
         {/* ========================================== */}
-        {/* BAGIAN ATAS: READY TO GROW                */}
+        {/* BAGIAN ATAS: READY TO GROW                 */}
         {/* ========================================== */}
         <div
           className="footer-cta-zone"
@@ -299,6 +391,7 @@ export default function Footer({ lang = "en" }) {
             }}
           >
             <span
+              className="footer-cta-badge"
               style={{
                 display: "inline-block",
                 color: "#60a5fa",
@@ -372,9 +465,27 @@ export default function Footer({ lang = "en" }) {
             className="desktop-footer-layout footer-grid-links"
             style={{ marginBottom: "0.85rem" }}
           >
+            {/* Kolom Brand — hanya tampil di desktop (display:none di mobile) */}
+            <div className="footer-brand-col">
+              <p className="footer-brand-name">M-YES</p>
+              <p className="footer-brand-tagline">
+                Manado Youth English Service
+              </p>
+              <p className="footer-brand-desc">
+                {lang === "id"
+                  ? "Komunitas anak muda yang bertumbuh bersama melalui ibadah berbahasa Inggris, persekutuan, dan pelayanan. Terbuka untuk siapa saja yang ingin belajar dan melayani."
+                  : "A youth community growing together through English worship, fellowship, and service. Open to anyone who wants to learn and serve."}
+              </p>
+              <p className="footer-brand-place">
+                <span aria-hidden="true">📍</span>
+                Manado, Sulawesi Utara — Indonesia
+              </p>
+            </div>
+
             {/* Kolom 1: Quick Links */}
             <div style={{ textAlign: "right" }}>
               <h3
+                className="footer-col-title"
                 style={{
                   color: "#fff",
                   fontSize: "0.88rem",
@@ -420,6 +531,7 @@ export default function Footer({ lang = "en" }) {
             {/* Kolom 2: Explore */}
             <div style={{ textAlign: "left" }}>
               <h3
+                className="footer-col-title"
                 style={{
                   color: "#fff",
                   fontSize: "0.88rem",

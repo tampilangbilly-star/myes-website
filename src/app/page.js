@@ -649,6 +649,7 @@ export default async function Home() {
                   </div>
                 </div>
 
+                {/* ── BAGIAN EMAIL YANG DIPERBARUI ──────────────────── */}
                 <div
                   style={{
                     display: "flex",
@@ -686,7 +687,33 @@ export default async function Home() {
                       />
                     </svg>
                   </div>
+                  <div>
+                    <span
+                      style={{
+                        display: "block",
+                        fontSize: "0.85rem",
+                        color: "#64748b",
+                        textTransform: "uppercase",
+                        letterSpacing: "1px",
+                        marginBottom: "4px",
+                      }}
+                    >
+                      Email
+                    </span>
+                    <a
+                      href={`mailto:${displayEmail}`}
+                      style={{
+                        color: "#e2e8f0",
+                        textDecoration: "none",
+                        fontWeight: "bold",
+                        fontSize: "1.1rem",
+                      }}
+                    >
+                      {displayEmail}
+                    </a>
+                  </div>
                 </div>
+                {/* ──────────────────────────────────────────────────── */}
               </div>
             </div>
           </div>
