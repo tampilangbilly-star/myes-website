@@ -67,27 +67,27 @@ export default function HolySpiritAmbient() {
         }
         
         /* =========================================================================
-           2. PENYESUAIAN KHUSUS LAYAR HP (MOBILE) — TELAH DIUBAH
+           2. PENYESUAIAN KHUSUS LAYAR HP (MOBILE) — NAIK KE TULISAN PUTIH
            ========================================================================= */
         @media (max-width: 768px) {
-          /* Merpati kini MENDARAT sedikit lebih tinggi: */
+          /* Merpati kini mendarat menyentuh tulisan putih di atas tombol: */
           @keyframes flyInMobile {
             0% { 
               transform: translate(-40vw, 15vh) scale(0.5) rotate(25deg); 
               opacity: 0; 
             }
             100% { 
-              /* Diubah dari 65vh menjadi 58vh agar posisinya naik sedikit */
-              transform: translate(62vw, 58vh) rotate(-4deg); 
+              /* Diubah menjadi 48vh agar naik menyentuh teks */
+              transform: translate(62vw, 48vh) rotate(-4deg); 
               opacity: 1; 
             }
           }
 
-          /* Sesuaikan juga gentleHover agar merpati tidak loncat ke posisi lama */
+          /* Sesuaikan juga gentleHover agar sinkron */
           @keyframes gentleHoverMobile {
-            0%, 100% { transform: translate(62vw, 58vh) rotate(-4deg); }
-            /* Diubah dari 63.5vh menjadi 56.5vh mengimbangi kenaikan di atas */
-            50% { transform: translate(63vw, 56.5vh) rotate(2deg); }
+            0%, 100% { transform: translate(62vw, 48vh) rotate(-4deg); }
+            /* Nilai 50% dikurangi 1.5vh (menjadi 46.5vh) untuk efek melayang (bobbing) */
+            50% { transform: translate(63vw, 46.5vh) rotate(2deg); }
           }
           
           .real-dove-container {
