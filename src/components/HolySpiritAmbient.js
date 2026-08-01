@@ -53,8 +53,8 @@ export default function HolySpiritAmbient() {
         .real-dove-container {
           position: absolute;
           /* TRIK ANIMASI BERANTAI: 
-              flyIn berjalan 2.5s lalu berhenti (forwards). 
-              gentleHover menunggu 2.5s baru mulai dan berulang (infinite). */
+             flyIn berjalan 2.5s lalu berhenti (forwards). 
+             gentleHover menunggu 2.5s baru mulai dan berulang (infinite). */
           animation: 
             flyIn 2.5s ease-out forwards,
             gentleHover 8s ease-in-out 2.5s infinite; 
@@ -70,23 +70,24 @@ export default function HolySpiritAmbient() {
            2. PENYESUAIAN KHUSUS LAYAR HP (MOBILE) — TELAH DIUBAH
            ========================================================================= */
         @media (max-width: 768px) {
-          /* Merpati kini MENDARAT DI AREA TEKS PUTIH (Lebih ke bawah): */
+          /* Merpati kini MENDARAT sedikit lebih tinggi: */
           @keyframes flyInMobile {
             0% { 
               transform: translate(-40vw, 15vh) scale(0.5) rotate(25deg); 
               opacity: 0; 
             }
             100% { 
-              /* Mengubah nilai Vertikal dari 32vh menjadi 65vh agar posisinya turun drastis ke area teks putih */
-              transform: translate(62vw, 65vh) rotate(-4deg); 
+              /* Diubah dari 65vh menjadi 58vh agar posisinya naik sedikit */
+              transform: translate(62vw, 58vh) rotate(-4deg); 
               opacity: 1; 
             }
           }
 
-          /* Sesuaikan juga gentleHover agar merpati tidak loncat ke atas lagi saat mendarat */
+          /* Sesuaikan juga gentleHover agar merpati tidak loncat ke posisi lama */
           @keyframes gentleHoverMobile {
-            0%, 100% { transform: translate(62vw, 65vh) rotate(-4deg); }
-            50% { transform: translate(63vw, 63.5vh) rotate(2deg); }
+            0%, 100% { transform: translate(62vw, 58vh) rotate(-4deg); }
+            /* Diubah dari 63.5vh menjadi 56.5vh mengimbangi kenaikan di atas */
+            50% { transform: translate(63vw, 56.5vh) rotate(2deg); }
           }
           
           .real-dove-container {
