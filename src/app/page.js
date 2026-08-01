@@ -8,7 +8,7 @@ import GuestSpeakerSlider from "@/components/GuestSpeakerSlider";
 import NewsHomeSlider from "@/components/NewsHomeSlider";
 import VirtualGreeter from "@/components/VirtualGreeter";
 import HolySpiritAmbient from "@/components/HolySpiritAmbient";
-import HomeMomentsSlider from "@/components/HomeMomentsSlider";
+// HomeMomentsSlider dihapus
 
 async function getData() {
   const [
@@ -19,7 +19,6 @@ async function getData() {
     mainBgSetting,
     speakers,
     contactItems,
-    homeMoments,
   ] = await Promise.all([
     prisma.slide.findMany({
       where: { isActive: true },
@@ -42,10 +41,6 @@ async function getData() {
       orderBy: { dateServed: "desc" },
     }),
     prisma.setting.findMany({ where: { group: "contact" } }),
-    prisma.homeMoment.findMany({
-      where: { isActive: true },
-      orderBy: { sortOrder: "asc" },
-    }),
   ]);
 
   const socials = {};
@@ -54,14 +49,17 @@ async function getData() {
   });
   const mainBg = mainBgSetting?.valueEn;
 
-  return { slides, programs, news, socials, mainBg, speakers, contactItems, homeMoments };
+  // homeMoments dihapus dari return
+  return { slides, programs, news, socials, mainBg, speakers, contactItems };
 }
 
 export default async function Home() {
   const cookieStore = cookies();
   const lang = cookieStore.get("lang")?.value || "en";
+  
+  // homeMoments dihapus dari destructuring
   const {
-    slides, programs, news, socials, mainBg, speakers, contactItems, homeMoments,
+    slides, programs, news, socials, mainBg, speakers, contactItems,
   } = await getData();
 
   const t = (item, field) => {
@@ -99,14 +97,6 @@ export default async function Home() {
           right: 8%;
           transform: translateY(-50%);
           z-index: 40;
-        }
-
-        /* MOMEN BERANDA — Posisi PC tetap di kiri */
-        .home-moment-overlay {
-          position: absolute;
-          top: 15%; 
-          left: 5%;
-          z-index: 38;
         }
 
         .cta-button {
@@ -221,22 +211,6 @@ export default async function Home() {
             padding: 0 1rem;
             z-index: 40;
           }
-
-          /* Tablet: Pindah ke kanan dan naikkan agar tidak nabrak */
-          .home-moment-overlay {
-            top: 90px; 
-            left: auto; /* Membatalkan posisi kiri */
-            right: 5%; /* Menempel ke kanan */
-          }
-        }
-
-        @media (max-width: 480px) {
-          /* Mobile: Dinaikkan lebih tinggi lagi dan diposisikan di kanan */
-          .home-moment-overlay { 
-            top: 70px; /* Nilai ini dinaikkan agar tidak melewati batas BG */
-            left: auto; 
-            right: 4%; 
-          }
         }
         
         @media (max-width: 768px) {
@@ -269,11 +243,7 @@ export default async function Home() {
 
         <HeroSlider slides={slides} socials={socials} lang={lang} />
 
-        {homeMoments && homeMoments.length > 0 && (
-          <div className="home-moment-overlay">
-            <HomeMomentsSlider moments={homeMoments} />
-          </div>
-        )}
+        {/* HomeMomentsSlider dihapus dari sini */}
 
         {speakers && speakers.length > 0 && (
           <div className="guest-speaker-overlay">
@@ -714,36 +684,7 @@ export default async function Home() {
                         d="M12 16.64l6.545-4.91v9.273H22.364A1.636 1.636 0 0 0 24 19.366V5.457c0-2.023-2.309-3.178-3.927-1.964L12 9.548 5.455 4.64C3.836 3.425 1.528 4.58 1.528 6.603V19.366A1.636 1.636 0 0 0 3.164 21h3.818V11.73L12 16.64z"
                         fill="#FBBC04"
                       />
-                      <path
-                        d="M12 16.64l6.545-4.91v9.273h-3.819V11.73L12 16.64z"
-                        fill="#EA4335"
-                      />
                     </svg>
-                  </div>
-                  <div>
-                    <span
-                      style={{
-                        display: "block",
-                        fontSize: "0.85rem",
-                        color: "#64748b",
-                        textTransform: "uppercase",
-                        letterSpacing: "1px",
-                        marginBottom: "4px",
-                      }}
-                    >
-                      Email
-                    </span>
-                    <a
-                      href={`mailto:${displayEmail}`}
-                      style={{
-                        color: "#e2e8f0",
-                        textDecoration: "none",
-                        fontWeight: "bold",
-                        fontSize: "1.1rem",
-                      }}
-                    >
-                      {displayEmail}
-                    </a>
                   </div>
                 </div>
               </div>
