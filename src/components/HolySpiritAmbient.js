@@ -17,7 +17,9 @@ export default function HolySpiritAmbient() {
       <style
         dangerouslySetInnerHTML={{
           __html: `
-        /* 1. Animasi Masuk (Fly In) - Hanya terjadi sekali saat web dimuat */
+        /* =========================================================================
+           1. PENGATURAN PC (DESKTOP) — Tetap Sama, Tidak Diubah
+           ========================================================================= */
         @keyframes flyIn {
           0% { 
             transform: translate(-30vw, 40vh) scale(0.5) rotate(25deg); 
@@ -29,7 +31,6 @@ export default function HolySpiritAmbient() {
           }
         }
 
-        /* 2. Gerakan Mengambang Halus (Hovering in place) - Melanjutkan flyIn */
         @keyframes gentleHover {
           0%, 100% { 
             transform: translate(25vw, 25vh) rotate(-2deg); 
@@ -39,13 +40,11 @@ export default function HolySpiritAmbient() {
           }
         }
 
-        /* Gerakan Kepakan Halus (Naik Turun) */
         @keyframes bobbing {
           0%, 100% { margin-top: 0px; }
           50% { margin-top: -12px; }
         }
 
-        /* Efek Cahaya Rohani yang Berdenyut */
         @keyframes holyGlow {
           0%, 100% { filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5)); }
           50% { filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.9)) drop-shadow(0 0 40px rgba(59, 130, 246, 0.6)); }
@@ -54,8 +53,8 @@ export default function HolySpiritAmbient() {
         .real-dove-container {
           position: absolute;
           /* TRIK ANIMASI BERANTAI: 
-             flyIn berjalan 2.5s lalu berhenti (forwards). 
-             gentleHover menunggu 2.5s baru mulai dan berulang (infinite). */
+              flyIn berjalan 2.5s lalu berhenti (forwards). 
+              gentleHover menunggu 2.5s baru mulai dan berulang (infinite). */
           animation: 
             flyIn 2.5s ease-out forwards,
             gentleHover 8s ease-in-out 2.5s infinite; 
@@ -67,26 +66,27 @@ export default function HolySpiritAmbient() {
           animation: bobbing 3s ease-in-out infinite, holyGlow 5s ease-in-out infinite;
         }
         
-        /* =========================================
-           PENYESUAIAN KHUSUS LAYAR HP (MOBILE)
-           ========================================= */
+        /* =========================================================================
+           2. PENYESUAIAN KHUSUS LAYAR HP (MOBILE) — TELAH DIUBAH
+           ========================================================================= */
         @media (max-width: 768px) {
-          /* Merpati kini MENDARAT DI ZONA JUDUL UTAMA (Lebih ke atas): */
+          /* Merpati kini MENDARAT DI AREA TEKS PUTIH (Lebih ke bawah): */
           @keyframes flyInMobile {
             0% { 
               transform: translate(-40vw, 15vh) scale(0.5) rotate(25deg); 
               opacity: 0; 
             }
             100% { 
-              /* Mengubah dari 54vh menjadi 32vh agar posisinya naik */
-              transform: translate(62vw, 32vh) rotate(-4deg); 
+              /* Mengubah nilai Vertikal dari 32vh menjadi 65vh agar posisinya turun drastis ke area teks putih */
+              transform: translate(62vw, 65vh) rotate(-4deg); 
               opacity: 1; 
             }
           }
 
+          /* Sesuaikan juga gentleHover agar merpati tidak loncat ke atas lagi saat mendarat */
           @keyframes gentleHoverMobile {
-            0%, 100% { transform: translate(62vw, 32vh) rotate(-4deg); }
-            50% { transform: translate(63vw, 30.5vh) rotate(2deg); }
+            0%, 100% { transform: translate(62vw, 65vh) rotate(-4deg); }
+            50% { transform: translate(63vw, 63.5vh) rotate(2deg); }
           }
           
           .real-dove-container {

@@ -164,3 +164,27 @@ model ActivityGallery {
   photos       ActivityPhoto[]
   createdAt    DateTime        @default(now())
 }
+
+model HeroOverlay {
+  id        String   @id @default(cuid())
+  imageUrl  String
+  createdAt DateTime @default(now())
+
+  @@map("hero_overlays")
+}
+
+// ============================================================
+// HOME MOMENTS — foto kegiatan mingguan TANPA keterangan, tampil
+// sebagai slider overlay landscape di homepage (mirip Guest Speaker
+// secara mekanisme UI, tapi murni visual — tidak ada nama/tanggal).
+// Terpisah sengaja dari ActivityGallery (Weekly Activities) yang
+// memang untuk galeri per-event lengkap dengan judul & video.
+// ============================================================
+model HomeMoment {
+  id        Int      @id @default(autoincrement())
+  image     String
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  @@map("home_moments")
+}

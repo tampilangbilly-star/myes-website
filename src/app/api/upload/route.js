@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-// Pastikan SUPABASE_SERVICE_ROLE_KEY sudah ditambahkan di Environment Variables Vercel
+// Pastikan SUPABASE_SERVICE_ROLE_KEY sudah ditambahkan di Environment Variables Vercel/.env
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY,
@@ -34,7 +34,8 @@ export async function POST(req) {
       data: { publicUrl },
     } = supabase.storage.from("uploads").getPublicUrl(filename);
 
-    return NextResponse.json({ path: publicUrl });
+    // Kirim 'url' agar cocok dengan frontend (uploadData.url)
+    return NextResponse.json({ url: publicUrl, path: publicUrl });
   } catch (error) {
     console.error("Upload Error:", error);
     return NextResponse.json(

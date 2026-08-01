@@ -22,6 +22,7 @@ export default function AdminLayout({ children }) {
         { href: "/admin/settings", icon: "📋", text: "About Us" },
         { href: "/admin/personnel", icon: "👥", text: "Personnel" },
         { href: "/admin/guest-speakers", icon: "🎤", text: "Guest Speakers" },
+        { href: "/admin/home-moments", icon: "🌟", text: "Momen Beranda" },
         { href: "/admin/programs", icon: "📚", text: "Programs" },
         { href: "/admin/activities", icon: "📅", text: "Activities" },
         {
