@@ -73,6 +73,7 @@ model Program {
   descriptionId String?  @db.Text @map("description_id")
   emoji         String   @default("📖")
   image         String?
+  images        String[] @default([]) // <-- TAMBAHAN BARU UNTUK SLIDER BANYAK FOTO
   sortOrder     Int      @default(0) @map("sort_order")
   isActive      Boolean  @default(true) @map("is_active")
   createdAt     DateTime @default(now())

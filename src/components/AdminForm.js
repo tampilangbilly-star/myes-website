@@ -14,7 +14,8 @@ export default function AdminForm({
 
   const defaults = {};
   fields.forEach((f) => {
-    defaults[f.name] = "";
+    // Jika tipe multiple file, set default ke array kosong
+    defaults[f.name] = f.multiple ? [] : "";
   });
 
   const [form, setForm] = useState(initialData || defaults);
@@ -23,6 +24,28 @@ export default function AdminForm({
   const [error, setError] = useState(null);
 
   const set = (k, v) => setForm({ ...form, [k]: v });
+
+  // === Fungsi Hapus Preview (Untuk Multiple Upload) ===
+  const removeExisting = (fieldName, index) => {
+    setForm((prev) => {
+      const current = prev[fieldName];
+      if (Array.isArray(current)) {
+        return { ...prev, [fieldName]: current.filter((_, i) => i !== index) };
+      }
+      return { ...prev, [fieldName]: "" };
+    });
+  };
+
+  const removeNew = (fieldName, index) => {
+    setMediaFiles((prev) => {
+      const current = prev[fieldName];
+      if (Array.isArray(current)) {
+        return { ...prev, [fieldName]: current.filter((_, i) => i !== index) };
+      }
+      return { ...prev, [fieldName]: null };
+    });
+  };
+  // ===================================================
 
   const uploadFile = async (file, folder) => {
     const fd = new FormData();
@@ -48,17 +71,33 @@ export default function AdminForm({
         data.sortOrder = parseInt(data.sortOrder) || 0;
       if (data.isActive !== undefined) data.isActive = !!data.isActive;
 
-      for (const [key, file] of Object.entries(mediaFiles)) {
-        if (file) {
+      // Proses upload Media Files (Single & Multiple)
+      for (const [key, value] of Object.entries(mediaFiles)) {
+        if (Array.isArray(value)) {
+          // JIKA MULTIPLE FILES (Array)
+          const folder = key === "photo" ? "personnel" : key === "backgroundImage" ? "slides/backgrounds" : "uploads";
+          const uploadedUrls = [];
+          
+          for (const file of value) {
+            const url = await uploadFile(file, folder);
+            uploadedUrls.push(url);
+          }
+          
+          // Gabungkan gambar yang sudah ada dengan yang baru di-upload
+          const existing = Array.isArray(data[key]) ? data[key] : (data[key] ? [data[key]] : []);
+          data[key] = [...existing, ...uploadedUrls]; // API Anda sudah diatur menerima array
+
+        } else if (value) {
+          // JIKA SINGLE FILE (Object File Biasa)
           data[key] = await uploadFile(
-            file,
+            value,
             key === "photo"
               ? "personnel"
               : key === "backgroundImage"
                 ? "slides/backgrounds"
                 : key === "video" // Folder khusus video
                   ? "activities/videos"
-                  : "uploads",
+                  : "uploads"
           );
         }
       }
@@ -157,44 +196,105 @@ export default function AdminForm({
             {/* IMAGE FILE */}
             {f.type === "file" && (
               <>
-                {form[f.name] && !mediaFiles[f.name] && (
-                  <img
-                    src={form[f.name]}
-                    style={{
-                      maxHeight: 100,
-                      display: "block",
-                      marginBottom: 8,
-                      borderRadius: 6,
-                    }}
-                    alt="Preview"
-                  />
+                {f.multiple ? (
+                  // ==============================
+                  // TAMPILAN KHUSUS MULTIPLE GAMBAR
+                  // ==============================
+                  <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "10px" }}>
+                    {/* Render Gambar Lama (Sudah di database) */}
+                    {Array.isArray(form[f.name]) && form[f.name].map((src, idx) => (
+                      <div key={`old-${idx}`} style={{ position: "relative" }}>
+                        <img
+                          src={src}
+                          style={{ maxHeight: 100, display: "block", borderRadius: 6 }}
+                          alt="Old Preview"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeExisting(f.name, idx)}
+                          style={{ position: "absolute", top: -8, right: -8, background: "#ef4444", color: "#fff", border: "none", borderRadius: "50%", width: 24, height: 24, cursor: "pointer", fontWeight: "bold" }}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+
+                    {/* Render Gambar Baru (Baru di-select, belum diupload) */}
+                    {Array.isArray(mediaFiles[f.name]) && mediaFiles[f.name].map((file, idx) => (
+                      <div key={`new-${idx}`} style={{ position: "relative" }}>
+                        <img
+                          src={URL.createObjectURL(file)}
+                          style={{ maxHeight: 100, display: "block", borderRadius: 6 }}
+                          alt="New Preview"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeNew(f.name, idx)}
+                          style={{ position: "absolute", top: -8, right: -8, background: "#ef4444", color: "#fff", border: "none", borderRadius: "50%", width: 24, height: 24, cursor: "pointer", fontWeight: "bold" }}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  // ==============================
+                  // TAMPILAN SINGLE GAMBAR (LAMA)
+                  // ==============================
+                  <>
+                    {form[f.name] && !mediaFiles[f.name] && (
+                      <img
+                        src={form[f.name]}
+                        style={{
+                          maxHeight: 100,
+                          display: "block",
+                          marginBottom: 8,
+                          borderRadius: 6,
+                        }}
+                        alt="Preview"
+                      />
+                    )}
+                    {mediaFiles[f.name] && (
+                      <img
+                        src={URL.createObjectURL(mediaFiles[f.name])}
+                        style={{
+                          maxHeight: 100,
+                          display: "block",
+                          marginBottom: 8,
+                          borderRadius: 6,
+                        }}
+                        alt="Preview baru"
+                      />
+                    )}
+                  </>
                 )}
-                {mediaFiles[f.name] && (
-                  <img
-                    src={URL.createObjectURL(mediaFiles[f.name])}
-                    style={{
-                      maxHeight: 100,
-                      display: "block",
-                      marginBottom: 8,
-                      borderRadius: 6,
-                    }}
-                    alt="Preview baru"
-                  />
-                )}
+
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(e) =>
-                    setMediaFiles({
-                      ...mediaFiles,
-                      [f.name]: e.target.files[0],
-                    })
-                  }
+                  multiple={f.multiple} // Mengizinkan blokir banyak file sekaligus
+                  onChange={(e) => {
+                    if (f.multiple) {
+                      const newFiles = Array.from(e.target.files);
+                      setMediaFiles((prev) => ({
+                        ...prev,
+                        // Append (tambahkan) file baru ke array file sebelumnya
+                        [f.name]: prev[f.name] ? [...prev[f.name], ...newFiles] : newFiles,
+                      }));
+                    } else {
+                      setMediaFiles({
+                        ...mediaFiles,
+                        [f.name]: e.target.files[0],
+                      });
+                    }
+                    // Me-reset value input agar bisa mengupload file yang sama jika tak sengaja terhapus
+                    e.target.value = null; 
+                  }}
                 />
               </>
             )}
 
-            {/* VIDEO FILE (BARU) */}
+            {/* VIDEO FILE */}
             {f.type === "video" && (
               <>
                 {form[f.name] && !mediaFiles[f.name] && (

@@ -8,6 +8,11 @@ import GuestSpeakerSlider from "@/components/GuestSpeakerSlider";
 import NewsHomeSlider from "@/components/NewsHomeSlider";
 import VirtualGreeter from "@/components/VirtualGreeter";
 import HolySpiritAmbient from "@/components/HolySpiritAmbient";
+
+// IMPORT KOMPONEN SLIDER BARU KITA
+import ProgramCardSlider from "@/components/ProgramCardSlider";
+import WelcomePopup from "@/components/WelcomePopup";
+
 // HomeMomentsSlider dihapus
 
 async function getData() {
@@ -19,6 +24,7 @@ async function getData() {
     mainBgSetting,
     speakers,
     contactItems,
+    missions,
   ] = await Promise.all([
     prisma.slide.findMany({
       where: { isActive: true },
@@ -32,6 +38,7 @@ async function getData() {
     prisma.news.findMany({
       where: { isActive: true },
       orderBy: { publishedAt: "desc" },
+      orderBy: { publishedAt: "desc" },
       take: 5,
     }),
     prisma.setting.findMany({ where: { group: "social" } }),
@@ -41,6 +48,11 @@ async function getData() {
       orderBy: { dateServed: "desc" },
     }),
     prisma.setting.findMany({ where: { group: "contact" } }),
+    prisma.mission.findMany({
+      where: { isActive: true },
+      orderBy: { createdAt: "desc" }, // Diurutkan berdasarkan yang terakhir dibuat/diupload
+      take: 5,
+    }),
   ]);
 
   const socials = {};
@@ -50,7 +62,7 @@ async function getData() {
   const mainBg = mainBgSetting?.valueEn;
 
   // homeMoments dihapus dari return
-  return { slides, programs, news, socials, mainBg, speakers, contactItems };
+  return { slides, programs, news, socials, mainBg, speakers, contactItems, missions };
 }
 
 export default async function Home() {
@@ -59,7 +71,7 @@ export default async function Home() {
   
   // homeMoments dihapus dari destructuring
   const {
-    slides, programs, news, socials, mainBg, speakers, contactItems,
+    slides, programs, news, socials, mainBg, speakers, contactItems, missions
   } = await getData();
 
   const t = (item, field) => {
@@ -81,7 +93,8 @@ export default async function Home() {
   return (
     <>
       <Navbar lang={lang} />
-
+<WelcomePopup news={news} missions={missions} lang={lang} />
+{/* ==================================== */}
       <style
         dangerouslySetInnerHTML={{
           __html: `
@@ -388,25 +401,30 @@ export default async function Home() {
                         : {}
                     }
                   />
+                  
+                  {/* === BAGIAN YANG DIPERBARUI UNTUK SLIDER GAMBAR PROGRAM === */}
                   <div className="program-card-body">
-                    {p.image ? (
-                      <img
-                        src={`${p.image}`}
-                        style={{
-                          width: "100%",
-                          height: 140,
-                          objectFit: "cover",
-                          borderRadius: 12,
-                          marginBottom: "1.2rem",
-                        }}
-                        alt=""
+                    <div 
+                      style={{ 
+                        position: "relative", 
+                        width: "100%", 
+                        height: 140, 
+                        borderRadius: 12, 
+                        overflow: "hidden", 
+                        marginBottom: "1.2rem",
+                        backgroundColor: "#030812" // Fallback color
+                      }}
+                    >
+                      <ProgramCardSlider 
+                        images={p.images?.length > 0 ? p.images : (p.image ? [p.image] : [])} 
+                        emoji={p.emoji} 
                       />
-                    ) : (
-                      <span className="emoji">{p.emoji}</span>
-                    )}
+                    </div>
                     <h3>{t(p, "title")}</h3>
                     <p>{t(p, "description")}</p>
                   </div>
+                  {/* ========================================================== */}
+
                 </div>
               ))}
             </div>

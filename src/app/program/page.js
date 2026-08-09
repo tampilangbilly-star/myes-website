@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ProgramCardSlider from "@/components/ProgramCardSlider";
 
 export default async function ProgramPage() {
   const lang = cookies().get("lang")?.value || "en";
@@ -255,11 +256,13 @@ export default async function ProgramPage() {
                   <span className="pg-index">
                     {String(i + 1).padStart(2, "0")}
                   </span>
-                  {p.image ? (
-                    <img src={`${p.image}`} alt="" />
-                  ) : (
-                    <span className="emoji-hero">{p.emoji}</span>
-                  )}
+                  
+                  {/* Memanggil komponen Slider dengan fallback array untuk data lama */}
+                  <ProgramCardSlider 
+                    images={p.images?.length > 0 ? p.images : (p.image ? [p.image] : [])} 
+                    emoji={p.emoji} 
+                  />
+
                 </div>
 
                 {/* Judul + cuplikan singkat */}
@@ -285,6 +288,9 @@ export default async function ProgramPage() {
           </div>
         </div>
       </section>
+      
+      {/* Jangan lupa untuk memasukkan Footer yang di-import di atas */}
+      <Footer />
     </>
   );
 }
