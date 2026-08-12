@@ -6,6 +6,10 @@ export default function WelcomePopup({ news, missions, lang }) {
   const [isOpen, setIsOpen] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // Rasio asli tiap gambar (lebar / tinggi), diisi saat gambar selesai dimuat.
+  // Dipakai agar kotak gambar mengikuti bentuk poster, bukan sebaliknya.
+  const [ratios, setRatios] = useState({});
+
   // 1. Ambil SATU berita terbaru (yang memiliki gambar)
   const latestNews = news?.find((n) => n.image);
 
@@ -64,6 +68,16 @@ export default function WelcomePopup({ news, missions, lang }) {
   const tTag = lang === "id" ? currentItem.tagId : currentItem.tagEn;
   const tBtnText = lang === "id" ? currentItem.btnId : currentItem.btnEn;
 
+  // Rasio kotak gambar mengikuti gambar yang sedang aktif.
+  // 4/5 hanya dipakai sementara sebelum gambar selesai dimuat.
+  const rasioAktif = ratios[currentItem.id] || 4 / 5;
+
+  const catatRasio = (id) => (e) => {
+    const { naturalWidth: w, naturalHeight: h } = e.currentTarget;
+    if (!w || !h) return;
+    setRatios((prev) => (prev[id] ? prev : { ...prev, [id]: w / h }));
+  };
+
   return (
     <div className="welcome-popup-overlay">
       <div className="welcome-popup-modal">
@@ -72,17 +86,27 @@ export default function WelcomePopup({ news, missions, lang }) {
           ✕
         </button>
 
-        {/* Kontainer Gambar Slider */}
-        <div className="welcome-image-container">
+        {/* Kontainer Gambar Slider — tingginya menyesuaikan bentuk poster */}
+        <div className="welcome-image-container" style={{ aspectRatio: rasioAktif }}>
           {popupItems.map((item, idx) => (
-            <img
+            <div
               key={item.id}
-              src={item.image}
-              alt={item.titleEn}
-              className={`welcome-image ${idx === currentIndex ? "active" : ""}`}
-            />
+              className={`welcome-slide ${idx === currentIndex ? "active" : ""}`}
+            >
+              {/* Lapisan buram: mengisi sisa ruang bila bentuk poster tidak
+                  sama dengan kotaknya, sehingga tidak ada bidang kosong. */}
+              <img src={item.image} alt="" aria-hidden="true" className="welcome-image-blur" />
+
+              {/* Gambar utama: contain, jadi poster tampil UTUH tanpa terpotong */}
+              <img
+                src={item.image}
+                alt={item.titleEn}
+                className="welcome-image"
+                onLoad={catatRasio(item.id)}
+              />
+            </div>
           ))}
-          
+
           {/* Tag Info di pojok gambar (Berubah sesuai slide) */}
           <span className="welcome-tag">{tTag}</span>
         </div>
@@ -90,7 +114,7 @@ export default function WelcomePopup({ news, missions, lang }) {
         {/* Info & Tombol Aksi */}
         <div className="welcome-content">
           <h3>{tTitle}</h3>
-          
+
           {/* Navigasi Titik (Dots) */}
           {popupItems.length > 1 && (
             <div className="welcome-dots">
@@ -131,8 +155,10 @@ export default function WelcomePopup({ news, missions, lang }) {
           background: #0a1628;
           width: 100%;
           max-width: 480px;
+          max-height: 92vh;          /* modal tidak melebihi layar ... */
+          overflow-y: auto;          /* ... sisanya bisa digulir */
+          -webkit-overflow-scrolling: touch;
           border-radius: 20px;
-          overflow: hidden;
           position: relative;
           box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
           border: 1px solid rgba(255, 255, 255, 0.1);
@@ -159,31 +185,50 @@ export default function WelcomePopup({ news, missions, lang }) {
           transition: background 0.3s;
         }
         .welcome-close-btn:hover {
-          background: #ef4444; 
+          background: #ef4444;
         }
 
+        /* Tinggi kotak ditentukan aspectRatio dari gambar yang sedang aktif,
+           lalu dibatasi agar judul dan tombol tetap kelihatan tanpa menggulir. */
         .welcome-image-container {
           position: relative;
           width: 100%;
-          aspect-ratio: 1 / 1; 
+          min-height: 200px;
+          max-height: 62vh;
           background: #030812;
           overflow: hidden;
+          border-radius: 20px 20px 0 0;
+          transition: aspect-ratio 0.45s ease;
+        }
+
+        .welcome-slide {
+          position: absolute;
+          inset: 0;
+          opacity: 0;
+          transition: opacity 0.8s ease-in-out;
+        }
+        .welcome-slide.active {
+          opacity: 1;
         }
 
         .welcome-image {
           position: absolute;
-          top: 0;
-          left: 0;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: contain;   /* KUNCI: poster tampil utuh, tidak dipotong */
+          z-index: 1;
+        }
+
+        .welcome-image-blur {
+          position: absolute;
+          inset: 0;
           width: 100%;
           height: 100%;
           object-fit: cover;
-          opacity: 0;
-          transition: opacity 0.8s ease-in-out, transform 4s linear;
-          transform: scale(1);
-        }
-        .welcome-image.active {
-          opacity: 1;
-          transform: scale(1.05); 
+          filter: blur(26px) brightness(0.5) saturate(130%);
+          transform: scale(1.2);
+          z-index: 0;
         }
 
         .welcome-tag {
@@ -197,7 +242,7 @@ export default function WelcomePopup({ news, missions, lang }) {
           font-size: 0.85rem;
           font-weight: bold;
           letter-spacing: 0.5px;
-          z-index: 2;
+          z-index: 3;
           box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
@@ -248,6 +293,15 @@ export default function WelcomePopup({ news, missions, lang }) {
         .welcome-btn:hover {
           background: #fff;
           color: #0f172a;
+        }
+
+        /* Layar pendek (HP mendatar / jendela kecil): beri ruang lebih
+           untuk teks agar tombol tidak terdorong keluar layar. */
+        @media (max-height: 700px) {
+          .welcome-image-container { max-height: 52vh; }
+          .welcome-content { padding: 1.1rem; }
+          .welcome-content h3 { font-size: 1.15rem; margin-bottom: 0.75rem; }
+          .welcome-dots { margin-bottom: 1rem; }
         }
 
         @keyframes fadeIn {
