@@ -12,7 +12,6 @@ export default function AdminLayout({ children }) {
       items: [
         { href: "/admin", icon: "📊", text: "Dashboard" },
         { href: "/admin/slides", icon: "🖼️", text: "Homepage Slides" },
-        // INI TAMBAHAN MENU BARUNYA:
         { href: "/admin/messages", icon: "📬", text: "Inbox Pesan" },
       ],
     },
@@ -31,6 +30,8 @@ export default function AdminLayout({ children }) {
           text: "Weekly Gallery",
         },
         { href: "/admin/missions", icon: "✈️", text: "Mission Trip" },
+        // INI MENU M-YES CARE YANG BARU DITAMBAHKAN:
+        { href: "/admin/care", icon: "❤️", text: "M-YES Care" },
         { href: "/admin/news", icon: "📰", text: "News" },
       ],
     },

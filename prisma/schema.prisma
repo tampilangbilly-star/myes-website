@@ -189,3 +189,31 @@ model HomeMoment {
   createdAt DateTime @default(now())
   @@map("home_moments")
 }
+// ============================================================
+// M-YES CARE — Galeri untuk kegiatan berdampak (sosial/rohani)
+// Mendukung multi-foto dan multi-video (embed YouTube).
+// ============================================================
+model CareActivity {
+  id            Int         @id @default(autoincrement())
+  titleEn       String      // Judul kegiatan (Inggris)
+  titleId       String?     // Judul kegiatan (Indonesia)
+  descriptionEn String?     @db.Text
+  descriptionId String?     @db.Text
+  activityDate  DateTime
+  isActive      Boolean     @default(true)
+  media         CareMedia[] // Relasi ke tabel media (Foto/Video)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@map("care_activities")
+}
+
+model CareMedia {
+  id             Int          @id @default(autoincrement())
+  type           String       @default("IMAGE") // Isi: "IMAGE" atau "YOUTUBE"
+  url            String       // Path gambar lokal ATAU ID/Link YouTube
+  careActivityId Int
+  careActivity   CareActivity @relation(fields: [careActivityId], references: [id], onDelete: Cascade)
+
+  @@map("care_media")
+}

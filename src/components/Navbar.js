@@ -32,6 +32,7 @@ export default function Navbar({ lang = "en" }) {
     { href: "/program", en: "Program", id: "Program" },
     { href: "/activities", en: "Weekly Activities", id: "Kegiatan Mingguan" },
     { href: "/mission", en: "Mission Trip", id: "Misi Perjalanan" },
+    { href: "/care", en: "M-YES Care", id: "M-YES Care" }, // <-- INI MENU M-YES CARE YANG BARU DITAMBAHKAN
     { href: "/news", en: "News", id: "Berita" },
     { href: "/contact", en: "Contact Us", id: "Hubungi Kami" },
   ];
