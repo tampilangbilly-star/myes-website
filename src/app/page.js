@@ -9,11 +9,8 @@ import NewsHomeSlider from "@/components/NewsHomeSlider";
 import VirtualGreeter from "@/components/VirtualGreeter";
 import HolySpiritAmbient from "@/components/HolySpiritAmbient";
 
-// IMPORT KOMPONEN SLIDER BARU KITA
 import ProgramCardSlider from "@/components/ProgramCardSlider";
 import WelcomePopup from "@/components/WelcomePopup";
-
-// HomeMomentsSlider dihapus
 
 async function getData() {
   const [
@@ -25,6 +22,7 @@ async function getData() {
     speakers,
     contactItems,
     missions,
+    care, // Menggunakan nama 'care'
   ] = await Promise.all([
     prisma.slide.findMany({
       where: { isActive: true },
@@ -38,7 +36,6 @@ async function getData() {
     prisma.news.findMany({
       where: { isActive: true },
       orderBy: { publishedAt: "desc" },
-      orderBy: { publishedAt: "desc" },
       take: 5,
     }),
     prisma.setting.findMany({ where: { group: "social" } }),
@@ -50,8 +47,14 @@ async function getData() {
     prisma.setting.findMany({ where: { group: "contact" } }),
     prisma.mission.findMany({
       where: { isActive: true },
-      orderBy: { createdAt: "desc" }, // Diurutkan berdasarkan yang terakhir dibuat/diupload
+      orderBy: { createdAt: "desc" }, 
       take: 5,
+    }),
+    prisma.careActivity.findMany({
+      where: { isActive: true },
+      include: { media: true },
+      orderBy: { activityDate: "desc" },
+      take: 1, 
     }),
   ]);
 
@@ -61,17 +64,15 @@ async function getData() {
   });
   const mainBg = mainBgSetting?.valueEn;
 
-  // homeMoments dihapus dari return
-  return { slides, programs, news, socials, mainBg, speakers, contactItems, missions };
+  return { slides, programs, news, socials, mainBg, speakers, contactItems, missions, care };
 }
 
 export default async function Home() {
   const cookieStore = cookies();
   const lang = cookieStore.get("lang")?.value || "en";
   
-  // homeMoments dihapus dari destructuring
   const {
-    slides, programs, news, socials, mainBg, speakers, contactItems, missions
+    slides, programs, news, socials, mainBg, speakers, contactItems, missions, care
   } = await getData();
 
   const t = (item, field) => {
@@ -93,7 +94,7 @@ export default async function Home() {
   return (
     <>
       <Navbar lang={lang} />
-<WelcomePopup news={news} missions={missions} lang={lang} />
+      <WelcomePopup news={news} cares={care} missions={missions} lang={lang} />
 {/* ==================================== */}
       <style
         dangerouslySetInnerHTML={{

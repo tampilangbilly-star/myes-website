@@ -2,12 +2,11 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
-export default function WelcomePopup({ news, missions, lang }) {
+export default function WelcomePopup({ news, missions, cares, lang }) {
   const [isOpen, setIsOpen] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   // Rasio asli tiap gambar (lebar / tinggi), diisi saat gambar selesai dimuat.
-  // Dipakai agar kotak gambar mengikuti bentuk poster, bukan sebaliknya.
   const [ratios, setRatios] = useState({});
 
   // 1. Ambil SATU berita terbaru (yang memiliki gambar)
@@ -16,9 +15,13 @@ export default function WelcomePopup({ news, missions, lang }) {
   // 2. Ambil SATU misi terbaru (yang memiliki gambar)
   const latestMission = missions?.find((m) => m.image);
 
-  // 3. Gabungkan keduanya ke dalam satu array untuk slider
+  // 3. Ambil SATU M-YES Care terbaru (yang memiliki media tipe IMAGE)
+  const latestCare = cares?.find((c) => c.media?.some((m) => m.type === "IMAGE"));
+
+  // 4. Gabungkan ketiganya ke dalam satu array untuk slider dengan URUTAN BARU
   const popupItems = [];
 
+  // Urutan 1: NEWS
   if (latestNews) {
     popupItems.push({
       id: "news-" + latestNews.id,
@@ -27,12 +30,31 @@ export default function WelcomePopup({ news, missions, lang }) {
       titleEn: latestNews.titleEn,
       tagId: latestNews.tagId || "Berita Terbaru",
       tagEn: latestNews.tagEn || "Latest News",
-      link: "/news", // Link menuju halaman berita
+      link: "/news", 
       btnId: "Lihat Detail Berita",
       btnEn: "View News Details",
     });
   }
 
+  // Urutan 2: M-YES CARE (Ditukar posisinya ke urutan kedua)
+  if (latestCare) {
+    const careImage = latestCare.media.find((m) => m.type === "IMAGE")?.url;
+    if (careImage) {
+      popupItems.push({
+        id: "care-" + latestCare.id,
+        image: careImage,
+        titleId: latestCare.titleId || latestCare.titleEn,
+        titleEn: latestCare.titleEn,
+        tagId: "Aksi Nyata",
+        tagEn: "M-YES Care",
+        link: "/care",
+        btnId: "Lihat M-YES Care",
+        btnEn: "View M-YES Care",
+      });
+    }
+  }
+
+  // Urutan 3: MISSIONS (Ditukar posisinya ke urutan terakhir)
   if (latestMission) {
     popupItems.push({
       id: "mission-" + latestMission.id,
@@ -41,7 +63,7 @@ export default function WelcomePopup({ news, missions, lang }) {
       titleEn: latestMission.titleEn,
       tagId: "Perjalanan Misi",
       tagEn: "Mission Trip",
-      link: "/missions", // Pastikan link ini mengarah ke halaman misi Anda
+      link: "/mission", 
       btnId: "Masuk ke Mission Trip",
       btnEn: "Enter Mission Trip",
     });
@@ -58,18 +80,14 @@ export default function WelcomePopup({ news, missions, lang }) {
     return () => clearInterval(timer);
   }, [isOpen, popupItems.length]);
 
-  // Jika ditutup atau tidak ada item yang punya gambar, jangan tampilkan apa-apa
   if (!isOpen || popupItems.length === 0) return null;
 
   const currentItem = popupItems[currentIndex];
 
-  // Menentukan teks bahasa untuk elemen yang sedang aktif
   const tTitle = lang === "id" ? currentItem.titleId : currentItem.titleEn;
   const tTag = lang === "id" ? currentItem.tagId : currentItem.tagEn;
   const tBtnText = lang === "id" ? currentItem.btnId : currentItem.btnEn;
 
-  // Rasio kotak gambar mengikuti gambar yang sedang aktif.
-  // 4/5 hanya dipakai sementara sebelum gambar selesai dimuat.
   const rasioAktif = ratios[currentItem.id] || 4 / 5;
 
   const catatRasio = (id) => (e) => {
@@ -81,23 +99,17 @@ export default function WelcomePopup({ news, missions, lang }) {
   return (
     <div className="welcome-popup-overlay">
       <div className="welcome-popup-modal">
-        {/* Tombol Close (X) */}
         <button className="welcome-close-btn" onClick={() => setIsOpen(false)}>
           ✕
         </button>
 
-        {/* Kontainer Gambar Slider — tingginya menyesuaikan bentuk poster */}
         <div className="welcome-image-container" style={{ aspectRatio: rasioAktif }}>
           {popupItems.map((item, idx) => (
             <div
               key={item.id}
               className={`welcome-slide ${idx === currentIndex ? "active" : ""}`}
             >
-              {/* Lapisan buram: mengisi sisa ruang bila bentuk poster tidak
-                  sama dengan kotaknya, sehingga tidak ada bidang kosong. */}
               <img src={item.image} alt="" aria-hidden="true" className="welcome-image-blur" />
-
-              {/* Gambar utama: contain, jadi poster tampil UTUH tanpa terpotong */}
               <img
                 src={item.image}
                 alt={item.titleEn}
@@ -107,15 +119,12 @@ export default function WelcomePopup({ news, missions, lang }) {
             </div>
           ))}
 
-          {/* Tag Info di pojok gambar (Berubah sesuai slide) */}
           <span className="welcome-tag">{tTag}</span>
         </div>
 
-        {/* Info & Tombol Aksi */}
         <div className="welcome-content">
           <h3>{tTitle}</h3>
 
-          {/* Navigasi Titik (Dots) */}
           {popupItems.length > 1 && (
             <div className="welcome-dots">
               {popupItems.map((_, idx) => (
@@ -129,7 +138,6 @@ export default function WelcomePopup({ news, missions, lang }) {
           )}
 
           <div className="welcome-action">
-            {/* Tombol dengan link dinamis berdasarkan slide yang sedang aktif */}
             <Link href={currentItem.link} className="welcome-btn" onClick={() => setIsOpen(false)}>
               {tBtnText}
             </Link>
@@ -155,8 +163,8 @@ export default function WelcomePopup({ news, missions, lang }) {
           background: #0a1628;
           width: 100%;
           max-width: 480px;
-          max-height: 92vh;          /* modal tidak melebihi layar ... */
-          overflow-y: auto;          /* ... sisanya bisa digulir */
+          max-height: 92vh;          
+          overflow-y: auto;          
           -webkit-overflow-scrolling: touch;
           border-radius: 20px;
           position: relative;
@@ -188,8 +196,6 @@ export default function WelcomePopup({ news, missions, lang }) {
           background: #ef4444;
         }
 
-        /* Tinggi kotak ditentukan aspectRatio dari gambar yang sedang aktif,
-           lalu dibatasi agar judul dan tombol tetap kelihatan tanpa menggulir. */
         .welcome-image-container {
           position: relative;
           width: 100%;
@@ -216,7 +222,7 @@ export default function WelcomePopup({ news, missions, lang }) {
           inset: 0;
           width: 100%;
           height: 100%;
-          object-fit: contain;   /* KUNCI: poster tampil utuh, tidak dipotong */
+          object-fit: contain;   
           z-index: 1;
         }
 
@@ -295,8 +301,6 @@ export default function WelcomePopup({ news, missions, lang }) {
           color: #0f172a;
         }
 
-        /* Layar pendek (HP mendatar / jendela kecil): beri ruang lebih
-           untuk teks agar tombol tidak terdorong keluar layar. */
         @media (max-height: 700px) {
           .welcome-image-container { max-height: 52vh; }
           .welcome-content { padding: 1.1rem; }
