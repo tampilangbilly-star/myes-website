@@ -48,7 +48,7 @@ export default function WeeklyGallery({ galleries, lang }) {
           <div key={gallery.id} className="gallery-box">
             <div
               style={{
-                borderBottom: "1px solid rgba(255,255,255,0.1)",
+                borderBottom: "1px solid var(--border-light)",
                 paddingBottom: "1rem",
                 marginBottom: "1.5rem",
               }}
@@ -56,7 +56,7 @@ export default function WeeklyGallery({ galleries, lang }) {
               <h3
                 style={{
                   fontSize: "clamp(1.2rem, 1rem + 2vw, 1.5rem)",
-                  color: "#fff",
+                  color: "var(--text-primary)",
                   margin: "0 0 0.5rem 0",
                   lineHeight: "1.3",
                 }}
@@ -67,7 +67,7 @@ export default function WeeklyGallery({ galleries, lang }) {
               </h3>
               <span
                 style={{
-                  color: "#3b82f6",
+                  color: "var(--accent-gold)",
                   fontSize: "0.9rem",
                   fontWeight: "bold",
                 }}
@@ -85,7 +85,7 @@ export default function WeeklyGallery({ galleries, lang }) {
               <div style={{ marginBottom: "2rem" }}>
                 <h4
                   style={{
-                    color: "#e2e8f0",
+                    color: "var(--text-primary)",
                     marginBottom: "1rem",
                     fontSize: "1.1rem",
                     display: "flex",
@@ -100,8 +100,8 @@ export default function WeeklyGallery({ galleries, lang }) {
                   style={{
                     borderRadius: "12px",
                     overflow: "hidden",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    backgroundColor: "#000",
+                    border: "1px solid var(--border-light)",
+                    backgroundColor: "var(--bg-surface)",
                     position: "relative",
                     paddingBottom: "56.25%",
                     height: 0,
@@ -130,7 +130,7 @@ export default function WeeklyGallery({ galleries, lang }) {
               <div>
                 <h4
                   style={{
-                    color: "#e2e8f0",
+                    color: "var(--text-primary)",
                     marginBottom: "1rem",
                     fontSize: "1.1rem",
                     display: "flex",
@@ -167,7 +167,7 @@ export default function WeeklyGallery({ galleries, lang }) {
 
         {galleries.length === 0 && (
           <div
-            style={{ textAlign: "center", color: "#94a3b8", padding: "2rem" }}
+            style={{ textAlign: "center", color: "var(--text-secondary)", padding: "2rem" }}
           >
             <p>
               {lang === "id"
@@ -222,7 +222,7 @@ export default function WeeklyGallery({ galleries, lang }) {
               maxHeight: "80vh",
               objectFit: "contain",
               borderRadius: "8px",
-              boxShadow: "0 20px 50px rgba(0,0,0,0.5)",
+              boxShadow: "0 20px 50px rgba(22, 36, 58, 0.09)",
             }}
             onClick={(e) => e.stopPropagation()}
           />
@@ -243,7 +243,7 @@ export default function WeeklyGallery({ galleries, lang }) {
               alignItems: "center",
               gap: "0.5rem",
               transition: "all 0.3s ease",
-              boxShadow: "0 10px 15px -3px rgba(59, 130, 246, 0.3)",
+              boxShadow: "0 10px 15px -3px rgba(22, 36, 58, 0.09)",
             }}
           >
             📥 {lang === "id" ? "Unduh" : "Download"}

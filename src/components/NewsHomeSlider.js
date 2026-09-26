@@ -33,11 +33,11 @@ export default function NewsHomeSlider({ items = [], lang = "en" }) {
         dangerouslySetInnerHTML={{
           __html: `
         .flyer-card {
-          background: #050b14;
+          background: var(--bg-surface);
           border: 1px solid rgba(59, 130, 246, 0.1);
           border-radius: 20px;
           padding: 1rem;
-          box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.7), 0 0 30px -5px rgba(59, 130, 246, 0.15);
+          box-shadow: 0 15px 35px -10px rgba(22, 36, 58, 0.09), 0 0 30px -5px rgba(22, 36, 58, 0.09);
           transition: all 0.4s ease;
           position: relative;
           cursor: pointer; /* Memberi sinyal ke user bahwa ini interaktif */
@@ -45,14 +45,14 @@ export default function NewsHomeSlider({ items = [], lang = "en" }) {
 
         .flyer-card:hover {
           border-color: rgba(59, 130, 246, 0.4);
-          box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8), 0 0 40px -5px rgba(59, 130, 246, 0.3);
+          box-shadow: 0 20px 40px -10px rgba(22, 36, 58, 0.09), 0 0 40px -5px rgba(22, 36, 58, 0.09);
           transform: translateY(-5px);
         }
 
         .flyer-viewport {
           width: 100%;
           aspect-ratio: 4 / 5;
-          background-color: #000;
+          background-color: var(--bg-surface);
           border-radius: 12px;
           overflow: hidden;
           position: relative;
@@ -87,7 +87,7 @@ export default function NewsHomeSlider({ items = [], lang = "en" }) {
           text-transform: uppercase;
           letter-spacing: 1px;
           z-index: 10;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+          box-shadow: 0 4px 10px rgba(22, 36, 58, 0.09);
         }
 
         .flyer-info-text {
@@ -107,7 +107,7 @@ export default function NewsHomeSlider({ items = [], lang = "en" }) {
           width: 6px;
           height: 6px;
           border-radius: 50%;
-          background: rgba(255,255,255,0.2);
+          background: var(--bg-soft);
           transition: all 0.3s ease;
         }
 
@@ -146,7 +146,7 @@ export default function NewsHomeSlider({ items = [], lang = "en" }) {
         <div className="flyer-info-text">
           <h4
             style={{
-              color: "#fff",
+              color: "var(--text-primary)",
               margin: "0 0 4px 0",
               fontSize: "1.1rem",
               fontWeight: "bold",

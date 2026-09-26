@@ -24,9 +24,9 @@ export default function MissionCarousel({ images }) {
         height: "400px", // Tinggi tetap agar rapi
         overflow: "hidden",
         borderRadius: "12px",
-        backgroundColor: "#000", // Latar hitam agar foto ukuran apapun menyatu
+        backgroundColor: "var(--bg-surface)", // Latar hitam agar foto ukuran apapun menyatu
         marginTop: "1.5rem",
-        boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.5)",
+        boxShadow: "0 10px 25px -5px rgba(22, 36, 58, 0.09)",
       }}
     >
       {images.map((img, index) => (

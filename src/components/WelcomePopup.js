@@ -160,7 +160,7 @@ export default function WelcomePopup({ news, missions, cares, lang }) {
         }
 
         .welcome-popup-modal {
-          background: #0a1628;
+          background: var(--bg-surface);
           width: 100%;
           max-width: 480px;
           max-height: 92vh;          
@@ -168,8 +168,8 @@ export default function WelcomePopup({ news, missions, cares, lang }) {
           -webkit-overflow-scrolling: touch;
           border-radius: 20px;
           position: relative;
-          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          box-shadow: 0 25px 50px -12px rgba(22, 36, 58, 0.09);
+          border: 1px solid var(--border-light);
           transform: translateY(20px);
           animation: slideUp 0.5s ease-out forwards;
         }
@@ -201,7 +201,7 @@ export default function WelcomePopup({ news, missions, cares, lang }) {
           width: 100%;
           min-height: 200px;
           max-height: 62vh;
-          background: #030812;
+          background: var(--bg-surface);
           overflow: hidden;
           border-radius: 20px 20px 0 0;
           transition: aspect-ratio 0.45s ease;
@@ -249,7 +249,7 @@ export default function WelcomePopup({ news, missions, cares, lang }) {
           font-weight: bold;
           letter-spacing: 0.5px;
           z-index: 3;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+          box-shadow: 0 4px 10px rgba(22, 36, 58, 0.09);
         }
 
         .welcome-content {
@@ -259,7 +259,7 @@ export default function WelcomePopup({ news, missions, cares, lang }) {
 
         .welcome-content h3 {
           margin: 0 0 1rem 0;
-          color: #fff;
+          color: var(--text-primary);
           font-size: 1.3rem;
           line-height: 1.4;
         }
@@ -274,7 +274,7 @@ export default function WelcomePopup({ news, missions, cares, lang }) {
           width: 8px;
           height: 8px;
           border-radius: 50%;
-          background: rgba(255, 255, 255, 0.2);
+          background: var(--bg-soft);
           cursor: pointer;
           transition: all 0.3s ease;
         }
@@ -288,9 +288,9 @@ export default function WelcomePopup({ news, missions, cares, lang }) {
           display: block;
           width: 100%;
           padding: 12px;
-          background: rgba(255,255,255,0.05);
+          background: var(--bg-soft);
           color: #fff;
-          border: 1px solid rgba(255,255,255,0.1);
+          border: 1px solid var(--border-light);
           border-radius: 12px;
           text-decoration: none;
           font-weight: bold;

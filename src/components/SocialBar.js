@@ -19,7 +19,7 @@ export default function SocialBar({ socials }) {
             36,
             0.4
           ); /* Latar belakang baris gelap transparan */
-          border-top: 1px solid rgba(255, 255, 255, 0.05);
+          border-top: 1px solid rgba(15, 23, 42, 0.08);
         }
         .social-follow-text {
           color: #8b9bb4;
@@ -37,10 +37,10 @@ export default function SocialBar({ socials }) {
           border-radius: 99px; /* Bentuk Kapsul/Pil */
           font-size: 0.9rem;
           font-weight: 600;
-          color: #fff;
+          color: var(--text-primary);
           text-decoration: none;
           transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(15, 23, 42, 0.16);
         }
         .social-pill:hover {
           transform: translateY(-4px) scale(1.02);
@@ -54,9 +54,9 @@ export default function SocialBar({ socials }) {
           box-shadow: 0 10px 20px rgba(24, 119, 242, 0.25);
         }
         .social-pill.tt {
-          background: #010101;
-          box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
-          border: 1px solid rgba(255, 255, 255, 0.15);
+          background: #ffffff;
+          box-shadow: 0 10px 20px rgba(15, 23, 42, 0.088);
+          border: 1px solid rgba(15, 23, 42, 0.16);
         }
         .social-pill.wa {
           background: #25d366;

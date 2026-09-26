@@ -1,7 +1,5 @@
 import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import MissionCarousel from "@/components/MissionCarousel"; // Memanggil slider yang baru dibuat
 
 export const dynamic = "force-dynamic";
@@ -50,7 +48,6 @@ export default async function MissionPage() {
 
   return (
     <>
-      <Navbar lang={lang} />
 
       <style
         dangerouslySetInnerHTML={{
@@ -70,7 +67,7 @@ export default async function MissionPage() {
           width: 2px;
           border-radius: 99px;
           background: linear-gradient(180deg, #60a5fa, #1d4ed8 45%, var(--gold) 100%);
-          box-shadow: 0 0 16px rgba(59, 130, 246, 0.45);
+          box-shadow: 0 0 16px rgba(22, 36, 58, 0.09);
         }
 
         .mt-item {
@@ -91,13 +88,13 @@ export default async function MissionPage() {
           border-radius: 50%;
           background: #60a5fa;
           border: 3px solid var(--bg-base);
-          box-shadow: 0 0 16px rgba(59, 130, 246, 0.8);
+          box-shadow: 0 0 16px rgba(22, 36, 58, 0.09);
           transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
                       background 0.4s ease, box-shadow 0.4s ease;
         }
         .mt-item:hover::after {
           background: var(--gold-light);
-          box-shadow: 0 0 22px var(--gold-glow), 0 0 40px rgba(232, 163, 61, 0.35);
+          box-shadow: 0 0 22px var(--gold-glow), 0 0 40px rgba(22, 36, 58, 0.09);
           transform: scale(1.25);
         }
         .mt-item:hover {
@@ -108,7 +105,7 @@ export default async function MissionPage() {
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          color: #93c5fd;
+          color: var(--accent-gold);
           background: rgba(37, 99, 235, 0.14);
           border: 1px solid rgba(96, 165, 250, 0.35);
           padding: 6px 16px;
@@ -126,20 +123,20 @@ export default async function MissionPage() {
           height: 7px;
           border-radius: 50%;
           background: #60a5fa;
-          box-shadow: 0 0 8px #60a5fa;
+          box-shadow: 0 0 8px rgba(22, 36, 58, 0.09);
         }
 
         .mt-item h3 {
           font-family: "Playfair Display", serif;
           font-size: clamp(1.55rem, 1.2rem + 2vw, 2.1rem);
-          color: #fff;
+          color: var(--text-primary);
           margin: 0 0 0.9rem;
           font-weight: 800;
           line-height: 1.2;
         }
 
         .mt-item p {
-          color: #94a3b8;
+          color: var(--text-secondary);
           line-height: 1.8;
           font-size: 1.02rem;
           margin: 0;

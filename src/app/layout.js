@@ -1,7 +1,6 @@
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import SocialFloat from "@/components/SocialFloat";
+import "./light-theme.css";
+import SiteShell from "@/components/SiteShell";
 import { getSocialLinks } from "@/lib/helpers";
 import { cookies } from "next/headers";
 
@@ -35,17 +34,7 @@ export default async function RootLayout({ children }) {
   return (
     <html lang={lang}>
       <body>
-        {/* 3. Render Navbar Elegan */}
-        <Navbar lang={lang} />
-
-        {/* 4. Konten Utama Halaman */}
-        <main>{children}</main>
-
-        {/* 5. Render Footer */}
-        <Footer lang={lang} />
-
-        {/* 6. Render Orb Media Sosial Melayang */}
-        <SocialFloat socials={socials} />
+        <SiteShell lang={lang} socials={socials}>{children}</SiteShell>
       </body>
     </html>
   );

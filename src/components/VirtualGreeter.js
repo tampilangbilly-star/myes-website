@@ -69,15 +69,15 @@ export default function VirtualGreeter({ lang = "en" }) {
           justify-content: center;
           font-size: 1.8rem;
           cursor: pointer;
-          box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+          box-shadow: 0 0 20px rgba(22, 36, 58, 0.09);
           position: relative;
           transition: transform 0.3s ease;
-          border: 3px solid #050b14;
+          border: 3px solid var(--border-light);
         }
 
         .ai-avatar:hover {
           transform: scale(1.1);
-          box-shadow: 0 0 30px rgba(59, 130, 246, 0.8);
+          box-shadow: 0 0 30px rgba(22, 36, 58, 0.09);
         }
 
         /* Lingkaran Pingping Online */
@@ -89,18 +89,18 @@ export default function VirtualGreeter({ lang = "en" }) {
           height: 14px;
           background-color: #22c55e;
           border-radius: 50%;
-          border: 2px solid #050b14;
+          border: 2px solid var(--border-light);
         }
 
         /* Chat Bubble Ala UI Modern */
         .chat-bubble {
-          background: rgba(15, 23, 42, 0.85);
+          background: var(--bg-surface);
           backdrop-filter: blur(10px);
           border: 1px solid rgba(59, 130, 246, 0.3);
           border-radius: 20px 20px 20px 0;
           padding: 1.2rem;
           width: 260px;
-          box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+          box-shadow: 0 15px 35px rgba(22, 36, 58, 0.09);
           transform-origin: bottom left;
           transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
           opacity: 0;
@@ -136,7 +136,7 @@ export default function VirtualGreeter({ lang = "en" }) {
           position: absolute;
           top: 8px;
           right: 12px;
-          color: #94a3b8;
+          color: var(--text-secondary);
           cursor: pointer;
           font-size: 1.2rem;
           background: none;
@@ -166,7 +166,7 @@ export default function VirtualGreeter({ lang = "en" }) {
         <p
           style={{
             margin: "0 0 5px 0",
-            color: "#60a5fa",
+            color: "var(--accent-gold)",
             fontSize: "0.8rem",
             fontWeight: "bold",
           }}
@@ -176,7 +176,7 @@ export default function VirtualGreeter({ lang = "en" }) {
         <p
           style={{
             margin: 0,
-            color: "#f8fafc",
+            color: "var(--text-primary)",
             fontSize: "0.95rem",
             lineHeight: "1.5",
           }}

@@ -1,7 +1,5 @@
 import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
-import Navbar from "@/components/Navbar";
-import SocialFloat from "@/components/SocialFloat";
 import WeeklyGallery from "@/components/WeeklyGallery";
 
 export const dynamic = "force-dynamic";
@@ -18,7 +16,6 @@ export default async function ActivitiesPage() {
 
   return (
     <>
-      <Navbar lang={lang} />
 
       <style
         dangerouslySetInnerHTML={{
@@ -40,7 +37,7 @@ export default async function ActivitiesPage() {
             right: 45%;
             height: 2px;
             background: linear-gradient(90deg, #3b82f6, var(--gold));
-            box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 12px rgba(22, 36, 58, 0.09);
             z-index: 3;
           }
         }
@@ -51,8 +48,8 @@ export default async function ActivitiesPage() {
           padding: clamp(3rem, 7vw, 5rem) clamp(1.5rem, 4vw, 2rem);
           text-align: center;
           overflow: hidden;
-          background-color: #050B14;
-          border: 1px solid rgba(255, 255, 255, 0.05);
+          background-color: var(--bg-surface);
+          border: 1px solid var(--border-light);
           transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
                       box-shadow 0.45s ease, border-color 0.45s ease;
         }
@@ -60,11 +57,11 @@ export default async function ActivitiesPage() {
           transform: translateY(-8px);
         }
         .schedule-card.blue:hover {
-          box-shadow: 0 20px 40px -10px rgba(59, 130, 246, 0.3);
+          box-shadow: 0 20px 40px -10px rgba(22, 36, 58, 0.09);
           border-color: rgba(59, 130, 246, 0.4);
         }
         .schedule-card.goldcard:hover {
-          box-shadow: 0 20px 40px -10px rgba(232, 163, 61, 0.3);
+          box-shadow: 0 20px 40px -10px rgba(22, 36, 58, 0.09);
           border-color: rgba(232, 163, 61, 0.45);
         }
 
@@ -82,12 +79,12 @@ export default async function ActivitiesPage() {
         .schedule-overlay {
           position: absolute;
           top: 0; left: 0; right: 0; bottom: 0;
-          background: linear-gradient(180deg, rgba(15, 23, 42, 0.85) 0%, rgba(5, 11, 20, 0.95) 100%);
+          background: linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-surface) 100%);
           z-index: 1;
           transition: opacity 0.3s ease;
         }
         .schedule-card:hover .schedule-overlay {
-          background: linear-gradient(180deg, rgba(15, 23, 42, 0.75) 0%, rgba(5, 11, 20, 0.85) 100%);
+          background: linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-surface) 100%);
         }
 
         .schedule-content {
@@ -99,10 +96,10 @@ export default async function ActivitiesPage() {
           font-size: clamp(1.8rem, 1.3rem + 2.6vw, 2.5rem);
           font-weight: 800;
           margin: 0 0 1rem;
-          color: #fff;
+          color: var(--text-primary);
         }
         .schedule-content p {
-          color: #cbd5e1;
+          color: var(--text-primary);
           line-height: 1.8;
           font-size: 1.02rem;
           max-width: 46ch;
@@ -121,8 +118,8 @@ export default async function ActivitiesPage() {
           text-transform: uppercase;
           margin-bottom: 1rem;
         }
-        .schedule-card.blue .session-badge { color: #93c5fd; }
-        .schedule-card.goldcard .session-badge { color: var(--gold-light); }
+        .schedule-card.blue .session-badge { color: var(--accent-gold); }
+        .schedule-card.goldcard .session-badge { color: var(--gold-ink); }
         .session-badge::before,
         .session-badge::after {
           content: '';
@@ -142,12 +139,12 @@ export default async function ActivitiesPage() {
         }
         .schedule-card.blue .schedule-time {
           background-color: rgba(59, 130, 246, 0.2);
-          color: #3b82f6;
+          color: var(--accent-gold);
           border: 1px solid rgba(59, 130, 246, 0.3);
         }
         .schedule-card.goldcard .schedule-time {
           background-color: rgba(232, 163, 61, 0.14);
-          color: var(--gold-light);
+          color: var(--gold-ink);
           border: 1px solid rgba(232, 163, 61, 0.35);
         }
 
@@ -167,8 +164,8 @@ export default async function ActivitiesPage() {
           height: 350px;
           border-radius: 16px;
           overflow: hidden;
-          box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
-          border: 1px solid rgba(255,255,255,0.1);
+          box-shadow: 0 10px 30px -10px rgba(22, 36, 58, 0.09);
+          border: 1px solid var(--border-light);
         }
 
         .maps-btn {
@@ -182,13 +179,13 @@ export default async function ActivitiesPage() {
           display: inline-flex;
           align-items: center;
           gap: 0.5rem;
-          box-shadow: 0 8px 22px rgba(59, 130, 246, 0.4);
+          box-shadow: 0 8px 22px rgba(22, 36, 58, 0.09);
           transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
                       box-shadow 0.35s ease;
         }
         .maps-btn:hover {
           transform: translateY(-2px);
-          box-shadow: 0 14px 32px rgba(59, 130, 246, 0.55);
+          box-shadow: 0 14px 32px rgba(22, 36, 58, 0.09);
         }
 
         @media (max-width: 992px) {
@@ -211,7 +208,7 @@ export default async function ActivitiesPage() {
           height: 200px;
           border-radius: 12px;
           overflow: hidden;
-          background-color: #050B14;
+          background-color: var(--bg-surface);
           cursor: zoom-in;
         }
         .gallery-img-wrapper img {
@@ -381,8 +378,6 @@ export default async function ActivitiesPage() {
           <WeeklyGallery galleries={galleries} lang={lang} />
         </div>
       </section>
-
-      <SocialFloat />
     </>
   );
 }

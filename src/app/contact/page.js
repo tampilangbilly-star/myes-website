@@ -1,6 +1,5 @@
 import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
-import Navbar from "@/components/Navbar";
 import ContactForm from "@/components/ContactForm";
 
 export default async function ContactPage() {
@@ -19,7 +18,6 @@ export default async function ContactPage() {
 
   return (
     <>
-      <Navbar lang={lang} />
 
       <style
         dangerouslySetInnerHTML={{
@@ -60,11 +58,11 @@ export default async function ContactPage() {
         .info-card h4 {
           font-family: "Playfair Display", serif;
           font-size: 1.3rem;
-          color: #fff;
+          color: var(--text-primary);
           margin: 0 0 0.5rem;
         }
         .info-card p {
-          color: #94a3b8;
+          color: var(--text-secondary);
           font-size: 0.95rem;
           line-height: 1.6;
           margin: 0;
@@ -76,8 +74,8 @@ export default async function ContactPage() {
           width: 70px;
           height: 70px;
           border-radius: 20px;
-          background: rgba(255,255,255,0.04);
-          border: 1px solid rgba(148, 178, 224, 0.15);
+          background: var(--bg-soft);
+          border: 1px solid var(--border-light);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -103,7 +101,7 @@ export default async function ContactPage() {
           background: rgba(59, 130, 246, 0.1);
           border: 1px solid rgba(96, 165, 250, 0.3);
           border-radius: 50%;
-          color: #3b82f6;
+          color: var(--accent-gold);
         }
 
         @keyframes bounce {
@@ -193,7 +191,7 @@ export default async function ContactPage() {
           <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
             <p
               style={{
-                color: "#94a3b8",
+                color: "var(--text-secondary)",
                 fontSize: "1.05rem",
                 marginBottom: "1rem",
               }}
@@ -343,7 +341,7 @@ export default async function ContactPage() {
             <h2
               style={{
                 fontSize: "clamp(1.6rem, 1.2rem + 2vw, 2rem)",
-                color: "#fff",
+                color: "var(--text-primary)",
                 fontWeight: "bold",
                 marginBottom: "0.5rem",
               }}
@@ -352,7 +350,7 @@ export default async function ContactPage() {
                 ? "Atau Kirim Pesan Langsung"
                 : "Or Send a Direct Message"}
             </h2>
-            <p style={{ color: "#94a3b8" }}>
+            <p style={{ color: "var(--text-secondary)" }}>
               {lang === "id"
                 ? "Isi formulir di bawah ini dan tim kami akan segera merespons Anda."
                 : "Fill out the form below and our team will get back to you shortly."}

@@ -26,6 +26,12 @@ export default function Navbar({ lang = "en" }) {
     return () => document.body.classList.remove("nav-open");
   }, [open]);
 
+  useEffect(() => {
+    const onKey = (event) => { if (event.key === "Escape") setOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   const links = [
     { href: "/about", en: "About Us", id: "Tentang Kami" },
     { href: "/personnel", en: "Personnel", id: "Personalia" },

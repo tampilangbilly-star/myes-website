@@ -1,14 +1,11 @@
 import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
 import HeroSlider from "@/components/HeroSlider";
-import SocialFloat from "@/components/SocialFloat";
 import GuestSpeakerSlider from "@/components/GuestSpeakerSlider";
 import NewsHomeSlider from "@/components/NewsHomeSlider";
 import VirtualGreeter from "@/components/VirtualGreeter";
 import HolySpiritAmbient from "@/components/HolySpiritAmbient";
-
 import ProgramCardSlider from "@/components/ProgramCardSlider";
 import WelcomePopup from "@/components/WelcomePopup";
 
@@ -93,7 +90,6 @@ export default async function Home() {
 
   return (
     <>
-      <Navbar lang={lang} />
       <WelcomePopup news={news} cares={care} missions={missions} lang={lang} />
 {/* ==================================== */}
       <style
@@ -128,20 +124,20 @@ export default async function Home() {
           letter-spacing: 0.3px;
           transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
                       box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-          box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+          box-shadow: 0 8px 24px rgba(22, 36, 58, 0.09),
+                      inset 0 1px 0 rgba(22, 36, 58, 0.09);
         }
         .cta-button:hover {
           transform: translateY(-3px);
-          box-shadow: 0 16px 40px rgba(59, 130, 246, 0.55),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+          box-shadow: 0 16px 40px rgba(22, 36, 58, 0.09),
+                      inset 0 1px 0 rgba(22, 36, 58, 0.09);
         }
 
         .viva-social {
           display: flex;
           align-items: center;
           gap: 0.8rem;
-          color: #e2e8f0;
+          color: var(--text-primary);
           text-decoration: none;
           font-weight: 500;
           font-size: 1.05rem;
@@ -151,17 +147,17 @@ export default async function Home() {
           transition: all 0.3s ease;
         }
         .viva-social:hover {
-          color: #fff;
+          color: var(--text-primary);
           transform: translateY(-2px);
-          border-color: rgba(255, 255, 255, 0.1);
-          background: rgba(255, 255, 255, 0.04);
+          border-color: var(--border-light);
+          background: var(--bg-soft);
         }
 
         .modern-social-title {
           margin: 0;
           font-size: 1.4rem;
           font-weight: 700;
-          color: #f8fafc;
+          color: var(--text-primary);
           letter-spacing: 0.5px;
           display: flex;
           align-items: center;
@@ -169,7 +165,7 @@ export default async function Home() {
 
         .bounce-right-arrow {
           animation: bounceRight 1.5s infinite;
-          color: #3b82f6;
+          color: var(--accent-gold);
           display: flex;
           align-items: center;
           margin-left: 1rem;
@@ -193,7 +189,7 @@ export default async function Home() {
         
         .news-title {
           font-size: clamp(2rem, 1.4rem + 2.6vw, 2.8rem);
-          color: #fff;
+          color: var(--text-primary);
           font-weight: 800;
           margin: 0.5rem 0 1.5rem 0;
           line-height: 1.2;
@@ -203,7 +199,7 @@ export default async function Home() {
         .location-title {
           font-size: clamp(1.7rem, 1.3rem + 1.8vw, 2.2rem);
           margin-bottom: 0.5rem;
-          color: #fff;
+          color: var(--text-primary);
           font-weight: bold;
         }
         
@@ -252,7 +248,7 @@ export default async function Home() {
         }}
       />
 
-      <div className="hero-wrapper">
+      <div className={`hero-wrapper${speakers?.length ? " has-speakers" : ""}`}>
         <HolySpiritAmbient />
 
         <HeroSlider slides={slides} socials={socials} lang={lang} />
@@ -269,8 +265,8 @@ export default async function Home() {
       {/* ── STRIP MEDIA SOSIAL ─────────────────────────────────────── */}
       <div
         style={{
-          backgroundColor: "#050B14",
-          borderBottom: "1px solid rgba(255,255,255,0.05)",
+          backgroundColor: "var(--bg-surface)",
+          borderBottom: "1px solid var(--border-light)",
           padding: "1.5rem 0",
         }}
       >
@@ -362,7 +358,7 @@ export default async function Home() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <svg width="28" height="28" fill="#fff" viewBox="0 0 24 24">
+              <svg width="28" height="28" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 15.68a6.34 6.34 0 0011.14 4.43v-7.4a8.27 8.27 0 004.86 1.52v-3.45a4.8 4.8 0 01-1.41-4.09z" />
               </svg>
               <span>
@@ -378,7 +374,7 @@ export default async function Home() {
         <section
           className="section bg-fixed"
           style={{
-            backgroundImage: `linear-gradient(rgba(5, 11, 20, 0.85), rgba(5, 11, 20, 0.95)), url('${mainBg || ""}')`,
+            backgroundImage: `linear-gradient(rgba(245, 248, 252, 0.96), rgba(245, 248, 252, 0.98)), url('${mainBg || ""}')`,
           }}
         >
           <div className="container">
@@ -413,7 +409,7 @@ export default async function Home() {
                         borderRadius: 12, 
                         overflow: "hidden", 
                         marginBottom: "1.2rem",
-                        backgroundColor: "#030812" // Fallback color
+                        backgroundColor: "var(--bg-surface)" // Fallback color
                       }}
                     >
                       <ProgramCardSlider 
@@ -442,9 +438,9 @@ export default async function Home() {
           style={{
             position: "relative",
             overflow: "hidden",
-            backgroundColor: "#080e17",
-            borderTop: "1px solid rgba(255,255,255,0.02)",
-            borderBottom: "1px solid rgba(255,255,255,0.02)",
+            backgroundColor: "var(--bg-surface)",
+            borderTop: "1px solid var(--border-light)",
+            borderBottom: "1px solid var(--border-light)",
           }}
         >
           {/* Efek Kabut Cahaya Biru di Kiri */}
@@ -456,7 +452,7 @@ export default async function Home() {
               width: "50%",
               height: "100%",
               background:
-                "radial-gradient(circle, rgba(59,130,246,0.08) 0%, rgba(8,14,23,0) 70%)",
+                "radial-gradient(circle, rgba(59,130,246,0.08) 0%, var(--bg-surface) 70%)",
               zIndex: 0,
             }}
           ></div>
@@ -470,7 +466,7 @@ export default async function Home() {
               width: "50%",
               height: "100%",
               background:
-                "radial-gradient(circle, rgba(234,67,53,0.05) 0%, rgba(8,14,23,0) 70%)",
+                "radial-gradient(circle, rgba(234,67,53,0.05) 0%, var(--bg-surface) 70%)",
               zIndex: 0,
             }}
           ></div>
@@ -489,7 +485,7 @@ export default async function Home() {
                 <div
                   className="overline"
                   style={{
-                    color: "#3b82f6",
+                    color: "var(--accent-gold)",
                     fontWeight: "bold",
                     textTransform: "uppercase",
                     letterSpacing: "1.5px",
@@ -504,7 +500,7 @@ export default async function Home() {
                 </h2>
                 <p
                   style={{
-                    color: "#94a3b8",
+                    color: "var(--text-secondary)",
                     lineHeight: "1.7",
                     fontSize: "1.05rem",
                     marginBottom: "2rem",
@@ -535,8 +531,8 @@ export default async function Home() {
       <section
         className="section section-padding bg-fixed"
         style={{
-          backgroundImage: `linear-gradient(rgba(5, 11, 20, 0.85), rgba(5, 11, 20, 0.95)), url('home.png')`,
-          borderTop: "1px solid rgba(255,255,255,0.05)",
+          backgroundImage: `linear-gradient(rgba(245, 248, 252, 0.96), rgba(245, 248, 252, 0.98)), url('home.png')`,
+          borderTop: "1px solid var(--border-light)",
         }}
       >
         <div className="container">
@@ -558,8 +554,8 @@ export default async function Home() {
                 height: "400px",
                 borderRadius: "18px",
                 overflow: "hidden",
-                border: "1px solid rgba(255,255,255,0.1)",
-                boxShadow: "0 10px 30px -10px rgba(0, 0, 0, 0.5)",
+                border: "1px solid var(--border-light)",
+                boxShadow: "0 10px 30px -10px rgba(22, 36, 58, 0.09)",
               }}
             >
               <iframe
@@ -586,7 +582,7 @@ export default async function Home() {
               ></div>
               <h4
                 style={{
-                  color: "#3b82f6",
+                  color: "var(--accent-gold)",
                   fontSize: "1.3rem",
                   marginBottom: "1rem",
                 }}
@@ -595,7 +591,7 @@ export default async function Home() {
               </h4>
               <p
                 style={{
-                  color: "#94a3b8",
+                  color: "var(--text-secondary)",
                   lineHeight: "1.8",
                   marginBottom: "2.5rem",
                   fontSize: "1.05rem",
@@ -657,7 +653,7 @@ export default async function Home() {
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
-                        color: "#e2e8f0",
+                        color: "var(--text-primary)",
                         textDecoration: "none",
                         fontWeight: "bold",
                         fontSize: "1.1rem",
@@ -722,7 +718,7 @@ export default async function Home() {
                     <a
                       href={`mailto:${displayEmail}`}
                       style={{
-                        color: "#e2e8f0",
+                        color: "var(--text-primary)",
                         textDecoration: "none",
                         fontWeight: "bold",
                         fontSize: "1.1rem",

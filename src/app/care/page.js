@@ -1,8 +1,5 @@
 import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import SocialFloat from "@/components/SocialFloat";
 import CareGallery from "@/components/CareGallery";
 
 export const dynamic = "force-dynamic";
@@ -20,7 +17,6 @@ export default async function CarePage() {
 
   return (
     <>
-      <Navbar lang={lang} />
 
       <style
         dangerouslySetInnerHTML={{
@@ -38,7 +34,7 @@ export default async function CarePage() {
           height: 200px;
           border-radius: 12px;
           overflow: hidden;
-          background-color: #050B14;
+          background-color: var(--bg-surface);
           cursor: zoom-in;
         }
         .gallery-img-wrapper img {
@@ -134,8 +130,6 @@ export default async function CarePage() {
           <CareGallery activities={activities} lang={lang} />
         </div>
       </section>
-
-      <SocialFloat />
       
     </>
   );

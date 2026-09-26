@@ -17,7 +17,7 @@ export default function NewsSlider({ items, lang }) {
 
   if (!items || items.length === 0) {
     return (
-      <p style={{ color: "#cbd5e1" }}>Slider: Data berita tidak ditemukan.</p>
+      <p style={{ color: "var(--text-primary)" }}>Slider: Data berita tidak ditemukan.</p>
     );
   }
 
@@ -30,8 +30,8 @@ export default function NewsSlider({ items, lang }) {
         margin: "0 auto",
         overflow: "hidden",
         borderRadius: "16px",
-        backgroundColor: "rgba(255,255,255,0.02)",
-        border: "1px solid rgba(255,255,255,0.05)",
+        backgroundColor: "var(--bg-soft)",
+        border: "1px solid var(--border-light)",
       }}
     >
       <div
@@ -52,7 +52,7 @@ export default function NewsSlider({ items, lang }) {
                 position: "relative",
                 width: "100%",
                 height: "550px", // Tinggi ekstra untuk slider
-                backgroundColor: "#050B14",
+                backgroundColor: "var(--bg-surface)",
                 overflow: "hidden",
               }}
             >
@@ -108,7 +108,7 @@ export default function NewsSlider({ items, lang }) {
                   display: "inline-block",
                   padding: "0.4rem 1rem",
                   backgroundColor: "rgba(59, 130, 246, 0.2)",
-                  color: "#3b82f6",
+                  color: "var(--accent-gold)",
                   borderRadius: "20px",
                   fontSize: "0.8rem",
                   fontWeight: "bold",
@@ -123,7 +123,7 @@ export default function NewsSlider({ items, lang }) {
                 style={{
                   fontSize: "1.5rem",
                   fontWeight: "bold",
-                  color: "#fff",
+                  color: "var(--text-primary)",
                   marginBottom: "1rem",
                   lineHeight: "1.4",
                 }}
@@ -132,7 +132,7 @@ export default function NewsSlider({ items, lang }) {
               </h3>
               <p
                 style={{
-                  color: "#cbd5e1",
+                  color: "var(--text-primary)",
                   fontSize: "1rem",
                   lineHeight: "1.6",
                   display: "-webkit-box",
@@ -156,7 +156,7 @@ export default function NewsSlider({ items, lang }) {
             justifyContent: "center",
             gap: "10px",
             padding: "1.5rem",
-            backgroundColor: "rgba(0,0,0,0.3)",
+            backgroundColor: "var(--bg-surface)",
           }}
         >
           {items.map((_, idx) => (

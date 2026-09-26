@@ -1,8 +1,5 @@
 import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import SocialFloat from "@/components/SocialFloat";
 
 export const dynamic = "force-dynamic";
 
@@ -50,7 +47,6 @@ export default async function PersonnelPage() {
 
   return (
     <>
-      <Navbar lang={lang} />
       <style
         dangerouslySetInnerHTML={{
           __html: `
@@ -75,15 +71,15 @@ export default async function PersonnelPage() {
         .group-title {
           font-family: "Playfair Display", serif;
           font-size: clamp(1.6rem, 1.2rem + 2vw, 2.2rem);
-          color: #fff;
+          color: var(--text-primary);
           font-weight: 800;
           text-transform: uppercase;
           letter-spacing: 3px;
           margin: 0;
           padding: 0.4rem 1.6rem;
-          border: 1px solid rgba(148, 178, 224, 0.18);
+          border: 1px solid var(--border-light);
           border-radius: 99px;
-          background: rgba(15, 26, 46, 0.6);
+          background: var(--bg-surface);
           white-space: nowrap;
         }
         
@@ -124,12 +120,12 @@ export default async function PersonnelPage() {
           border-radius: 24px;
           padding: 4px;
           background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(232, 163, 61, 0.35));
-          box-shadow: 0 0 25px rgba(59, 130, 246, 0.2);
+          box-shadow: 0 0 25px rgba(22, 36, 58, 0.09);
           margin: 0 auto 1.5rem auto;
           transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
         }
         .leader-card:hover .avatar-rect {
-          box-shadow: 0 0 35px rgba(59, 130, 246, 0.5);
+          box-shadow: 0 0 35px rgba(22, 36, 58, 0.09);
           transform: scale(1.04);
         }
         .img-rect {
@@ -137,15 +133,15 @@ export default async function PersonnelPage() {
           border-radius: 20px;
           object-fit: cover;
           object-position: top;
-          border: 4px solid #050b14;
-          background-color: #0f172a;
+          border: 4px solid var(--border-light);
+          background-color: var(--bg-surface);
         }
 
         /* ==================== KARTU ANGGOTA (BULAT) ==================== */
         .member-card {
           padding: clamp(2rem, 5vw, 3rem) 1.5rem;
           text-align: center;
-          background: linear-gradient(180deg, rgba(15, 26, 46, 0.5), rgba(7, 14, 27, 0.6));
+          background: linear-gradient(180deg, var(--bg-surface), var(--bg-surface));
         }
         .avatar-ring {
           width: min(180px, 52vw);
@@ -164,8 +160,8 @@ export default async function PersonnelPage() {
           border-radius: 50%;
           object-fit: cover;
           object-position: top;
-          border: 4px solid #0a0f1a;
-          background-color: #0f172a;
+          border: 4px solid var(--border-light);
+          background-color: var(--bg-surface);
         }
 
         /* ==================== PUSAT PELAYANAN (YESUS) ==================== */
@@ -194,7 +190,7 @@ export default async function PersonnelPage() {
           border-radius: 50%;
           padding: 5px;
           background: linear-gradient(135deg, #FFD700, #FDB931);
-          box-shadow: 0 0 50px rgba(255, 215, 0, 0.4);
+          box-shadow: 0 0 50px rgba(22, 36, 58, 0.09);
           margin: 0 auto 1.5rem auto;
         }
         .jesus-img {
@@ -202,7 +198,7 @@ export default async function PersonnelPage() {
           border-radius: 50%;
           object-fit: cover;
           object-position: top;
-          border: 4px solid #050b14;
+          border: 4px solid var(--border-light);
         }
         .jesus-card::after {
           content: '';
@@ -218,15 +214,15 @@ export default async function PersonnelPage() {
         /* ==================== TYPOGRAPHY ==================== */
         .p-name {
           font-family: "Playfair Display", serif;
-          font-size: 1.4rem; color: #f8fafc; font-weight: 700;
+          font-size: 1.4rem; color: var(--text-primary); font-weight: 700;
           margin: 0 0 0.5rem 0;
         }
         .leader-name { font-size: 1.6rem; }
         .p-role {
-          color: #3b82f6; font-size: 0.9rem; font-weight: 700;
+          color: var(--accent-gold); font-size: 0.9rem; font-weight: 700;
           text-transform: uppercase; letter-spacing: 1.5px; margin: 0;
         }
-        .p-bio { color: #94a3b8; font-size: 0.95rem; line-height: 1.6; margin: 1rem 0 0 0; }
+        .p-bio { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; margin: 1rem 0 0 0; }
 
         /* ==================== RESPONSIVE KHUSUS ANDROID/MOBILE ==================== */
         @media (max-width: 768px) {
@@ -330,7 +326,7 @@ export default async function PersonnelPage() {
             </h3>
             <p
               className="p-role"
-              style={{ color: "#FFD700", fontSize: "1.1rem" }}
+              style={{ color: "var(--gold-ink)", fontSize: "1.1rem" }}
             >
               {lang === "id"
                 ? "Kepala Gereja & Pusat Pelayanan"
@@ -406,7 +402,7 @@ export default async function PersonnelPage() {
                         )}
                       </div>
                       <h3 className="p-name">{p.fullName || p.name}</h3>
-                      <p className="p-role" style={{ color: "#94a3b8" }}>
+                      <p className="p-role" style={{ color: "var(--text-secondary)" }}>
                         {p.displayRole}
                       </p>
                     </div>
@@ -490,7 +486,7 @@ export default async function PersonnelPage() {
                       )}
                     </div>
                     <h3 className="p-name">{p.fullName || p.name}</h3>
-                    <p className="p-role" style={{ color: "#94a3b8" }}>
+                    <p className="p-role" style={{ color: "var(--text-secondary)" }}>
                       {p.displayRole}
                     </p>
                   </div>
@@ -530,7 +526,7 @@ export default async function PersonnelPage() {
                       )}
                     </div>
                     <h3 className="p-name">{p.fullName || p.name}</h3>
-                    <p className="p-role" style={{ color: "#94a3b8" }}>
+                    <p className="p-role" style={{ color: "var(--text-secondary)" }}>
                       {p.displayRole}
                     </p>
                   </div>
@@ -540,7 +536,6 @@ export default async function PersonnelPage() {
           )}
         </div>
       </section>
-      <SocialFloat />
     </>
   );
 }

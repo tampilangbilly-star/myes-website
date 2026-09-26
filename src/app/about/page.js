@@ -1,8 +1,5 @@
 import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
-import Navbar from "@/components/Navbar";
-import SocialFloat from "@/components/SocialFloat";
-import Footer from "@/components/Footer";
 
 export default async function AboutPage() {
   const cookieStore = cookies();
@@ -10,7 +7,6 @@ export default async function AboutPage() {
 
   return (
     <>
-      <Navbar lang={lang} />
 
       {/* CSS KHUSUS HALAMAN ABOUT — LAYOUT BARU */}
       <style
@@ -34,15 +30,15 @@ export default async function AboutPage() {
           font-size: 1.9rem;
           background: rgba(59, 130, 246, 0.14);
           border: 1px solid rgba(96, 165, 250, 0.3);
-          box-shadow: inset 0 0 14px rgba(59, 130, 246, 0.18);
+          box-shadow: inset 0 0 14px rgba(22, 36, 58, 0.09);
         }
         .story-panel h2 {
           font-size: clamp(1.7rem, 1.2rem + 2.4vw, 2.4rem);
-          color: #fff;
+          color: var(--text-primary);
           margin: 0 0 1.2rem;
         }
         .story-panel p {
-          color: #cbd5e1;
+          color: var(--text-primary);
           font-size: clamp(1rem, 0.95rem + 0.3vw, 1.1rem);
           line-height: 1.85;
           margin: 0;
@@ -92,11 +88,11 @@ export default async function AboutPage() {
         }
         .vm-card h3 {
           font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2rem);
-          color: #fff;
+          color: var(--text-primary);
           margin: 0 0 1.1rem;
         }
         .vm-card p, .vm-card li {
-          color: #cbd5e1;
+          color: var(--text-primary);
           line-height: 1.8;
           font-size: 1.02rem;
         }
@@ -127,10 +123,10 @@ export default async function AboutPage() {
         .value-strip {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
-          border: 1px solid rgba(148, 178, 224, 0.12);
+          border: 1px solid var(--border-light);
           border-radius: 20px;
           overflow: hidden;
-          background: linear-gradient(180deg, rgba(15, 26, 46, 0.7), rgba(7, 14, 27, 0.9));
+          background: linear-gradient(180deg, var(--bg-surface), var(--bg-surface));
         }
         .value-cell {
           text-align: center;
@@ -161,11 +157,11 @@ export default async function AboutPage() {
         }
         .value-cell h4 {
           font-size: 1.5rem;
-          color: #fff;
+          color: var(--text-primary);
           margin: 0 0 0.7rem;
         }
         .value-cell p {
-          color: #94a3b8;
+          color: var(--text-secondary);
           line-height: 1.7;
           margin: 0;
           font-size: 0.95rem;
@@ -284,7 +280,7 @@ export default async function AboutPage() {
               <div
                 className="panel-kicker"
                 style={{
-                  color: "#60a5fa",
+                  color: "var(--accent-gold)",
                   fontSize: "0.85rem",
                   fontWeight: "700",
                   textTransform: "uppercase",
@@ -296,7 +292,7 @@ export default async function AboutPage() {
               </div>
               <h2
                 style={{
-                  color: "#fff",
+                  color: "var(--text-primary)",
                   marginBottom: "1.25rem",
                   fontSize: "2rem",
                 }}
@@ -308,7 +304,7 @@ export default async function AboutPage() {
                   display: "flex",
                   flexDirection: "column",
                   gap: "1.2rem",
-                  color: "#cbd5e1",
+                  color: "var(--text-primary)",
                   lineHeight: "1.7",
                   fontSize: "1.05rem",
                 }}
@@ -355,7 +351,7 @@ export default async function AboutPage() {
               <div
                 className="panel-kicker"
                 style={{
-                  color: "#60a5fa",
+                  color: "var(--accent-gold)",
                   fontSize: "0.8rem",
                   fontWeight: "700",
                   textTransform: "uppercase",
@@ -367,14 +363,14 @@ export default async function AboutPage() {
               </div>
               <h3
                 style={{
-                  color: "#fff",
+                  color: "var(--text-primary)",
                   marginBottom: "1rem",
                   fontSize: "1.5rem",
                 }}
               >
                 {lang === "id" ? "Visi" : "Vision"}
               </h3>
-              <p style={{ color: "#cbd5e1", lineHeight: "1.7" }}>
+              <p style={{ color: "var(--text-primary)", lineHeight: "1.7" }}>
                 {lang === "id"
                   ? "Menjadi komunitas pemuda yang bertumbuh dalam iman, melayani dengan kasih, dan mengembangkan kemampuan bahasa Inggris untuk memberikan dampak positif bagi masyarakat."
                   : "To become a youth community that grows in faith, serves with love, and develops English proficiency to make a positive impact on society."}
@@ -400,7 +396,7 @@ export default async function AboutPage() {
               <div
                 className="panel-kicker gold"
                 style={{
-                  color: "#eab308",
+                  color: "var(--gold-ink)",
                   fontSize: "0.8rem",
                   fontWeight: "700",
                   textTransform: "uppercase",
@@ -412,7 +408,7 @@ export default async function AboutPage() {
               </div>
               <h3
                 style={{
-                  color: "#fff",
+                  color: "var(--text-primary)",
                   marginBottom: "1rem",
                   fontSize: "1.5rem",
                 }}
@@ -421,7 +417,7 @@ export default async function AboutPage() {
               </h3>
               <ul
                 style={{
-                  color: "#cbd5e1",
+                  color: "var(--text-primary)",
                   lineHeight: "1.6",
                   paddingLeft: "1.2rem",
                   display: "flex",
@@ -459,13 +455,13 @@ export default async function AboutPage() {
       {/* 3. CORE VALUES SECTION */}
       <section
         className="section section-alt"
-        style={{ backgroundColor: "#020617" }}
+        style={{ backgroundColor: "var(--bg-surface)" }}
       >
         <div className="container" style={{ maxWidth: "1200px" }}>
           <div className="vh-heading">
             <span className="bar" />
             <div>
-              <span className="overline" style={{ color: "#eab308" }}>
+              <span className="overline" style={{ color: "var(--gold-ink)" }}>
                 {lang === "id" ? "Prinsip Kami" : "Our Principles"}
               </span>
               <h2>{lang === "id" ? "Nilai-Nilai Inti" : "Core Values"}</h2>
@@ -508,8 +504,6 @@ export default async function AboutPage() {
           </div>
         </div>
       </section>
-
-      <SocialFloat />
     </>
   );
 }

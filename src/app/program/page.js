@@ -1,7 +1,5 @@
 import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import ProgramCardSlider from "@/components/ProgramCardSlider";
 
 export default async function ProgramPage() {
@@ -16,7 +14,6 @@ export default async function ProgramPage() {
 
   return (
     <>
-      <Navbar lang={lang} />
 
       <style
         dangerouslySetInnerHTML={{
@@ -36,7 +33,7 @@ export default async function ProgramPage() {
         .pg-media {
           position: relative;
           aspect-ratio: 16 / 10;
-          background: #030812;
+          background: var(--bg-surface);
           overflow: hidden;
         }
         .pg-media img {
@@ -69,9 +66,9 @@ export default async function ProgramPage() {
           font-family: "Playfair Display", serif;
           font-size: 1rem;
           font-weight: 700;
-          color: #fff;
-          background: rgba(3, 8, 18, 0.65);
-          border: 1px solid rgba(255, 255, 255, 0.15);
+          color: var(--text-primary);
+          background: var(--bg-surface);
+          border: 1px solid var(--border-light);
           padding: 4px 12px;
           border-radius: 99px;
           letter-spacing: 1px;
@@ -81,7 +78,7 @@ export default async function ProgramPage() {
           position: absolute;
           inset: auto 0 0 0;
           height: 60%;
-          background: linear-gradient(to top, rgba(7, 14, 27, 0.95), transparent);
+          background: linear-gradient(to top, var(--bg-surface), transparent);
         }
 
         .pg-body {
@@ -92,11 +89,11 @@ export default async function ProgramPage() {
         }
         .pg-body h3 {
           font-size: 1.35rem;
-          color: #fff;
+          color: var(--text-primary);
           margin: 0 0 0.6rem;
         }
         .pg-body .pg-excerpt {
-          color: #94a3b8;
+          color: var(--text-secondary);
           font-size: 0.95rem;
           line-height: 1.7;
           margin: 0;
@@ -111,11 +108,11 @@ export default async function ProgramPage() {
           text-align: left;
         }
         .program-overlay .full-desc {
-          color: #cbd5e1;
+          color: var(--text-primary);
           font-size: 0.92rem;
           line-height: 1.7;
           margin: 0;
-          border-top: 1px dashed rgba(148, 178, 224, 0.2);
+          border-top: 1px dashed var(--border-light);
           padding-top: 0.9rem;
         }
 
@@ -132,7 +129,7 @@ export default async function ProgramPage() {
           text-decoration: none;
           font-weight: bold;
           font-size: 0.9rem;
-          box-shadow: 0 8px 22px rgba(59, 130, 246, 0.4);
+          box-shadow: 0 8px 22px rgba(22, 36, 58, 0.09);
           transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
                       box-shadow 0.35s ease;
         }
@@ -142,7 +139,7 @@ export default async function ProgramPage() {
         }
         .join-btn:hover {
           transform: translateY(-2px);
-          box-shadow: 0 14px 32px rgba(59, 130, 246, 0.55);
+          box-shadow: 0 14px 32px rgba(22, 36, 58, 0.09);
         }
         .join-btn:hover::after {
           transform: translateX(4px);
@@ -164,7 +161,7 @@ export default async function ProgramPage() {
             max-height: 300px;
             opacity: 1;
             padding-top: 0.9rem;
-            border-top-color: rgba(148, 178, 224, 0.2);
+            border-top-color: var(--border-light);
           }
         }
 
@@ -212,7 +209,7 @@ export default async function ProgramPage() {
             min-height: 36px !important;
             padding: 0.4rem 1rem !important;
             font-size: 0.75rem !important;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
+            box-shadow: 0 4px 12px rgba(22, 36, 58, 0.09) !important;
           }
         }
       `,
@@ -290,7 +287,6 @@ export default async function ProgramPage() {
       </section>
       
       {/* Jangan lupa untuk memasukkan Footer yang di-import di atas */}
-      <Footer />
     </>
   );
 }

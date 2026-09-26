@@ -55,9 +55,9 @@ export default function ContactForm({ lang }) {
             width: "100%",
             padding: "12px",
             borderRadius: "8px",
-            background: "rgba(255,255,255,0.05)",
-            border: "1px solid rgba(255,255,255,0.1)",
-            color: "#fff",
+            background: "var(--bg-soft)",
+            border: "1px solid var(--border-light)",
+            color: "var(--text-primary)",
             marginBottom: "1rem",
           }}
         />
@@ -72,9 +72,9 @@ export default function ContactForm({ lang }) {
             width: "100%",
             padding: "12px",
             borderRadius: "8px",
-            background: "rgba(255,255,255,0.05)",
-            border: "1px solid rgba(255,255,255,0.1)",
-            color: "#fff",
+            background: "var(--bg-soft)",
+            border: "1px solid var(--border-light)",
+            color: "var(--text-primary)",
             marginBottom: "1rem",
           }}
         />
@@ -89,9 +89,9 @@ export default function ContactForm({ lang }) {
             width: "100%",
             padding: "12px",
             borderRadius: "8px",
-            background: "rgba(255,255,255,0.05)",
-            border: "1px solid rgba(255,255,255,0.1)",
-            color: "#fff",
+            background: "var(--bg-soft)",
+            border: "1px solid var(--border-light)",
+            color: "var(--text-primary)",
             marginBottom: "1.5rem",
           }}
         />
@@ -102,8 +102,8 @@ export default function ContactForm({ lang }) {
         style={{
           width: "100%",
           padding: "14px",
-          background: isSubmitting ? "#475569" : "#3b82f6",
-          color: "#fff",
+          background: isSubmitting ? "#475569" : "#2563eb",
+          color: "var(--text-primary)",
           border: "none",
           borderRadius: "8px",
           fontWeight: "bold",

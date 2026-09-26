@@ -1,7 +1,5 @@
 import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 
 // Anti-Cache agar berita selalu update (real-time)
 export const dynamic = "force-dynamic";
@@ -24,7 +22,6 @@ export default async function NewsPage() {
 
   return (
     <>
-      <Navbar lang={lang} />
 
       <style
         dangerouslySetInnerHTML={{
@@ -50,13 +47,13 @@ export default async function NewsPage() {
           aspect-ratio: 4 / 5; /* Proporsi standar flyer vertical */
           background:
             radial-gradient(circle at 30% 20%, rgba(59, 130, 246, 0.08), transparent 60%),
-            #000;
+            var(--bg-surface);
           position: relative;
           display: flex;
           align-items: center;
           justify-content: center;
           overflow: hidden;
-          border-bottom: 1px solid rgba(255,255,255,0.06);
+          border-bottom: 1px solid var(--border-light);
         }
 
         .news-img-box img {
@@ -82,9 +79,9 @@ export default async function NewsPage() {
           gap: 6px;
           padding: 6px 12px;
           border-radius: 99px;
-          background: rgba(3, 8, 18, 0.75);
-          border: 1px solid rgba(148, 178, 224, 0.25);
-          color: #cbd5e1;
+          background: var(--bg-surface);
+          border: 1px solid var(--border-light);
+          color: var(--text-primary);
           font-family: "DM Sans", sans-serif;
           font-size: 0.72rem;
           font-weight: 700;
@@ -102,7 +99,7 @@ export default async function NewsPage() {
         .news-tag {
           align-self: flex-start;
           background: rgba(59, 130, 246, 0.15);
-          color: #93c5fd;
+          color: var(--accent-gold);
           padding: 4px 10px;
           border-radius: 99px;
           border: 1px solid rgba(96, 165, 250, 0.3);
@@ -122,14 +119,14 @@ export default async function NewsPage() {
         .news-title {
           font-family: "Playfair Display", serif;
           font-size: 1.15rem;
-          color: #fff;
+          color: var(--text-primary);
           font-weight: bold;
           margin: 0 0 0.5rem 0;
           line-height: 1.35;
         }
 
         .news-desc {
-          color: #94a3b8;
+          color: var(--text-secondary);
           font-size: 0.88rem;
           line-height: 1.6;
           margin-bottom: 1rem;
@@ -142,7 +139,7 @@ export default async function NewsPage() {
           gap: 0.5rem;
           color: #64748b;
           font-size: 0.8rem;
-          border-top: 1px solid rgba(255,255,255,0.06);
+          border-top: 1px solid var(--border-light);
           padding-top: 0.8rem;
         }
 

@@ -14,8 +14,8 @@ export default function Footer({ lang = "en" }) {
     <footer
       className="footer-cinema"
       style={{
-        background: "#030814",
-        color: "#94a3b8",
+        background: "var(--bg-surface)",
+        color: "var(--text-secondary)",
         fontFamily: "inherit",
         position: "relative",
         display: "flex",
@@ -34,8 +34,8 @@ export default function Footer({ lang = "en" }) {
           position: absolute;
           inset: 0;
           background-image: 
-            linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            linear-gradient(to right, var(--bg-soft) 1px, transparent 1px),
+            linear-gradient(to bottom, var(--bg-soft) 1px, transparent 1px);
           background-size: 40px 40px;
           pointer-events: none;
           z-index: 0;
@@ -51,7 +51,7 @@ export default function Footer({ lang = "en" }) {
           font-family: "Playfair Display", serif;
           font-size: clamp(6rem, 12vw, 11rem);
           font-weight: 900;
-          color: rgba(255, 255, 255, 0.022);
+          color: var(--text-primary);
           line-height: 1;
           user-select: none;
           pointer-events: none;
@@ -86,7 +86,7 @@ export default function Footer({ lang = "en" }) {
         ========================================== */
         .footer-link {
           position: relative;
-          color: #94a3b8;
+          color: var(--text-secondary);
           text-decoration: none;
           transition: color 0.3s ease;
           display: inline-block;
@@ -94,7 +94,7 @@ export default function Footer({ lang = "en" }) {
         }
 
         .footer-link:hover {
-          color: #fff;
+          color: var(--text-primary);
         }
 
         .footer-link::after {
@@ -132,13 +132,13 @@ export default function Footer({ lang = "en" }) {
             transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
             box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
           box-shadow:
-            0 6px 20px rgba(59, 130, 246, 0.4),
-            inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            0 6px 20px rgba(22, 36, 58, 0.09),
+            inset 0 1px 0 rgba(22, 36, 58, 0.09);
         }
 
         .cta-button:hover {
           transform: translateY(-2px);
-          box-shadow: 0 12px 30px rgba(59, 130, 246, 0.55);
+          box-shadow: 0 12px 30px rgba(22, 36, 58, 0.09);
         }
 
         /* ==========================================
@@ -224,7 +224,7 @@ export default function Footer({ lang = "en" }) {
             font-family: "Playfair Display", serif;
             font-size: 1.75rem;
             font-weight: 900;
-            color: #fff;
+            color: var(--text-primary);
             letter-spacing: 1px;
             margin: 0 0 0.35rem 0;
             line-height: 1;
@@ -234,7 +234,7 @@ export default function Footer({ lang = "en" }) {
             font-size: 0.72rem;
             letter-spacing: 2.5px;
             text-transform: uppercase;
-            color: #60a5fa;
+            color: var(--accent-gold);
             margin: 0 0 1rem 0;
             font-weight: 600;
           }
@@ -242,7 +242,7 @@ export default function Footer({ lang = "en" }) {
           .footer-brand-desc {
             font-size: 0.9rem;
             line-height: 1.75;
-            color: #94a3b8;
+            color: var(--text-secondary);
             margin: 0 0 1rem 0;
           }
 
@@ -258,7 +258,7 @@ export default function Footer({ lang = "en" }) {
           .footer-grid-links h3 {
             font-size: 0.95rem !important;
             margin: 0 0 0.4rem 0 !important;
-            color: #fff !important;
+            color: var(--text-primary) !important;
             text-transform: uppercase;
             letter-spacing: 1.2px !important;
           }
@@ -333,7 +333,7 @@ export default function Footer({ lang = "en" }) {
           .footer-grid-links h3 {
             font-size: 0.85rem !important;
             margin-bottom: 0.4rem !important;
-            color: #60a5fa !important;
+            color: var(--accent-gold) !important;
             letter-spacing: 0.5px;
             text-transform: uppercase;
           }
@@ -394,7 +394,7 @@ export default function Footer({ lang = "en" }) {
               className="footer-cta-badge"
               style={{
                 display: "inline-block",
-                color: "#60a5fa",
+                color: "var(--accent-gold)",
                 fontSize: "0.65rem",
                 fontWeight: "700",
                 letterSpacing: "2px",
@@ -413,7 +413,7 @@ export default function Footer({ lang = "en" }) {
               className="footer-cta-title"
               style={{
                 marginBottom: "0.3rem",
-                color: "#fff",
+                color: "var(--text-primary)",
                 fontWeight: "bold",
               }}
             >
@@ -425,7 +425,7 @@ export default function Footer({ lang = "en" }) {
             <p
               style={{
                 fontSize: "0.88rem",
-                color: "#cbd5e1",
+                color: "var(--text-primary)",
                 marginBottom: "0.85rem",
                 lineHeight: "1.5",
                 maxWidth: "440px",
@@ -487,7 +487,7 @@ export default function Footer({ lang = "en" }) {
               <h3
                 className="footer-col-title"
                 style={{
-                  color: "#fff",
+                  color: "var(--text-primary)",
                   fontSize: "0.88rem",
                   margin: "0 0 0.3rem 0",
                   fontWeight: "600",
@@ -533,7 +533,7 @@ export default function Footer({ lang = "en" }) {
               <h3
                 className="footer-col-title"
                 style={{
-                  color: "#fff",
+                  color: "var(--text-primary)",
                   fontSize: "0.88rem",
                   margin: "0 0 0.3rem 0",
                   fontWeight: "600",
@@ -585,7 +585,7 @@ export default function Footer({ lang = "en" }) {
               flexWrap: "wrap",
               gap: "0.5rem",
               paddingTop: "0.5rem",
-              borderTop: "1px solid rgba(255, 255, 255, 0.06)",
+              borderTop: "1px solid var(--border-light)",
               fontSize: "0.75rem",
               color: "#64748b",
             }}

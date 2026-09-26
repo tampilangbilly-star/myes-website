@@ -12,9 +12,9 @@ export default function SocialFloat() {
           __html: `
         /* Animasi Denyut Cahaya (Pulse) */
         @keyframes pulse-wa {
-          0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
-          70% { box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); }
-          100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+          0% { box-shadow: 0 0 0 0 rgba(22, 36, 58, 0.09); }
+          70% { box-shadow: 0 0 0 15px rgba(22, 36, 58, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(22, 36, 58, 0); }
         }
 
         .wa-float-btn {
@@ -29,7 +29,7 @@ export default function SocialFloat() {
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4);
+          box-shadow: 0 10px 25px rgba(22, 36, 58, 0.09);
           z-index: 99;
           transition: transform 0.3s ease, background-color 0.3s ease;
           text-decoration: none;
@@ -40,15 +40,15 @@ export default function SocialFloat() {
           transform: scale(1.1) translateY(-5px);
           background-color: #20b858;
           animation: none; /* Hentikan denyut saat di-hover */
-          box-shadow: 0 15px 35px rgba(37, 211, 102, 0.6);
+          box-shadow: 0 15px 35px rgba(22, 36, 58, 0.09);
         }
 
         /* Tooltip Teks (Muncul saat di-hover) */
         .wa-tooltip {
           position: absolute;
           right: 75px;
-          background: rgba(15, 23, 42, 0.9);
-          color: white;
+          background: var(--bg-surface);
+          color: var(--text-primary);
           padding: 8px 14px;
           border-radius: 8px;
           font-size: 0.85rem;
@@ -58,7 +58,7 @@ export default function SocialFloat() {
           pointer-events: none;
           transform: translateX(10px);
           transition: all 0.3s ease;
-          border: 1px solid rgba(255,255,255,0.1);
+          border: 1px solid var(--border-light);
         }
 
         .wa-float-btn:hover .wa-tooltip {

@@ -6,7 +6,7 @@ export default function CareGallery({ activities = [], lang = "en" }) {
 
   if (!activities || activities.length === 0) {
     return (
-      <div style={{ textAlign: "center", padding: "4rem 0", color: "#94a3b8" }}>
+      <div style={{ textAlign: "center", padding: "4rem 0", color: "var(--text-secondary)" }}>
         <p>{lang === "id" ? "Belum ada kegiatan M-YES Care." : "No M-YES Care activities yet."}</p>
       </div>
     );
@@ -23,20 +23,20 @@ export default function CareGallery({ activities = [], lang = "en" }) {
             key={item.id} 
             className="panel"
             style={{
-              background: "#050B14",
-              border: "1px solid rgba(255, 255, 255, 0.08)",
+              background: "var(--bg-surface)",
+              border: "1px solid var(--border-light)",
               borderRadius: "20px",
               padding: "clamp(1.5rem, 3vw, 2.5rem)",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.3)"
+              boxShadow: "0 10px 30px rgba(22, 36, 58, 0.09)"
             }}
           >
             {/* JUDUL & TANGGAL KEGIATAN */}
             <div style={{ marginBottom: "1.5rem" }}>
-              <h3 style={{ fontSize: "1.5rem", color: "#fff", marginBottom: "0.4rem", fontFamily: '"Playfair Display", serif' }}>
+              <h3 style={{ fontSize: "1.5rem", color: "var(--text-primary)", marginBottom: "0.4rem", fontFamily: '"Playfair Display", serif' }}>
                 {lang === "id" ? item.titleId || item.titleEn : item.titleEn}
               </h3>
               
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#93c5fd", fontSize: "0.9rem", fontWeight: "500" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "var(--accent-gold)", fontSize: "0.9rem", fontWeight: "500" }}>
                 <span>📅</span>
                 <span>
                   {new Date(item.activityDate).toLocaleDateString(lang === "id" ? "id-ID" : "en-US", {
@@ -50,7 +50,7 @@ export default function CareGallery({ activities = [], lang = "en" }) {
 
             {/* DESKRIPSI (JIKA ADA) */}
             {(item.descriptionEn || item.descriptionId) && (
-              <p style={{ color: "#cbd5e1", lineHeight: "1.7", marginBottom: "1.5rem", fontSize: "0.98rem" }}>
+              <p style={{ color: "var(--text-primary)", lineHeight: "1.7", marginBottom: "1.5rem", fontSize: "0.98rem" }}>
                 {lang === "id" ? item.descriptionId || item.descriptionEn : item.descriptionEn}
               </p>
             )}
@@ -58,7 +58,7 @@ export default function CareGallery({ activities = [], lang = "en" }) {
             {/* GALERI FOTO DALAM GRID RAPI */}
             {images.length > 0 && (
               <div>
-                <div style={{ fontSize: "0.9rem", fontWeight: "bold", color: "#94a3b8", marginBottom: "0.8rem", textTransform: "uppercase", letterSpacing: "1px" }}>
+                <div style={{ fontSize: "0.9rem", fontWeight: "bold", color: "var(--text-secondary)", marginBottom: "0.8rem", textTransform: "uppercase", letterSpacing: "1px" }}>
                   {lang === "id" ? "Galeri Foto" : "Photo Gallery"}
                 </div>
                 <div className="gallery-grid">
@@ -81,12 +81,12 @@ export default function CareGallery({ activities = [], lang = "en" }) {
             {/* VIDEO YOUTUBE (JIKA ADA) */}
             {youtubeVideos.length > 0 && (
               <div style={{ marginTop: "1.5rem" }}>
-                <div style={{ fontSize: "0.9rem", fontWeight: "bold", color: "#94a3b8", marginBottom: "0.8rem", textTransform: "uppercase", letterSpacing: "1px" }}>
+                <div style={{ fontSize: "0.9rem", fontWeight: "bold", color: "var(--text-secondary)", marginBottom: "0.8rem", textTransform: "uppercase", letterSpacing: "1px" }}>
                   {lang === "id" ? "Video Kegiatan" : "Activity Videos"}
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 300px), 1fr))", gap: "1rem" }}>
                   {youtubeVideos.map((vid, idx) => (
-                    <div key={idx} style={{ position: "relative", aspectRatio: "16/9", borderRadius: "12px", overflow: "hidden", background: "#000" }}>
+                    <div key={idx} style={{ position: "relative", aspectRatio: "16/9", borderRadius: "12px", overflow: "hidden", background: "var(--bg-surface)" }}>
                       <iframe
                         src={`https://www.youtube.com/embed/${vid.url}`}
                         title="YouTube video player"
@@ -132,7 +132,7 @@ export default function CareGallery({ activities = [], lang = "en" }) {
                 maxHeight: "75vh",
                 borderRadius: "12px",
                 objectFit: "contain",
-                boxShadow: "0 20px 40px rgba(0,0,0,0.6)",
+                boxShadow: "0 20px 40px rgba(22, 36, 58, 0.09)",
               }}
             />
             

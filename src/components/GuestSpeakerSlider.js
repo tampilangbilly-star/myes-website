@@ -81,15 +81,15 @@ export default function GuestSpeakerSlider({ speakers, lang }) {
       style={{
         position: "relative",
         overflow: "hidden",
-        background: "rgba(15, 23, 42, 0.45)",
+        background: "var(--bg-surface)",
         backdropFilter: "blur(16px)",
         WebkitBackdropFilter: "blur(16px)",
-        border: "1px solid rgba(255, 255, 255, 0.15)",
+        border: "1px solid var(--border-light)",
         borderRadius: "20px",
         padding: "1.2rem 1.5rem",
         width: "min(360px, calc(100vw - 2.5rem))",
-        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
-        color: "white",
+        boxShadow: "0 25px 50px -12px rgba(22, 36, 58, 0.09)",
+        color: "var(--text-primary)",
         cursor: total > 1 ? "pointer" : "default",
       }}
     >
@@ -137,7 +137,7 @@ export default function GuestSpeakerSlider({ speakers, lang }) {
         <span
           style={{
             backgroundColor: "rgba(59, 130, 246, 0.2)",
-            color: "#3b82f6",
+            color: "var(--accent-gold)",
             padding: "0.3rem 0.8rem",
             borderRadius: "30px",
             fontSize: "0.8rem",
@@ -180,7 +180,7 @@ export default function GuestSpeakerSlider({ speakers, lang }) {
             borderRadius: "12px",
             overflow: "hidden",
             marginBottom: "1rem",
-            border: "2px solid rgba(255,255,255,0.05)",
+            border: "2px solid var(--border-light)",
           }}
         >
           <img
@@ -201,7 +201,7 @@ export default function GuestSpeakerSlider({ speakers, lang }) {
             fontSize: "1.15rem",
             fontWeight: "bold",
             margin: "0 0 0.3rem 0",
-            color: "#fff",
+            color: "var(--text-primary)",
             lineHeight: "1.3",
           }}
         >
@@ -209,7 +209,7 @@ export default function GuestSpeakerSlider({ speakers, lang }) {
         </h4>
         <p
           style={{
-            color: "#94a3b8",
+            color: "var(--text-secondary)",
             fontSize: "0.85rem",
             margin: "0 0 0.8rem 0",
             lineHeight: "1.4",
@@ -219,7 +219,7 @@ export default function GuestSpeakerSlider({ speakers, lang }) {
         </p>
         <p
           style={{
-            color: "#e2e8f0",
+            color: "var(--text-primary)",
             fontSize: "0.8rem",
             margin: 0,
             display: "flex",
