@@ -1,45 +1,31 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
-/**
- * Reveal — animasi masuk saat elemen terlihat di viewport.
- * Dipakai section Homepage (kelas .hm-reveal di globals.css layer V4).
- * • Tanpa library — IntersectionObserver native.
- * • delay: detik (stagger antar elemen) via CSS variable --hm-d.
- * • prefers-reduced-motion ditangani di CSS (animasi dimatikan).
- */
-export default function Reveal({
-  children,
-  delay = 0,
-  as: Tag = "div",
-  className = "",
-}) {
+/** Animasi masuk halus saat elemen terlihat (menghormati prefers-reduced-motion lewat CSS). */
+export default function Reveal({ children, className = "", as: Tag = "div", delay = 0, ...rest }) {
   const ref = useRef(null);
-
+  const [visible, setVisible] = useState(false);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    if (!("IntersectionObserver" in window)) {
+      const raf = requestAnimationFrame(() => setVisible(true));
+      return () => cancelAnimationFrame(raf);
+    }
     const io = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-visible");
-            io.unobserve(entry.target);
-          }
-        });
+        if (entries.some((e) => e.isIntersecting)) {
+          setVisible(true);
+          io.disconnect();
+        }
       },
-      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" },
+      { rootMargin: "0px 0px -6% 0px" },
     );
     io.observe(el);
     return () => io.disconnect();
   }, []);
-
   return (
-    <Tag
-      ref={ref}
-      className={`hm-reveal ${className}`}
-      style={{ "--hm-d": `${delay}s` }}
-    >
+    <Tag ref={ref} className={`reveal ${visible ? "is-visible" : ""} ${className}`} style={delay ? { transitionDelay: `${delay}ms` } : undefined} {...rest}>
       {children}
     </Tag>
   );

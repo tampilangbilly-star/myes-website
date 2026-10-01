@@ -1,198 +1,71 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import clsx from "clsx";
+import Icon from "./Icon";
 
-export default function VirtualGreeter({ lang = "en" }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
+const KEY = "myes-greeter-seen";
 
-  // Muncul perlahan setelah 2 detik website dimuat
+/** "M-YES Virtual Buddy": sapaan kecil di kiri bawah (tidak bertabrakan dengan tombol WhatsApp di kanan). */
+export default function VirtualGreeter({ joinUrl, lang = "en" }) {
+  const [open, setOpen] = useState(false);
+  const id = lang === "id";
+
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsVisible(true);
-      setIsOpen(true); // Langsung membuka pesan panggilan
-    }, 2000);
-
-    // Otomatis menutup chat bubble setelah 12 detik agar tidak mengganggu bacaan
-    const closeTimer = setTimeout(() => {
-      setIsOpen(false);
-    }, 12000);
-
-    return () => {
-      clearTimeout(timer);
-      clearTimeout(closeTimer);
-    };
+    let seen = false;
+    try {
+      seen = sessionStorage.getItem(KEY) === "1";
+    } catch {}
+    if (seen) return;
+    // Tunggu sampai popup sambutan selesai, supaya tidak ada dua hal muncul bersamaan.
+    const t = setInterval(() => {
+      if (document.querySelector('[aria-modal="true"]')) return;
+      if (window.scrollY < 10 && performance.now() < 7000) return;
+      clearInterval(t);
+      setOpen(true);
+      try {
+        sessionStorage.setItem(KEY, "1");
+      } catch {}
+    }, 1000);
+    return () => clearInterval(t);
   }, []);
 
-  if (!isVisible) return null;
-
   return (
-    <div
-      style={{
-        position: "fixed",
-        bottom: "30px",
-        left: "30px",
-        zIndex: 100,
-        display: "flex",
-        alignItems: "flex-end",
-        gap: "15px",
-        fontFamily: "system-ui, -apple-system, sans-serif",
-      }}
-    >
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-        /* Efek Lambaian Tangan */
-        @keyframes waveHand {
-          0% { transform: rotate(0deg); }
-          10% { transform: rotate(14deg); }
-          20% { transform: rotate(-8deg); }
-          30% { transform: rotate(14deg); }
-          40% { transform: rotate(-4deg); }
-          50% { transform: rotate(10deg); }
-          60%, 100% { transform: rotate(0deg); }
-        }
-        
-        .waving-hand {
-          display: inline-block;
-          animation: waveHand 2.5s infinite;
-          transform-origin: 70% 70%;
-        }
+    <div className="fixed bottom-[max(16px,env(safe-area-inset-bottom))] left-4 z-40 flex items-end gap-3 sm:left-6">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        aria-controls="virtual-buddy"
+        aria-label={id ? "Buka sapaan M-YES" : "Open M-YES greeting"}
+        className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-line bg-surface text-2xl shadow-lift transition hover:scale-105 active:scale-95"
+      >
+        <span className="inline-block origin-[70%_70%] motion-safe:animate-[wave_2.4s_ease-in-out_infinite]">👋</span>
+        <span className="absolute right-0.5 top-0.5 h-3 w-3 rounded-full border-2 border-surface bg-success" />
+      </button>
 
-        /* Avatar AI Glowing */
-        .ai-avatar {
-          width: 60px;
-          height: 60px;
-          background: linear-gradient(135deg, #2563eb, #d6249f);
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 1.8rem;
-          cursor: pointer;
-          box-shadow: 0 0 20px rgba(22, 36, 58, 0.09);
-          position: relative;
-          transition: transform 0.3s ease;
-          border: 3px solid var(--border-light);
-        }
-
-        .ai-avatar:hover {
-          transform: scale(1.1);
-          box-shadow: 0 0 30px rgba(22, 36, 58, 0.09);
-        }
-
-        /* Lingkaran Pingping Online */
-        .online-dot {
-          position: absolute;
-          top: 2px;
-          right: 2px;
-          width: 14px;
-          height: 14px;
-          background-color: #22c55e;
-          border-radius: 50%;
-          border: 2px solid var(--border-light);
-        }
-
-        /* Chat Bubble Ala UI Modern */
-        .chat-bubble {
-          background: var(--bg-surface);
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(59, 130, 246, 0.3);
-          border-radius: 20px 20px 20px 0;
-          padding: 1.2rem;
-          width: 260px;
-          box-shadow: 0 15px 35px rgba(22, 36, 58, 0.09);
-          transform-origin: bottom left;
-          transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          opacity: 0;
-          transform: scale(0.1);
-          pointer-events: none;
-        }
-
-        .chat-bubble.open {
-          opacity: 1;
-          transform: scale(1);
-          pointer-events: auto;
-        }
-
-        /* Tombol Aksi di Dalam Bubble */
-        .join-btn-ai {
-          display: inline-block;
-          margin-top: 12px;
-          padding: 8px 16px;
-          background: #3b82f6;
-          color: white;
-          border-radius: 8px;
-          text-decoration: none;
-          font-size: 0.85rem;
-          font-weight: bold;
-          transition: background 0.3s;
-        }
-
-        .join-btn-ai:hover {
-          background: #2563eb;
-        }
-
-        .close-chat {
-          position: absolute;
-          top: 8px;
-          right: 12px;
-          color: var(--text-secondary);
-          cursor: pointer;
-          font-size: 1.2rem;
-          background: none;
-          border: none;
-          padding: 0;
-        }
-        .close-chat:hover { color: #ef4444; }
-        
-        @media (max-width: 768px) {
-          .chat-bubble { width: 220px; }
-        }
-      `,
-        }}
-      />
-
-      {/* Avatar Bulat yang bisa diklik */}
-      <div className="ai-avatar" onClick={() => setIsOpen(!isOpen)}>
-        <span className="waving-hand">👋</span>
-        <div className="online-dot"></div>
-      </div>
-
-      {/* Balon Pesan yang muncul (Pop-up) */}
-      <div className={`chat-bubble ${isOpen ? "open" : ""}`}>
-        <button className="close-chat" onClick={() => setIsOpen(false)}>
-          &times;
-        </button>
-        <p
-          style={{
-            margin: "0 0 5px 0",
-            color: "var(--accent-gold)",
-            fontSize: "0.8rem",
-            fontWeight: "bold",
-          }}
-        >
-          M-YES Virtual Buddy
+      <div
+        id="virtual-buddy"
+        role="status"
+        className={clsx(
+          "card mb-1 w-[min(260px,calc(100vw-9.5rem))] origin-bottom-left p-4 transition duration-300",
+          open ? "scale-100 opacity-100" : "pointer-events-none scale-90 opacity-0",
+        )}
+        aria-hidden={!open}
+      >
+        <div className="flex items-start justify-between gap-2">
+          <p className="text-xs font-bold uppercase tracking-wider text-primary-strong">M-YES Virtual Buddy</p>
+          <button type="button" onClick={() => setOpen(false)} tabIndex={open ? 0 : -1} className="-mr-2 -mt-2 flex h-9 w-9 items-center justify-center rounded-lg text-ink-soft hover:bg-ink/5 hover:text-ink" aria-label={id ? "Tutup" : "Close"}>
+            <Icon name="close" size={16} />
+          </button>
+        </div>
+        <p className="mt-1 text-sm leading-relaxed text-ink">
+          {id ? "Halo! Selamat datang di M-YES. Ayo bertumbuh dalam iman dan bahasa Inggris bersama kami minggu ini!" : "Hi there! Welcome to M-YES. Let's grow in faith and English together this week!"}
         </p>
-        <p
-          style={{
-            margin: 0,
-            color: "var(--text-primary)",
-            fontSize: "0.95rem",
-            lineHeight: "1.5",
-          }}
-        >
-          {lang === "id"
-            ? "Halo! Selamat datang di M-YES. Ayo bertumbuh dalam iman dan bahasa Inggris bersama kami minggu ini!"
-            : "Hi there! Welcome to M-YES. Let's grow in faith and English together this week!"}
-        </p>
-        <a
-          href="https://chat.whatsapp.com/Fialpt9jLrCL0oLagStRTc"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="join-btn-ai"
-        >
-          {lang === "id" ? "👉 Gabung Sekarang" : "👉 Join Us Now"}
-        </a>
+        {joinUrl && (
+          <a href={joinUrl} target="_blank" rel="noopener noreferrer" tabIndex={open ? 0 : -1} className="btn-primary btn-sm mt-3 w-full">
+            {id ? "Gabung Sekarang" : "Join Us Now"} <Icon name="arrow-right" size={16} />
+          </a>
+        )}
       </div>
     </div>
   );

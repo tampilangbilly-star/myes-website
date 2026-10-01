@@ -1,627 +1,130 @@
-"use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Image from "next/image";
+import Icon from "./Icon";
+import { getSite } from "@/lib/site";
 
-export default function Footer({ lang = "en" }) {
-  const pathname = usePathname();
+const QUICK = [
+  { href: "/about", en: "About", id: "Tentang" },
+  { href: "/personnel", en: "Personnel", id: "Personalia" },
+  { href: "/program", en: "Program", id: "Program" },
+  { href: "/activities", en: "Activities", id: "Kegiatan" },
+];
+const EXPLORE = [
+  { href: "/mission", en: "Mission", id: "Misi" },
+  { href: "/care", en: "M-YES Care", id: "M-YES Care" },
+  { href: "/news", en: "News", id: "Berita" },
+  { href: "/contact", en: "Contact", id: "Kontak" },
+];
 
-  // Logika penyembunyi: Jika rute berawalan /admin, jangan tampilkan footer
-  if (pathname?.startsWith("/admin")) {
-    return null;
-  }
+export default async function Footer({ lang = "en" }) {
+  const site = await getSite(lang);
+  const id = lang === "id";
+  const socials = [
+    { key: "instagram", label: "Instagram", href: site.socials.instagram },
+    { key: "whatsapp", label: "WhatsApp", href: site.socials.whatsapp },
+    { key: "tiktok", label: "TikTok", href: site.socials.tiktok },
+    { key: "facebook", label: "Facebook", href: site.socials.facebook },
+    { key: "youtube", label: "YouTube", href: site.socials.youtube },
+  ].filter((s) => s.href);
 
   return (
-    <footer
-      className="footer-cinema"
-      style={{
-        background: "var(--bg-surface)",
-        color: "var(--text-secondary)",
-        fontFamily: "inherit",
-        position: "relative",
-        display: "flex",
-        flexDirection: "column",
-        borderTop: "1px solid rgba(59, 130, 246, 0.2)",
-        overflow: "hidden",
-      }}
-    >
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-        /* ==========================================
-            POLA GRID BACKGROUND
-        ========================================== */
-        .footer-grid-pattern {
-          position: absolute;
-          inset: 0;
-          background-image: 
-            linear-gradient(to right, var(--bg-soft) 1px, transparent 1px),
-            linear-gradient(to bottom, var(--bg-soft) 1px, transparent 1px);
-          background-size: 40px 40px;
-          pointer-events: none;
-          z-index: 0;
-        }
-
-        /* ==========================================
-            WATERMARK M-YES
-        ========================================== */
-        .footer-watermark {
-          position: absolute;
-          bottom: 10px;
-          right: 30px;
-          font-family: "Playfair Display", serif;
-          font-size: clamp(6rem, 12vw, 11rem);
-          font-weight: 900;
-          color: var(--text-primary);
-          line-height: 1;
-          user-select: none;
-          pointer-events: none;
-          z-index: 0;
-          letter-spacing: -2px;
-        }
-
-        .footer-content-wrapper {
-          position: relative;
-          z-index: 1;
-        }
-
-        /* ==========================================
-            GARIS CAHAYA
-        ========================================== */
-        .footer-glow-line {
-          width: 100%;
-          height: 1px;
-          background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(59, 130, 246, 0.5),
-            var(--gold, #e8a33d),
-            rgba(59, 130, 246, 0.5),
-            transparent
-          );
-          margin-bottom: 1rem;
-        }
-
-        /* ==========================================
-            FOOTER LINK
-        ========================================== */
-        .footer-link {
-          position: relative;
-          color: var(--text-secondary);
-          text-decoration: none;
-          transition: color 0.3s ease;
-          display: inline-block;
-          padding: 1px 0;
-        }
-
-        .footer-link:hover {
-          color: var(--text-primary);
-        }
-
-        .footer-link::after {
-          content: '';
-          position: absolute;
-          width: 0;
-          height: 2px;
-          bottom: -2px;
-          left: 0;
-          border-radius: 99px;
-          background: linear-gradient(90deg, #3b82f6, #06b6d4);
-          transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-
-        .footer-link:hover::after {
-          width: 100%;
-        }
-
-        /* ==========================================
-            CTA BUTTON
-        ========================================== */
-        .cta-button {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          min-height: 40px;
-          background: linear-gradient(135deg, #1d4ed8, #3b82f6);
-          color: #fff;
-          padding: 0.6rem 1.8rem;
-          border-radius: 50px;
-          text-decoration: none;
-          font-weight: bold;
-          font-size: 0.9rem;
-          transition:
-            transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-            box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-          box-shadow:
-            0 6px 20px rgba(22, 36, 58, 0.09),
-            inset 0 1px 0 rgba(22, 36, 58, 0.09);
-        }
-
-        .cta-button:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 12px 30px rgba(22, 36, 58, 0.09);
-        }
-
-        /* ==========================================
-            JUDUL CTA
-        ========================================== */
-        .footer-cta-title {
-          font-family: "Playfair Display", serif;
-          font-size: clamp(1.5rem, 1.1rem + 1.8vw, 2.1rem);
-          letter-spacing: -0.5px;
-        }
-
-        /* ==========================================
-            DESKTOP FOOTER LAYOUT
-        ========================================== */
-        .desktop-footer-layout {
-          max-width: 750px;
-          margin: 0 auto;
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 2rem;
-          justify-items: center;
-        }
-
-        /* Kolom brand: HANYA tampil di desktop.
-            Default disembunyikan agar tampilan Android benar-benar
-            tidak berubah sedikit pun. */
-        .footer-brand-col {
-          display: none;
-        }
-
-        /* ==========================================
-            PERBAIKAN KHUSUS DESKTOP
-            Tidak mengubah tampilan Android/Mobile
-        ========================================== */
-        @media (min-width: 769px) {
-          /* Menyembunyikan bagian CTA (Ready to Grow) khusus di Desktop */
-          .footer-cta-zone {
-            display: none !important;
-          }
-
-          /* Menyembunyikan garis cahaya pemisah bagian CTA jika diperlukan kerapian */
-          .footer-glow-container {
-            display: none !important;
-          }
-
-          .footer-cinema {
-            height: auto;
-            min-height: 0;
-          }
-
-          .footer-content-wrapper {
-            width: 100%;
-            height: auto;
-          }
-
-          /* — Container utama dilebarkan mengikuti layar besar — */
-          .footer-main-container {
-            max-width: 1180px !important;
-            padding: 2.5rem 2.5rem 1.1rem !important;
-          }
-
-          /* — Layout 3 kolom: Brand | Tautan Cepat | Jelajahi — */
-          .desktop-footer-layout {
-            max-width: none !important;
-            grid-template-columns: 2.1fr 1fr 1fr !important;
-            gap: 3.5rem !important;
-            justify-items: start !important;
-            align-items: start !important;
-            margin-bottom: 2.2rem !important;
-          }
-
-          .desktop-footer-layout > div {
-            text-align: left !important;
-            width: 100%;
-          }
-
-          .footer-brand-col {
-            display: block !important;
-            max-width: 420px;
-          }
-
-          .footer-brand-name {
-            font-family: "Playfair Display", serif;
-            font-size: 1.75rem;
-            font-weight: 900;
-            color: var(--text-primary);
-            letter-spacing: 1px;
-            margin: 0 0 0.35rem 0;
-            line-height: 1;
-          }
-
-          .footer-brand-tagline {
-            font-size: 0.72rem;
-            letter-spacing: 2.5px;
-            text-transform: uppercase;
-            color: var(--accent-gold);
-            margin: 0 0 1rem 0;
-            font-weight: 600;
-          }
-
-          .footer-brand-desc {
-            font-size: 0.9rem;
-            line-height: 1.75;
-            color: var(--text-secondary);
-            margin: 0 0 1rem 0;
-          }
-
-          .footer-brand-place {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.45rem;
-            font-size: 0.82rem;
-            color: #64748b;
-            margin: 0;
-          }
-
-          .footer-grid-links h3 {
-            font-size: 0.95rem !important;
-            margin: 0 0 0.4rem 0 !important;
-            color: var(--text-primary) !important;
-            text-transform: uppercase;
-            letter-spacing: 1.2px !important;
-          }
-
-          /* Aksen garis kecil di bawah judul kolom */
-          .footer-col-title::after {
-            content: '';
-            display: block;
-            width: 30px;
-            height: 2px;
-            margin-top: 0.6rem;
-            margin-bottom: 1rem;
-            border-radius: 99px;
-            background: linear-gradient(90deg, #3b82f6, var(--gold, #e8a33d));
-          }
-
-          .footer-grid-links ul {
-            font-size: 0.92rem !important;
-            gap: 0.65rem !important;
-          }
-
-          .footer-bottom-flex {
-            padding-top: 1.3rem !important;
-            font-size: 0.8rem !important;
-          }
-
-          .footer-watermark {
-            bottom: -6px;
-            right: 40px;
-            pointer-events: none;
-          }
-        }
-
-        /* ==========================================
-            RESPONSIF KHUSUS ANDROID/MOBILE
-            TIDAK DIUBAH
-        ========================================== */
-        @media (max-width: 768px) {
-          .footer-cta-zone {
-            padding: 2rem 1rem 1.25rem !important;
-          }
-
-          .footer-cta-title {
-            font-size: 1.4rem !important;
-          }
-
-          .footer-cta-zone p {
-            font-size: 0.85rem !important;
-            margin-bottom: 0.85rem !important;
-          }
-
-          .cta-button {
-            min-height: 38px !important;
-            padding: 0.5rem 1.4rem !important;
-            font-size: 0.85rem !important;
-          }
-          
-          .footer-main-container {
-            padding: 0.4rem 1rem 0.85rem !important;
-          }
-
-          .desktop-footer-layout {
-            grid-template-columns: 1fr 1fr !important;
-            gap: 1rem !important;
-            max-width: 100% !important;
-          }
-
-          .desktop-footer-layout > div {
-            text-align: center !important;
-          }
-
-          .footer-grid-links h3 {
-            font-size: 0.85rem !important;
-            margin-bottom: 0.4rem !important;
-            color: var(--accent-gold) !important;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-          }
-
-          .footer-grid-links ul {
-            font-size: 0.8rem !important;
-            gap: 0.3rem !important;
-          }
-
-          .footer-watermark {
-            font-size: 20vw !important;
-            bottom: 0px !important;
-            right: 5% !important;
-          }
-
-          .footer-bottom-flex {
-            flex-direction: column !important;
-            text-align: center !important;
-            gap: 0.35rem !important;
-            padding-top: 0.5rem !important;
-            font-size: 0.72rem !important;
-          }
-        }
-      `,
-        }}
-      />
-
-      {/* Latar Belakang Kotak-Kotak Tipis (Grid Pattern) */}
-      <div className="footer-grid-pattern"></div>
-
-      {/* Watermark Teks M-YES Besar dan Samar */}
-      <div className="footer-watermark" aria-hidden="true">
-        M-YES
+    <footer className="mt-auto border-t border-line bg-surface">
+      {/* Ajakan bergabung */}
+      <div className="container-x pt-14">
+        <div className="relative overflow-hidden rounded-3xl bg-primary px-6 py-10 text-primary-ink sm:px-10 sm:py-12">
+          <div aria-hidden className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-white/10" />
+          <div aria-hidden className="pointer-events-none absolute -bottom-20 right-24 h-44 w-44 rounded-full bg-white/10" />
+          <div className="relative flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <div className="max-w-xl">
+              <h2 className="text-2xl font-extrabold text-white sm:text-3xl">{id ? "Siap Bertumbuh Bersama?" : "Ready to Grow Together?"}</h2>
+              <p className="mt-2 leading-relaxed text-white/90">
+                {id
+                  ? "Mari bergabung dengan komunitas anak muda M-YES. Kita belajar bahasa Inggris, membangun relasi, dan memperdalam iman bersama-sama!"
+                  : "Join the M-YES youth community. We learn English, build friendships, and grow deeper in faith together!"}
+              </p>
+            </div>
+            <a href={site.socials.whatsapp || "/contact"} target="_blank" rel="noopener noreferrer" className="btn shrink-0 bg-white text-primary-strong hover:bg-white/90">
+              {id ? "Bergabung Sekarang" : "Join Us Now"} <Icon name="arrow-right" size={18} />
+            </a>
+          </div>
+        </div>
       </div>
 
-      <div className="footer-content-wrapper">
-        {/* ========================================== */}
-        {/* BAGIAN ATAS: READY TO GROW                 */}
-        {/* ========================================== */}
-        <div
-          className="footer-cta-zone"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "2.2rem 1.25rem 1.2rem",
-          }}
-        >
-          <div
-            className="container"
-            style={{
-              maxWidth: "600px",
-              margin: "0 auto",
-              textAlign: "center",
-            }}
-          >
-            <span
-              className="footer-cta-badge"
-              style={{
-                display: "inline-block",
-                color: "var(--accent-gold)",
-                fontSize: "0.65rem",
-                fontWeight: "700",
-                letterSpacing: "2px",
-                textTransform: "uppercase",
-                marginBottom: "0.3rem",
-                background: "rgba(59, 130, 246, 0.1)",
-                padding: "2px 8px",
-                borderRadius: "99px",
-                border: "1px solid rgba(59, 130, 246, 0.2)",
-              }}
-            >
-              M-YES Community
-            </span>
-
-            <h2
-              className="footer-cta-title"
-              style={{
-                marginBottom: "0.3rem",
-                color: "var(--text-primary)",
-                fontWeight: "bold",
-              }}
-            >
-              {lang === "id"
-                ? "Siap Bertumbuh Bersama?"
-                : "Ready to Grow With Us?"}
-            </h2>
-
-            <p
-              style={{
-                fontSize: "0.88rem",
-                color: "var(--text-primary)",
-                marginBottom: "0.85rem",
-                lineHeight: "1.5",
-                maxWidth: "440px",
-                marginLeft: "auto",
-                marginRight: "auto",
-              }}
-            >
-              {lang === "id"
-                ? "Mari bergabung dengan komunitas anak muda M-YES. Kita belajar bahasa Inggris, membangun relasi, dan memperdalam iman bersama-sama!"
-                : "Join the M-YES youth community. We learn English, build relationships, and deepen our faith together!"}
-            </p>
-
-            <Link href="/contact" className="cta-button">
-              {lang === "id" ? "Bergabung Sekarang" : "Join Us Now"}
-            </Link>
-          </div>
+      <div className="container-x grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
+        <div>
+          <Link href="/" className="inline-flex items-center gap-3" aria-label="M-YES Home">
+            <Image src="/logo-myes.png" alt="" width={44} height={44} className="h-11 w-11 object-contain" />
+            <span className="font-display text-lg font-extrabold">M-YES</span>
+          </Link>
+          <p className="mt-4 max-w-sm text-sm leading-relaxed text-ink-muted">
+            {id
+              ? "Komunitas anak muda yang bertumbuh bersama melalui ibadah berbahasa Inggris, persekutuan, dan pelayanan. Terbuka untuk siapa saja yang ingin belajar dan melayani."
+              : "A youth community growing together through English-language worship, fellowship, and service. Open to anyone who wants to learn and serve."}
+          </p>
+          {socials.length > 0 && (
+            <ul className="mt-5 flex flex-wrap gap-2">
+              {socials.map((s) => (
+                <li key={s.key}>
+                  <a href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label} className="icon-btn border border-line bg-surface hover:border-primary/40 hover:text-primary">
+                    <Icon name={s.key} />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
-        {/* Garis Cahaya Pemisah Estetik */}
-        <div className="footer-glow-container" style={{ padding: "0 1.25rem" }}>
-          <div className="footer-glow-line"></div>
+        <FooterLinks title={id ? "Tautan Cepat" : "Quick Links"} links={QUICK} lang={lang} />
+        <FooterLinks title={id ? "Jelajahi" : "Explore"} links={EXPLORE} lang={lang} />
+
+        <div>
+          <h3 className="text-sm font-bold uppercase tracking-wider text-ink-soft">{id ? "Kontak" : "Contact"}</h3>
+          <ul className="mt-4 space-y-3 text-sm text-ink-muted">
+            <li className="flex gap-3">
+              <Icon name="pin" size={18} className="mt-0.5 shrink-0 text-primary" />
+              <span>{site.contact.address}</span>
+            </li>
+            <li>
+              <a href={`mailto:${site.contact.email}`} className="flex gap-3 break-all hover:text-primary">
+                <Icon name="mail" size={18} className="mt-0.5 shrink-0 text-primary" />
+                {site.contact.email}
+              </a>
+            </li>
+            <li>
+              <a href={`https://wa.me/${site.contact.phoneDigits}`} target="_blank" rel="noopener noreferrer" className="flex gap-3 hover:text-primary">
+                <Icon name="phone" size={18} className="mt-0.5 shrink-0 text-primary" />
+                {site.contact.phone}
+              </a>
+            </li>
+          </ul>
         </div>
+      </div>
 
-        {/* ========================================== */}
-        {/* BAGIAN BAWAH: MENU & COPYRIGHT            */}
-        {/* ========================================== */}
-        <div
-          className="container footer-main-container"
-          style={{
-            maxWidth: "800px",
-            margin: "0 auto",
-            padding: "0 1.25rem 0.85rem",
-            width: "100%",
-          }}
-        >
-          <div
-            className="desktop-footer-layout footer-grid-links"
-            style={{ marginBottom: "0.85rem" }}
-          >
-            {/* Kolom Brand — hanya tampil di desktop (display:none di mobile) */}
-            <div className="footer-brand-col">
-              <p className="footer-brand-name">M-YES</p>
-              <p className="footer-brand-tagline">
-                Manado Youth English Service
-              </p>
-              <p className="footer-brand-desc">
-                {lang === "id"
-                  ? "Komunitas anak muda yang bertumbuh bersama melalui ibadah berbahasa Inggris, persekutuan, dan pelayanan. Terbuka untuk siapa saja yang ingin belajar dan melayani."
-                  : "A youth community growing together through English worship, fellowship, and service. Open to anyone who wants to learn and serve."}
-              </p>
-              <p className="footer-brand-place">
-                <span aria-hidden="true">📍</span>
-                Manado, Sulawesi Utara — Indonesia
-              </p>
-            </div>
-
-            {/* Kolom 1: Quick Links */}
-            <div style={{ textAlign: "right" }}>
-              <h3
-                className="footer-col-title"
-                style={{
-                  color: "var(--text-primary)",
-                  fontSize: "0.88rem",
-                  margin: "0 0 0.3rem 0",
-                  fontWeight: "600",
-                  letterSpacing: "0.5px",
-                }}
-              >
-                {lang === "id" ? "Tautan Cepat" : "Quick Links"}
-              </h3>
-
-              <ul
-                style={{
-                  listStyle: "none",
-                  padding: 0,
-                  margin: 0,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "0.25rem",
-                  fontSize: "0.82rem",
-                }}
-              >
-                <li>
-                  <Link href="/about" className="footer-link">
-                    {lang === "id" ? "Tentang" : "About"}
-                  </Link>
-                </li>
-
-                <li>
-                  <Link href="/program" className="footer-link">
-                    Program
-                  </Link>
-                </li>
-
-                <li>
-                  <Link href="/activities" className="footer-link">
-                    {lang === "id" ? "Kegiatan" : "Activities"}
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Kolom 2: Explore */}
-            <div style={{ textAlign: "left" }}>
-              <h3
-                className="footer-col-title"
-                style={{
-                  color: "var(--text-primary)",
-                  fontSize: "0.88rem",
-                  margin: "0 0 0.3rem 0",
-                  fontWeight: "600",
-                  letterSpacing: "0.5px",
-                }}
-              >
-                {lang === "id" ? "Jelajahi" : "Explore"}
-              </h3>
-
-              <ul
-                style={{
-                  listStyle: "none",
-                  padding: 0,
-                  margin: 0,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "0.25rem",
-                  fontSize: "0.82rem",
-                }}
-              >
-                <li>
-                  <Link href="/mission" className="footer-link">
-                    {lang === "id" ? "Misi" : "Mission"}
-                  </Link>
-                </li>
-
-                <li>
-                  <Link href="/news" className="footer-link">
-                    {lang === "id" ? "Berita" : "News"}
-                  </Link>
-                </li>
-
-                <li>
-                  <Link href="/contact" className="footer-link">
-                    {lang === "id" ? "Kontak" : "Contact"}
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          {/* COPYRIGHT & DEVELOPER CREDIT */}
-          <div
-            className="footer-bottom-flex"
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: "0.5rem",
-              paddingTop: "0.5rem",
-              borderTop: "1px solid var(--border-light)",
-              fontSize: "0.75rem",
-              color: "#64748b",
-            }}
-          >
-            <p style={{ margin: 0 }}>
-              © {new Date().getFullYear()} Manado Youth English Service (M-YES).
-              All rights reserved.
-            </p>
-
-            <div style={{ margin: 0 }}>
-              <Link
-                href="/admin"
-                style={{
-                  color: "#64748b",
-                  opacity: 0.7,
-                  textDecoration: "none",
-                  letterSpacing: "1px",
-                  transition: "all 0.3s ease",
-                }}
-                onMouseOver={(e) => {
-                  e.target.style.opacity = "1";
-                  e.target.style.color = "#3b82f6";
-                }}
-                onMouseOut={(e) => {
-                  e.target.style.opacity = "0.7";
-                  e.target.style.color = "#64748b";
-                }}
-              >
-                Admin{" "}
-                <span style={{ margin: "0 4px", fontWeight: "300" }}>~bt~</span>{" "}
-                Billy Tampilang
-              </Link>
-            </div>
-          </div>
+      <div className="border-t border-line">
+        <div className="container-x flex flex-col gap-2 py-5 pb-24 text-xs text-ink-soft sm:flex-row sm:items-center sm:justify-between sm:pb-5">
+          <p>© {new Date().getFullYear()} Manado Youth English Service (M-YES). All rights reserved.</p>
+          <Link href="/admin" className="opacity-80 transition hover:text-primary hover:opacity-100">
+            Admin <span className="mx-1 font-light">~bt~</span> Billy Tampilang
+          </Link>
         </div>
       </div>
     </footer>
+  );
+}
+
+function FooterLinks({ title, links, lang }) {
+  return (
+    <div>
+      <h3 className="text-sm font-bold uppercase tracking-wider text-ink-soft">{title}</h3>
+      <ul className="mt-2 grid grid-cols-2 gap-x-4 sm:grid-cols-1">
+        {links.map((l) => (
+          <li key={l.href}>
+            <Link href={l.href} className="flex min-h-11 items-center text-sm font-medium text-ink-muted transition hover:text-primary">
+              {lang === "id" ? l.id : l.en}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

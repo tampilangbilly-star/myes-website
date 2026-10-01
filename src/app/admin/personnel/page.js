@@ -1,37 +1,9 @@
-"use client";
-import AdminCrud from "@/components/AdminCrud";
+import prisma from "@/lib/prisma";
+import ResourceList from "@/components/admin/ResourceList";
 
-export default function AdminPersonnel() {
-  return (
-    <AdminCrud
-      title="Organization Personnel"
-      apiUrl="/api/personnel"
-      createUrl="/admin/personnel/new"
-      columns={[
-        {
-          key: "photo",
-          label: "Photo",
-          render: (i) => (
-            <div className="table-img">
-              {i.photo ? (
-                <img
-                  src={i.photo?.startsWith("/") ? i.photo : `${i.photo}`}
-                  alt=""
-                />
-              ) : (
-                "👤"
-              )}
-            </div>
-          ),
-        },
-        {
-          key: "name",
-          label: "Name",
-          render: (i) => <strong>{i.name}</strong>,
-        },
-        { key: "roleEn", label: "Role (EN)" },
-        { key: "sortOrder", label: "Order" },
-      ]}
-    />
-  );
+export const metadata = { title: "personnel" };
+
+export default async function Page() {
+  const rows = await prisma.personnel.findMany({ orderBy: [{ sortOrder: "asc" }, { id: "asc" }] });
+  return <ResourceList resource="personnel" rows={rows} />;
 }

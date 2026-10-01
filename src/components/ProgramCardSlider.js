@@ -1,45 +1,12 @@
-"use client";
-import { useState, useEffect } from "react";
+import ImageFader from "./ImageFader";
 
-export default function ProgramCardSlider({ images, emoji }) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  useEffect(() => {
-    // Jika gambar kurang dari 2, tidak perlu jalankan interval
-    if (!images || images.length <= 1) return;
-
-    const timer = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 4000); // Gambar berpindah otomatis setiap 4 detik
-
-    return () => clearInterval(timer);
-  }, [images]);
-
-  // Jika tidak ada gambar, tampilkan emoji fallback
-  if (!images || images.length === 0) {
-    return <span className="emoji-hero">{emoji}</span>;
-  }
-
-  return (
-    <>
-      {images.map((img, idx) => (
-        <img
-          key={idx}
-          src={img}
-          alt={`Program image ${idx + 1}`}
-          style={{
-            position: idx === 0 ? "relative" : "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            opacity: idx === currentIndex ? 1 : 0,
-            transition: "opacity 1s ease-in-out, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1)",
-            zIndex: idx === currentIndex ? 1 : 0,
-          }}
-        />
-      ))}
-    </>
-  );
+/** Foto kartu program (fade otomatis) atau emoji bila belum ada foto. */
+export default function ProgramCardSlider({ images = [], emoji = "📖", title = "Program", className = "aspect-[4/3]" }) {
+  if (!images.length)
+    return (
+      <div className={`flex items-center justify-center bg-primary-soft text-5xl ${className}`} aria-hidden>
+        {emoji}
+      </div>
+    );
+  return <ImageFader images={images} alt={title} className={`bg-line ${className}`} sizes="(min-width:1024px) 360px, (min-width:640px) 50vw, 100vw" />;
 }

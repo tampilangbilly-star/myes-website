@@ -1,14 +1,4 @@
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { collectionHandlers } from "@/lib/crud";
+import { personnelSchema } from "@/lib/validation";
 
-export async function GET() {
-  const items = await prisma.personnel.findMany({
-    orderBy: { sortOrder: "asc" },
-  });
-  return NextResponse.json(items);
-}
-export async function POST(req) {
-  const data = await req.json();
-  const item = await prisma.personnel.create({ data });
-  return NextResponse.json(item);
-}
+export const { GET, POST } = collectionHandlers("personnel", personnelSchema, { orderBy: { sortOrder: "asc" } });

@@ -1,37 +1,9 @@
-"use client";
-import AdminCrud from "@/components/AdminCrud";
+import prisma from "@/lib/prisma";
+import ResourceList from "@/components/admin/ResourceList";
 
-export default function AdminMissions() {
-  return (
-    <AdminCrud
-      title="Mission Trips"
-      apiUrl="/api/missions"
-      createUrl="/admin/missions/new"
-      columns={[
-        {
-          key: "image",
-          label: "Img",
-          render: (i) => (
-            <div className="table-img">
-              {i.image ? (
-                <img
-                  src={i.image?.startsWith("/") ? i.image : `${i.image}`}
-                  alt=""
-                />
-              ) : (
-                "✈️"
-              )}
-            </div>
-          ),
-        },
-        {
-          key: "titleEn",
-          label: "Title",
-          render: (i) => <strong>{i.titleEn}</strong>,
-        },
-        { key: "dateLabelEn", label: "Date Label" },
-        { key: "sortOrder", label: "Order" },
-      ]}
-    />
-  );
+export const metadata = { title: "missions" };
+
+export default async function Page() {
+  const rows = await prisma.mission.findMany({ orderBy: [{ sortOrder: "asc" }, { id: "asc" }] });
+  return <ResourceList resource="missions" rows={rows} />;
 }

@@ -1,380 +1,103 @@
 import prisma from "@/lib/prisma";
-import { cookies } from "next/headers";
+import { getLang, t } from "@/lib/helpers";
+import { getSite } from "@/lib/site";
+import { safe } from "@/lib/data";
+import { pageMeta } from "@/lib/seo";
+import PageHeader from "@/components/PageHeader";
+import SectionHeading from "@/components/SectionHeading";
+import Reveal from "@/components/Reveal";
+import SmartImage from "@/components/SmartImage";
 import WeeklyGallery from "@/components/WeeklyGallery";
+import Icon from "@/components/Icon";
 
-export const dynamic = "force-dynamic";
+export const metadata = pageMeta("Weekly Activities", "M-YES Friday: interactive English learning followed by worship together. See the schedule and gallery.", "/activities");
+
+// Dua sesi utama (seperti sebelumnya). Rundown detail diambil dari Admin → Jadwal (tipe learning / worship).
+const SESSIONS = [
+  { type: "learning", time: "17:30 - 18:30", en: "English Learning", id: "English Learning", desc: { en: "An interactive and fun session to sharpen your English grammar, vocabulary, and conversation skills.", id: "Sesi interaktif dan menyenangkan untuk mengasah kemampuan tata bahasa, kosakata, dan percakapan bahasa Inggris Anda." } },
+  { type: "worship", time: "18:30 - selesai", en: "Worship Together", id: "Worship Together", desc: { en: "An intimate time to praise, worship, and listen to the truth of God's Word together with the community.", id: "Waktu yang intim untuk memuji, menyembah, dan mendengarkan kebenaran Firman Tuhan bersama komunitas." } },
+];
+
+// "17:00 - 17:10" + ... + "17:45 - 18:15" → "17:00 - 18:15"
+function rangeOf(items) {
+  const times = items.flatMap((a) => a.time.match(/\d{1,2}[:.]\d{2}/g) || []);
+  if (!times.length) return "";
+  return times.length > 1 ? `${times[0]} - ${times[times.length - 1]}` : times[0];
+}
 
 export default async function ActivitiesPage() {
-  const cookieStore = cookies();
-  const lang = cookieStore.get("lang")?.value || "en";
-
-  const galleries = await prisma.activityGallery.findMany({
-    where: { isActive: true },
-    include: { photos: true },
-    orderBy: { activityDate: "desc" },
-  });
+  const lang = await getLang();
+  const id = lang === "id";
+  const site = await getSite(lang);
+  const [schedule, galleries] = await Promise.all([
+    safe(prisma.activity.findMany({ orderBy: [{ sortOrder: "asc" }, { id: "asc" }] })),
+    safe(prisma.activityGallery.findMany({ where: { isActive: true }, include: { photos: { orderBy: { id: "asc" } } }, orderBy: { activityDate: "desc" } })),
+  ]);
+  const sessions = SESSIONS;
 
   return (
     <>
-
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-        /* ===== ALUR JUMAT (FRIDAY FLOW) ===== */
-        .friday-flow {
-          position: relative;
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
-          gap: clamp(1.5rem, 4vw, 2.5rem);
-        }
-        /* Garis penghubung antar sesi di desktop */
-        @media (min-width: 761px) {
-          .friday-flow::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 45%;
-            right: 45%;
-            height: 2px;
-            background: linear-gradient(90deg, #3b82f6, var(--gold));
-            box-shadow: 0 0 12px rgba(22, 36, 58, 0.09);
-            z-index: 3;
-          }
-        }
-
-        .schedule-card {
-          position: relative;
-          border-radius: 20px;
-          padding: clamp(3rem, 7vw, 5rem) clamp(1.5rem, 4vw, 2rem);
-          text-align: center;
-          overflow: hidden;
-          background-color: var(--bg-surface);
-          border: 1px solid var(--border-light);
-          transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-                      box-shadow 0.45s ease, border-color 0.45s ease;
-        }
-        .schedule-card:hover {
-          transform: translateY(-8px);
-        }
-        .schedule-card.blue:hover {
-          box-shadow: 0 20px 40px -10px rgba(22, 36, 58, 0.09);
-          border-color: rgba(59, 130, 246, 0.4);
-        }
-        .schedule-card.goldcard:hover {
-          box-shadow: 0 20px 40px -10px rgba(22, 36, 58, 0.09);
-          border-color: rgba(232, 163, 61, 0.45);
-        }
-
-        .card-bg-img {
-          position: absolute;
-          top: 0; left: 0; width: 100%; height: 100%;
-          object-fit: cover;
-          z-index: 0;
-          transition: transform 0.6s ease;
-        }
-        .schedule-card:hover .card-bg-img {
-          transform: scale(1.05);
-        }
-
-        .schedule-overlay {
-          position: absolute;
-          top: 0; left: 0; right: 0; bottom: 0;
-          background: linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-surface) 100%);
-          z-index: 1;
-          transition: opacity 0.3s ease;
-        }
-        .schedule-card:hover .schedule-overlay {
-          background: linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-surface) 100%);
-        }
-
-        .schedule-content {
-          position: relative;
-          z-index: 2;
-        }
-        .schedule-content h2 {
-          font-family: "Playfair Display", serif;
-          font-size: clamp(1.8rem, 1.3rem + 2.6vw, 2.5rem);
-          font-weight: 800;
-          margin: 0 0 1rem;
-          color: var(--text-primary);
-        }
-        .schedule-content p {
-          color: var(--text-primary);
-          line-height: 1.8;
-          font-size: 1.02rem;
-          max-width: 46ch;
-          margin: 0 auto;
-        }
-
-        /* Penanda sesi (Sesi 1 / Sesi 2) */
-        .session-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          font-family: "DM Sans", sans-serif;
-          font-size: 0.68rem;
-          font-weight: 700;
-          letter-spacing: 3px;
-          text-transform: uppercase;
-          margin-bottom: 1rem;
-        }
-        .schedule-card.blue .session-badge { color: var(--accent-gold); }
-        .schedule-card.goldcard .session-badge { color: var(--gold-ink); }
-        .session-badge::before,
-        .session-badge::after {
-          content: '';
-          width: 18px;
-          height: 1.5px;
-          background: currentColor;
-          opacity: 0.6;
-        }
-
-        .schedule-time {
-          display: inline-block;
-          padding: 0.5rem 1.5rem;
-          border-radius: 30px;
-          font-weight: bold;
-          font-size: 1.05rem;
-          margin-bottom: 1.5rem;
-        }
-        .schedule-card.blue .schedule-time {
-          background-color: rgba(59, 130, 246, 0.2);
-          color: var(--accent-gold);
-          border: 1px solid rgba(59, 130, 246, 0.3);
-        }
-        .schedule-card.goldcard .schedule-time {
-          background-color: rgba(232, 163, 61, 0.14);
-          color: var(--gold-ink);
-          border: 1px solid rgba(232, 163, 61, 0.35);
-        }
-
-        /* ===== BAGIAN LOKASI DENGAN MAPS LANGSUNG ===== */
-        .location-section {
-          margin-top: clamp(2.5rem, 6vw, 4rem);
-          border-radius: 24px;
-          padding: clamp(1.5rem, 5vw, 3rem);
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: clamp(2rem, 5vw, 3rem);
-          align-items: center;
-        }
-
-        .map-container {
-          width: 100%;
-          height: 350px;
-          border-radius: 16px;
-          overflow: hidden;
-          box-shadow: 0 10px 30px -10px rgba(22, 36, 58, 0.09);
-          border: 1px solid var(--border-light);
-        }
-
-        .maps-btn {
-          background: linear-gradient(135deg, #1d4ed8, #3b82f6);
-          color: white;
-          min-height: 48px;
-          padding: 0.8rem 1.8rem;
-          border-radius: 30px;
-          text-decoration: none;
-          font-weight: bold;
-          display: inline-flex;
-          align-items: center;
-          gap: 0.5rem;
-          box-shadow: 0 8px 22px rgba(22, 36, 58, 0.09);
-          transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-                      box-shadow 0.35s ease;
-        }
-        .maps-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 14px 32px rgba(22, 36, 58, 0.09);
-        }
-
-        @media (max-width: 992px) {
-          .location-section {
-            grid-template-columns: 1fr;
-          }
-          .map-container { height: 300px; }
-        }
-
-        /* ===== CSS GALERI (DESKTOP) ===== */
-        .gallery-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
-          gap: 15px;
-          margin-top: 2rem;
-        }
-
-        .gallery-img-wrapper {
-          position: relative;
-          height: 200px;
-          border-radius: 12px;
-          overflow: hidden;
-          background-color: var(--bg-surface);
-          cursor: zoom-in;
-        }
-        .gallery-img-wrapper img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          transition: transform 0.5s ease;
-        }
-        .gallery-img-wrapper:hover img {
-          transform: scale(1.1);
-        }
-
-        .zoom-overlay {
-          position: absolute;
-          top: 0; left: 0; right: 0; bottom: 0;
-          background-color: rgba(15, 23, 42, 0.5);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          opacity: 0;
-          transition: opacity 0.3s ease;
-        }
-        .zoom-overlay span {
-          font-size: 2.5rem;
-          transform: scale(0.5);
-          transition: transform 0.3s ease;
-        }
-        .gallery-img-wrapper:hover .zoom-overlay {
-          opacity: 1;
-        }
-        .gallery-img-wrapper:hover .zoom-overlay span {
-          transform: scale(1);
-        }
-
-        /* ==================== RESPONSIVE KHUSUS ANDROID/MOBILE ==================== */
-        @media (max-width: 768px) {
-          /* 1. JADWAL JUMAT (FRIDAY FLOW) DIBUAT 2 KOLOM BERDAMPINGAN */
-          .friday-flow {
-            grid-template-columns: repeat(2, 1fr) !important;
-            gap: 0.5rem !important; /* Jarak dirapatkan */
-          }
-          .schedule-card {
-            padding: 1.5rem 0.5rem !important; /* Kurangi area kosong dalam kartu */
-            border-radius: 12px !important;
-          }
-          .session-badge {
-            font-size: 0.5rem !important;
-            letter-spacing: 1px !important;
-            gap: 4px !important;
-            margin-bottom: 0.5rem !important;
-          }
-          .session-badge::before, .session-badge::after {
-            width: 10px !important; /* Garis kecil penanda sesi diperpendek */
-          }
-          .schedule-content h2 {
-            font-size: 1.1rem !important;
-            margin-bottom: 0.5rem !important;
-          }
-          .schedule-time {
-            font-size: 0.75rem !important;
-            padding: 0.3rem 0.6rem !important;
-            margin-bottom: 0 !important;
-          }
-          .schedule-content p {
-            display: none !important; /* Sembunyikan paragraf agar 2 kolom tidak memanjang berantakan */
-          }
-
-          /* 2. GALERI DIBUAT 3 KOLOM BERDAMPINGAN */
-          .gallery-grid {
-             grid-template-columns: repeat(3, 1fr) !important;
-             gap: 0.35rem !important;
-             margin-top: 1rem !important;
-          }
-          .gallery-img-wrapper {
-            height: clamp(85px, 28vw, 120px) !important;
-            border-radius: 8px !important;
-          }
-          .zoom-overlay { display: none !important; }
-        }
-      `
-        }}
+      <PageHeader
+        eyebrow={id ? "Setiap Jumat" : "Every Friday"}
+        title="M-YES Friday"
+        subtitle={id ? "Akhiri pekanmu dengan bertumbuh bersama kami setiap hari Jumat melalui pembelajaran bahasa Inggris interaktif dan persekutuan rohani yang hangat." : "Wrap up your week and grow with us every Friday through interactive English learning and warm spiritual fellowship."}
       />
 
-      {/* HEADER REBRANDING */}
-      <header className="ph2">
-        <div className="ph2-inner">
-          <span className="ph2-watermark" aria-hidden="true">
-            Friday
-          </span>
-          <div className="ph2-overline">
-            <span className="live-dot" />
-            {lang === "id" ? "Setiap Jumat" : "Every Friday"}
-          </div>
-          <h1 className="ph2-title">
-            M-YES <em>Friday</em>
-          </h1>
-          <p className="ph2-sub">
-            {lang === "id"
-              ? "Akhiri pekanmu dengan bertumbuh bersama kami setiap hari Jumat melalui pembelajaran bahasa Inggris interaktif dan persekutuan rohani yang hangat."
-              : "Wrap up your week and grow with us every Friday through interactive English learning and warm spiritual fellowship."}
-          </p>
-          <div className="ph2-rule">
-            <i />
-            <i />
-          </div>
-        </div>
-      </header>
-
-      {/* 1. BAGIAN JADWAL & LOKASI */}
       <section className="section">
-        <div className="container" style={{ maxWidth: "1000px" }}>
-          {/* Kartu Jadwal — Alur Jumat */}
-          <div className="friday-flow">
-            <div className="schedule-card blue">
-              <img src="learn-img.jpeg" className="card-bg-img" alt="" />
-              <div className="schedule-overlay" />
-              <div className="schedule-content">
-                <span className="session-badge">
-                  {lang === "id" ? "Sesi Pertama" : "First Session"}
-                </span>
-                <h2>English Learning</h2>
-                <div className="schedule-time">17:30 - 18:30 WITA</div>
-                <p>
-                  {lang === "id"
-                    ? "Sesi interaktif dan menyenangkan untuk mengasah kemampuan tata bahasa, kosakata, dan percakapan bahasa Inggris Anda."
-                    : "An interactive and fun session to sharpen your English grammar, vocabulary, and conversation skills."}
-                </p>
-              </div>
-            </div>
-
-            <div className="schedule-card goldcard">
-              <img src="worship-img.jpeg" className="card-bg-img" alt="" />
-              <div className="schedule-overlay" />
-              <div className="schedule-content">
-                <span className="session-badge">
-                  {lang === "id" ? "Sesi Kedua" : "Second Session"}
-                </span>
-                <h2>Worship Together</h2>
-                <div className="schedule-time">18:30 - Selesai</div>
-                <p>
-                  {lang === "id"
-                    ? "Waktu yang intim untuk memuji, menyembah, dan mendengarkan kebenaran Firman Tuhan bersama komunitas."
-                    : "An intimate time to praise, worship, and listen to the truth of God's Word together with the community."}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div> {/* <-- PENUTUP DIV CONTAINER DITAMBAHKAN DI SINI */}
-      </section> {/* <-- PENUTUP SECTION DITAMBAHKAN DI SINI */}
-
-
-      {/* 2. BAGIAN GALERI KEGIATAN MINGGUAN */}
-      <section className="section section-alt">
-        <div className="container">
-          <div className="vh-heading">
-            <span className="bar" />
-            <div>
-              <span className="overline">
-                {lang === "id" ? "Momen Kami" : "Our Moments"}
+        <div className="container-x">
+          <ol className="grid gap-5 md:grid-cols-2">
+            {sessions.map((s, i) => {
+              const items = schedule.filter((a) => a.type === s.type);
+              return (
+                <Reveal as="li" key={s.type} delay={i * 100} className="card card-hover flex flex-col overflow-hidden">
+                  <div className="relative aspect-[16/9] bg-line">
+                    <SmartImage src={s.type === "learning" ? "/learn-img.jpeg" : "/worship-img.jpeg"} alt="" fill sizes="(min-width:768px) 560px, 100vw" className="object-cover" />
+                    <span className="absolute left-3 top-3 rounded-full bg-surface/95 px-3 py-1 text-xs font-bold text-primary-strong shadow-card">{id ? ["Sesi Pertama", "Sesi Kedua"][i] : ["First Session", "Second Session"][i]}</span>
+                  </div>
+                  <div className="flex-1 p-5 sm:p-6">
+                    <p className="inline-flex items-center gap-2 text-sm font-semibold text-primary-strong">
+                      <Icon name="clock" size={16} /> {rangeOf(items) || s.time} WITA
+                    </p>
+                    <h2 className="mt-2 flex items-center gap-2 text-2xl font-extrabold">
+                      <Icon name={s.type === "learning" ? "book" : "heart"} className="text-primary" /> {s[lang]}
+                    </h2>
+                    <p className="mt-2 leading-relaxed text-ink-muted">{s.desc[lang]}</p>
+                    {items.length > 0 && (
+                      <ol className="mt-5 space-y-0 border-t border-line pt-4">
+                        {items.map((a) => (
+                          <li key={a.id} className="relative flex gap-3 pb-4 pl-5 last:pb-0 before:absolute before:left-[5px] before:top-2 before:h-full before:w-px before:bg-line last:before:hidden">
+                            <span aria-hidden className="absolute left-0 top-1.5 h-[11px] w-[11px] rounded-full border-2 border-primary bg-surface" />
+                            <div className="min-w-0">
+                              <p className="text-xs font-bold tabular-nums text-primary-strong">{a.time}</p>
+                              <p className="font-semibold">{t(a, "activity", lang)}</p>
+                              {t(a, "description", lang) && <p className="text-sm text-ink-muted">{t(a, "description", lang)}</p>}
+                            </div>
+                          </li>
+                        ))}
+                      </ol>
+                    )}
+                  </div>
+                </Reveal>
+              );
+            })}
+          </ol>
+          <Reveal className="mt-5 flex flex-col gap-3 rounded-2xl border border-line bg-surface p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+            <p className="flex items-start gap-3 text-sm text-ink-muted">
+              <Icon name="pin" className="mt-0.5 shrink-0 text-primary" />
+              <span>
+                <strong className="text-ink">M-YES Basecamp</strong> — {site.contact.address}
               </span>
-              <h2>
-                {lang === "id" ? "Galeri Kegiatan" : "Activities Gallery"}
-              </h2>
-            </div>
-          </div>
+            </p>
+            <a href={site.contact.mapUrl} target="_blank" rel="noopener noreferrer" className="btn-outline btn-sm shrink-0">
+              <Icon name="external" size={16} /> Google Maps
+            </a>
+          </Reveal>
+        </div>
+      </section>
 
+      <section className="section border-t border-line bg-surface">
+        <div className="container-x">
+          <SectionHeading eyebrow={id ? "Momen Kami" : "Our Moments"} title={id ? "Galeri Kegiatan" : "Activities Gallery"} />
           <WeeklyGallery galleries={galleries} lang={lang} />
         </div>
       </section>

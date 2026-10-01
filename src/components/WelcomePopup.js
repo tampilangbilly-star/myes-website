@@ -1,320 +1,128 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import clsx from "clsx";
+import SmartImage from "./SmartImage";
+import Icon from "./Icon";
 
-export default function WelcomePopup({ news, missions, cares, lang }) {
-  const [isOpen, setIsOpen] = useState(true);
-  const [currentIndex, setCurrentIndex] = useState(0);
+const SEEN_KEY = "myes-popup-seen";
 
-  // Rasio asli tiap gambar (lebar / tinggi), diisi saat gambar selesai dimuat.
-  const [ratios, setRatios] = useState({});
+/**
+ * Popup sambutan: berita, M-YES Care, dan mission trip terbaru (yang punya gambar).
+ * Muncul sekali per sesi browser. HP: bottom sheet; desktop: modal di tengah.
+ */
+export default function WelcomePopup({ news = [], missions = [], cares = [], lang = "en" }) {
+  const id = lang === "id";
+  const items = [];
+  const latestNews = news.find((n) => n.image);
+  if (latestNews)
+    items.push({ key: "news-" + latestNews.id, image: latestNews.image, title: (id && latestNews.titleId) || latestNews.titleEn, tag: id ? latestNews.tagId || "Berita Terbaru" : latestNews.tagEn || "Latest News", href: "/news", cta: id ? "Lihat Detail Berita" : "View News Details" });
+  const latestCare = cares.find((c) => c.media?.some((m) => m.type === "IMAGE"));
+  if (latestCare)
+    items.push({ key: "care-" + latestCare.id, image: latestCare.media.find((m) => m.type === "IMAGE").url, title: (id && latestCare.titleId) || latestCare.titleEn, tag: id ? "Aksi Nyata" : "M-YES Care", href: "/care", cta: id ? "Lihat M-YES Care" : "View M-YES Care" });
+  const latestMission = missions.find((m) => m.image);
+  if (latestMission)
+    items.push({ key: "mission-" + latestMission.id, image: latestMission.image, title: (id && latestMission.titleId) || latestMission.titleEn, tag: id ? "Perjalanan Misi" : "Mission Trip", href: "/mission", cta: id ? "Masuk ke Mission Trip" : "Enter Mission Trip" });
 
-  // 1. Ambil SATU berita terbaru (yang memiliki gambar)
-  const latestNews = news?.find((n) => n.image);
-
-  // 2. Ambil SATU misi terbaru (yang memiliki gambar)
-  const latestMission = missions?.find((m) => m.image);
-
-  // 3. Ambil SATU M-YES Care terbaru (yang memiliki media tipe IMAGE)
-  const latestCare = cares?.find((c) => c.media?.some((m) => m.type === "IMAGE"));
-
-  // 4. Gabungkan ketiganya ke dalam satu array untuk slider dengan URUTAN BARU
-  const popupItems = [];
-
-  // Urutan 1: NEWS
-  if (latestNews) {
-    popupItems.push({
-      id: "news-" + latestNews.id,
-      image: latestNews.image,
-      titleId: latestNews.titleId || latestNews.titleEn,
-      titleEn: latestNews.titleEn,
-      tagId: latestNews.tagId || "Berita Terbaru",
-      tagEn: latestNews.tagEn || "Latest News",
-      link: "/news", 
-      btnId: "Lihat Detail Berita",
-      btnEn: "View News Details",
-    });
-  }
-
-  // Urutan 2: M-YES CARE (Ditukar posisinya ke urutan kedua)
-  if (latestCare) {
-    const careImage = latestCare.media.find((m) => m.type === "IMAGE")?.url;
-    if (careImage) {
-      popupItems.push({
-        id: "care-" + latestCare.id,
-        image: careImage,
-        titleId: latestCare.titleId || latestCare.titleEn,
-        titleEn: latestCare.titleEn,
-        tagId: "Aksi Nyata",
-        tagEn: "M-YES Care",
-        link: "/care",
-        btnId: "Lihat M-YES Care",
-        btnEn: "View M-YES Care",
-      });
-    }
-  }
-
-  // Urutan 3: MISSIONS (Ditukar posisinya ke urutan terakhir)
-  if (latestMission) {
-    popupItems.push({
-      id: "mission-" + latestMission.id,
-      image: latestMission.image,
-      titleId: latestMission.titleId || latestMission.titleEn,
-      titleEn: latestMission.titleEn,
-      tagId: "Perjalanan Misi",
-      tagEn: "Mission Trip",
-      link: "/mission", 
-      btnId: "Masuk ke Mission Trip",
-      btnEn: "Enter Mission Trip",
-    });
-  }
+  const [open, setOpen] = useState(false);
+  const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const closeRef = useRef(null);
+  const count = items.length;
 
   useEffect(() => {
-    if (!isOpen || popupItems.length <= 1) return;
+    if (!count) return;
+    let seen = false;
+    try {
+      seen = sessionStorage.getItem(SEEN_KEY) === "1";
+    } catch {}
+    if (seen) return;
+    const t = setTimeout(() => setOpen(true), 1200);
+    return () => clearTimeout(t);
+  }, [count]);
 
-    // Ganti gambar otomatis setiap 5 detik
-    const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % popupItems.length);
-    }, 5000);
+  const close = useCallback(() => {
+    setOpen(false);
+    try {
+      sessionStorage.setItem(SEEN_KEY, "1");
+    } catch {}
+  }, []);
 
-    return () => clearInterval(timer);
-  }, [isOpen, popupItems.length]);
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e) => e.key === "Escape" && close();
+    window.addEventListener("keydown", onKey);
+    const f = requestAnimationFrame(() => closeRef.current?.focus());
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+      cancelAnimationFrame(f);
+    };
+  }, [open, close]);
 
-  if (!isOpen || popupItems.length === 0) return null;
+  useEffect(() => {
+    if (!open || count < 2 || paused) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const t = setInterval(() => setIndex((i) => (i + 1) % count), 5000);
+    return () => clearInterval(t);
+  }, [open, count, paused]);
 
-  const currentItem = popupItems[currentIndex];
-
-  const tTitle = lang === "id" ? currentItem.titleId : currentItem.titleEn;
-  const tTag = lang === "id" ? currentItem.tagId : currentItem.tagEn;
-  const tBtnText = lang === "id" ? currentItem.btnId : currentItem.btnEn;
-
-  const rasioAktif = ratios[currentItem.id] || 4 / 5;
-
-  const catatRasio = (id) => (e) => {
-    const { naturalWidth: w, naturalHeight: h } = e.currentTarget;
-    if (!w || !h) return;
-    setRatios((prev) => (prev[id] ? prev : { ...prev, [id]: w / h }));
-  };
+  if (!open || !count) return null;
+  const item = items[index % count];
 
   return (
-    <div className="welcome-popup-overlay">
-      <div className="welcome-popup-modal">
-        <button className="welcome-close-btn" onClick={() => setIsOpen(false)}>
-          ✕
-        </button>
+    <div className="fixed inset-0 z-[70] flex items-end justify-center sm:items-center sm:p-6" role="dialog" aria-modal="true" aria-labelledby="welcome-title">
+      <button type="button" aria-label={id ? "Tutup" : "Close"} tabIndex={-1} onClick={close} className="animate-fade-in absolute inset-0 cursor-default bg-ink/55 backdrop-blur-sm" />
+      <div
+        className="animate-sheet-up relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-3xl bg-surface shadow-lift sm:max-w-md sm:animate-fade-up sm:rounded-3xl"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+        onTouchStart={() => setPaused(true)}
+      >
+        {/* Pegangan bottom sheet (HP) */}
+        <div aria-hidden className="mx-auto mt-2.5 h-1.5 w-10 shrink-0 rounded-full bg-ink/15 sm:hidden" />
 
-        <div className="welcome-image-container" style={{ aspectRatio: rasioAktif }}>
-          {popupItems.map((item, idx) => (
-            <div
-              key={item.id}
-              className={`welcome-slide ${idx === currentIndex ? "active" : ""}`}
-            >
-              <img src={item.image} alt="" aria-hidden="true" className="welcome-image-blur" />
-              <img
-                src={item.image}
-                alt={item.titleEn}
-                className="welcome-image"
-                onLoad={catatRasio(item.id)}
-              />
-            </div>
-          ))}
-
-          <span className="welcome-tag">{tTag}</span>
+        <div className="flex items-center justify-between gap-3 px-5 pb-2 pt-3 sm:pt-5">
+          <p className="text-sm font-semibold text-ink-muted">{id ? "Selamat datang di M-YES 👋" : "Welcome to M-YES 👋"}</p>
+          <button ref={closeRef} type="button" onClick={close} className="icon-btn -mr-2" aria-label={id ? "Tutup" : "Close"}>
+            <Icon name="close" />
+          </button>
         </div>
 
-        <div className="welcome-content">
-          <h3>{tTitle}</h3>
+        <div className="relative mx-5 aspect-[4/5] max-h-[52dvh] shrink overflow-hidden rounded-2xl bg-bg">
+          {items.map((it, i) => (
+            <div key={it.key} className={clsx("absolute inset-0 transition-opacity duration-500", i === index ? "opacity-100" : "opacity-0")} aria-hidden={i !== index}>
+              <SmartImage src={it.image} alt={i === index ? it.title : ""} fill sizes="(min-width:640px) 420px, 92vw" className="object-contain" />
+            </div>
+          ))}
+          <span className="absolute left-3 top-3 rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-ink shadow-card">{item.tag}</span>
+        </div>
 
-          {popupItems.length > 1 && (
-            <div className="welcome-dots">
-              {popupItems.map((_, idx) => (
-                <span
-                  key={idx}
-                  className={`welcome-dot ${idx === currentIndex ? "active" : ""}`}
-                  onClick={() => setCurrentIndex(idx)}
-                />
+        <div className="px-5 pb-[max(20px,env(safe-area-inset-bottom))] pt-4">
+          <h2 id="welcome-title" key={item.key} className="animate-fade-up line-clamp-2 text-xl font-bold leading-snug">
+            {item.title}
+          </h2>
+          {count > 1 && (
+            <div className="mt-2 flex items-center" role="tablist" aria-label={id ? "Pilih info" : "Choose item"}>
+              {items.map((it, i) => (
+                <button key={it.key} type="button" role="tab" aria-selected={i === index} aria-label={it.tag} onClick={() => setIndex(i)} className="flex h-9 w-6 items-center justify-center">
+                  <span className={clsx("block h-1.5 rounded-full transition-all", i === index ? "w-5 bg-primary" : "w-1.5 bg-ink/20")} />
+                </button>
               ))}
             </div>
           )}
-
-          <div className="welcome-action">
-            <Link href={currentItem.link} className="welcome-btn" onClick={() => setIsOpen(false)}>
-              {tBtnText}
+          <div className="mt-3 grid grid-cols-[1fr_auto] gap-2">
+            <Link href={item.href} onClick={close} className="btn-primary">
+              {item.cta} <Icon name="arrow-right" size={18} />
             </Link>
+            <button type="button" onClick={close} className="btn-ghost">
+              {id ? "Nanti saja" : "Later"}
+            </button>
           </div>
         </div>
       </div>
-
-      <style dangerouslySetInnerHTML={{ __html: `
-        .welcome-popup-overlay {
-          position: fixed;
-          inset: 0;
-          background: rgba(3, 8, 18, 0.85);
-          backdrop-filter: blur(8px);
-          z-index: 99999;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 1rem;
-          animation: fadeIn 0.4s ease-out forwards;
-        }
-
-        .welcome-popup-modal {
-          background: var(--bg-surface);
-          width: 100%;
-          max-width: 480px;
-          max-height: 92vh;          
-          overflow-y: auto;          
-          -webkit-overflow-scrolling: touch;
-          border-radius: 20px;
-          position: relative;
-          box-shadow: 0 25px 50px -12px rgba(22, 36, 58, 0.09);
-          border: 1px solid var(--border-light);
-          transform: translateY(20px);
-          animation: slideUp 0.5s ease-out forwards;
-        }
-
-        .welcome-close-btn {
-          position: absolute;
-          top: 15px;
-          right: 15px;
-          width: 36px;
-          height: 36px;
-          border-radius: 50%;
-          background: rgba(0, 0, 0, 0.6);
-          color: white;
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 1.2rem;
-          cursor: pointer;
-          z-index: 10;
-          transition: background 0.3s;
-        }
-        .welcome-close-btn:hover {
-          background: #ef4444;
-        }
-
-        .welcome-image-container {
-          position: relative;
-          width: 100%;
-          min-height: 200px;
-          max-height: 62vh;
-          background: var(--bg-surface);
-          overflow: hidden;
-          border-radius: 20px 20px 0 0;
-          transition: aspect-ratio 0.45s ease;
-        }
-
-        .welcome-slide {
-          position: absolute;
-          inset: 0;
-          opacity: 0;
-          transition: opacity 0.8s ease-in-out;
-        }
-        .welcome-slide.active {
-          opacity: 1;
-        }
-
-        .welcome-image {
-          position: absolute;
-          inset: 0;
-          width: 100%;
-          height: 100%;
-          object-fit: contain;   
-          z-index: 1;
-        }
-
-        .welcome-image-blur {
-          position: absolute;
-          inset: 0;
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          filter: blur(26px) brightness(0.5) saturate(130%);
-          transform: scale(1.2);
-          z-index: 0;
-        }
-
-        .welcome-tag {
-          position: absolute;
-          bottom: 15px;
-          left: 15px;
-          background: linear-gradient(135deg, #1d4ed8, #3b82f6);
-          color: white;
-          padding: 6px 14px;
-          border-radius: 99px;
-          font-size: 0.85rem;
-          font-weight: bold;
-          letter-spacing: 0.5px;
-          z-index: 3;
-          box-shadow: 0 4px 10px rgba(22, 36, 58, 0.09);
-        }
-
-        .welcome-content {
-          padding: 1.5rem;
-          text-align: center;
-        }
-
-        .welcome-content h3 {
-          margin: 0 0 1rem 0;
-          color: var(--text-primary);
-          font-size: 1.3rem;
-          line-height: 1.4;
-        }
-
-        .welcome-dots {
-          display: flex;
-          justify-content: center;
-          gap: 8px;
-          margin-bottom: 1.5rem;
-        }
-        .welcome-dot {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          background: var(--bg-soft);
-          cursor: pointer;
-          transition: all 0.3s ease;
-        }
-        .welcome-dot.active {
-          background: #3b82f6;
-          width: 24px;
-          border-radius: 99px;
-        }
-
-        .welcome-btn {
-          display: block;
-          width: 100%;
-          padding: 12px;
-          background: var(--bg-soft);
-          color: #fff;
-          border: 1px solid var(--border-light);
-          border-radius: 12px;
-          text-decoration: none;
-          font-weight: bold;
-          transition: all 0.3s;
-        }
-        .welcome-btn:hover {
-          background: #fff;
-          color: #0f172a;
-        }
-
-        @media (max-height: 700px) {
-          .welcome-image-container { max-height: 52vh; }
-          .welcome-content { padding: 1.1rem; }
-          .welcome-content h3 { font-size: 1.15rem; margin-bottom: 0.75rem; }
-          .welcome-dots { margin-bottom: 1rem; }
-        }
-
-        @keyframes fadeIn {
-          to { opacity: 1; }
-        }
-        @keyframes slideUp {
-          to { transform: translateY(0); }
-        }
-      `}} />
     </div>
   );
 }

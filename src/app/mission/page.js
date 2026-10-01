@@ -1,212 +1,73 @@
 import prisma from "@/lib/prisma";
-import { cookies } from "next/headers";
-import MissionCarousel from "@/components/MissionCarousel"; // Memanggil slider yang baru dibuat
+import { getLang, t } from "@/lib/helpers";
+import { safe } from "@/lib/data";
+import { pageMeta } from "@/lib/seo";
+import PageHeader from "@/components/PageHeader";
+import Reveal from "@/components/Reveal";
+import MissionCarousel from "@/components/MissionCarousel";
+import EmptyState from "@/components/EmptyState";
+import Icon from "@/components/Icon";
 
-export const dynamic = "force-dynamic";
+export const metadata = pageMeta("Mission Trip", "Reaching out beyond Manado — stories and photos from M-YES mission trips.", "/mission");
 
 export default async function MissionPage() {
-  const cookieStore = cookies();
-  const lang = cookieStore.get("lang")?.value || "en";
+  const lang = await getLang();
+  const id = lang === "id";
+  const rows = await safe(prisma.mission.findMany({ where: { isActive: true }, orderBy: [{ sortOrder: "asc" }, { id: "asc" }] }));
 
-  const rawItems = await prisma.mission.findMany({
-    where: { isActive: true },
-    orderBy: { sortOrder: "asc" },
-  });
-
-  const t = (item, f) =>
-    lang === "id" ? item[f + "Id"] || item[f + "En"] : item[f + "En"];
-
-  // ========================================================
-  // LOGIKA SMART GROUPING
-  // Mengelompokkan gambar berdasarkan Judul (Title) yang sama
-  // ========================================================
-  const groupedMissions = [];
-
-  rawItems.forEach((m) => {
-    const groupTitle = t(m, "title");
-
-    // Cek apakah judul lokasi ini sudah ada di dalam grup
-    let group = groupedMissions.find((g) => g.title === groupTitle);
-
-    // Jika belum ada, buat grup baru
-    if (!group) {
-      group = {
-        id: m.id,
-        title: groupTitle,
-        description: t(m, "description"),
-        dateLabel: t(m, "dateLabel"),
-        images: [],
-      };
-      groupedMissions.push(group);
+  // Baris dengan judul yang sama digabung menjadi satu perjalanan dengan banyak foto (seperti sebelumnya)
+  const groups = [];
+  for (const m of rows) {
+    const title = t(m, "title", lang);
+    let g = groups.find((x) => x.title === title);
+    if (!g) {
+      g = { id: m.id, title, description: t(m, "description", lang), dateLabel: t(m, "dateLabel", lang), images: [] };
+      groups.push(g);
     }
-
-    // Masukkan gambar ke dalam grup tersebut
-    if (m.image) {
-      group.images.push(m.image);
-    }
-  });
+    if (!g.description) g.description = t(m, "description", lang);
+    if (!g.dateLabel) g.dateLabel = t(m, "dateLabel", lang);
+    if (m.image) g.images.push(m.image);
+  }
 
   return (
     <>
-
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-        /* ===== TIMELINE MISI GENERASI BARU ===== */
-        .mt-timeline {
-          position: relative;
-          padding-left: clamp(2rem, 6vw, 3.25rem);
-        }
-        /* Garis vertikal bercahaya biru → emas */
-        .mt-timeline::before {
-          content: '';
-          position: absolute;
-          left: clamp(0.6rem, 2vw, 1.1rem);
-          top: 6px;
-          bottom: 6px;
-          width: 2px;
-          border-radius: 99px;
-          background: linear-gradient(180deg, #60a5fa, #1d4ed8 45%, var(--gold) 100%);
-          box-shadow: 0 0 16px rgba(22, 36, 58, 0.09);
-        }
-
-        .mt-item {
-          position: relative;
-          margin-bottom: clamp(2.5rem, 6vw, 4.5rem);
-          padding: clamp(1.5rem, 4.5vw, 2.5rem);
-        }
-        .mt-item:last-child { margin-bottom: 0; }
-
-        /* Titik penanda di garis */
-        .mt-item::after {
-          content: '';
-          position: absolute;
-          top: clamp(1.9rem, 4vw, 2.6rem);
-          left: calc(clamp(2rem, 6vw, 3.25rem) * -1 + clamp(0.6rem, 2vw, 1.1rem) - 6px);
-          width: 14px;
-          height: 14px;
-          border-radius: 50%;
-          background: #60a5fa;
-          border: 3px solid var(--bg-base);
-          box-shadow: 0 0 16px rgba(22, 36, 58, 0.09);
-          transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-                      background 0.4s ease, box-shadow 0.4s ease;
-        }
-        .mt-item:hover::after {
-          background: var(--gold-light);
-          box-shadow: 0 0 22px var(--gold-glow), 0 0 40px rgba(22, 36, 58, 0.09);
-          transform: scale(1.25);
-        }
-        .mt-item:hover {
-          transform: translateY(-6px) translateX(6px);
-        }
-
-        .mt-date {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          color: var(--accent-gold);
-          background: rgba(37, 99, 235, 0.14);
-          border: 1px solid rgba(96, 165, 250, 0.35);
-          padding: 6px 16px;
-          border-radius: 99px;
-          font-family: "DM Sans", sans-serif;
-          font-size: 0.78rem;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 2px;
-          margin-bottom: 1.1rem;
-        }
-        .mt-date::before {
-          content: '';
-          width: 7px;
-          height: 7px;
-          border-radius: 50%;
-          background: #60a5fa;
-          box-shadow: 0 0 8px rgba(22, 36, 58, 0.09);
-        }
-
-        .mt-item h3 {
-          font-family: "Playfair Display", serif;
-          font-size: clamp(1.55rem, 1.2rem + 2vw, 2.1rem);
-          color: var(--text-primary);
-          margin: 0 0 0.9rem;
-          font-weight: 800;
-          line-height: 1.2;
-        }
-
-        .mt-item p {
-          color: var(--text-secondary);
-          line-height: 1.8;
-          font-size: 1.02rem;
-          margin: 0;
-        }
-      `,
-        }}
+      <PageHeader
+        eyebrow={id ? "Menjangkau" : "Reaching Out"}
+        title={id ? "Misi Perjalanan" : "Mission Trip"}
+        subtitle={id ? "Membawa kasih Kristus dan semangat belajar ke tempat-tempat baru." : "Bringing the love of Christ and a passion for learning to new places."}
       />
-
-      <header className="ph2">
-        <div className="ph2-inner">
-          <span className="ph2-watermark" aria-hidden="true">
-            Mission
-          </span>
-          <div className="ph2-overline">
-            <span className="live-dot" />
-            {lang === "id" ? "Menjangkau" : "Reaching Out"}
-          </div>
-          <h1 className="ph2-title">
-            {lang === "id" ? (
-              <>
-                Misi <em>Perjalanan</em>
-              </>
-            ) : (
-              <>
-                Mission <em>Trip</em>
-              </>
-            )}
-          </h1>
-          <div className="ph2-rule">
-            <i />
-            <i />
-          </div>
-        </div>
-      </header>
-
-      <section className="section section-dark" style={{ minHeight: "60vh" }}>
-        <div
-          className="container"
-          style={{ maxWidth: "800px", margin: "0 auto" }}
-        >
-          <div className="mt-timeline">
-            {groupedMissions.length > 0 ? (
-              groupedMissions.map((group) => (
-                <div key={group.id} className="panel mt-item">
-                  <div className="mt-date">{group.dateLabel}</div>
-
-                  <h3>{group.title}</h3>
-
-                  <p>{group.description}</p>
-
-                  {/* Memanggil komponen Slider otomatis dengan mengirim kumpulan gambar */}
-                  <MissionCarousel images={group.images} />
-                </div>
-              ))
-            ) : (
-              <div
-                style={{
-                  textAlign: "center",
-                  color: "#64748b",
-                  padding: "5rem 0",
-                }}
-              >
-                <h2>
-                  {lang === "id"
-                    ? "Belum ada catatan perjalanan."
-                    : "No mission trips recorded yet."}
-                </h2>
-              </div>
-            )}
-          </div>
+      <section className="section">
+        <div className="container-x">
+          {groups.length ? (
+            <ol className="relative space-y-8 border-l-2 border-primary/20 pl-5 sm:space-y-12 sm:pl-10">
+              {groups.map((g, i) => (
+                <Reveal as="li" key={g.id} className="relative">
+                  <span aria-hidden className="absolute -left-[31px] top-6 flex h-5 w-5 items-center justify-center rounded-full bg-primary ring-4 ring-bg sm:-left-[51px]">
+                    <span className="h-1.5 w-1.5 rounded-full bg-white" />
+                  </span>
+                  <article className={`card grid gap-5 overflow-hidden p-4 sm:p-6 ${g.images.length ? "lg:grid-cols-2 lg:items-center" : ""}`}>
+                    {g.images.length > 0 && <MissionCarousel images={g.images} title={g.title} />}
+                    <div className={i % 2 && g.images.length ? "lg:order-first" : ""}>
+                      {g.dateLabel && (
+                        <p className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-3 py-1 text-xs font-bold text-primary-strong">
+                          <Icon name="calendar" size={14} /> {g.dateLabel}
+                        </p>
+                      )}
+                      <h2 className="mt-3 text-2xl font-extrabold leading-tight sm:text-3xl">{g.title}</h2>
+                      {g.description && <p className="mt-3 whitespace-pre-line leading-relaxed text-ink-muted">{g.description}</p>}
+                      {g.images.length > 1 && (
+                        <p className="mt-4 inline-flex items-center gap-1.5 text-sm text-ink-soft">
+                          <Icon name="camera" size={16} /> {g.images.length} {id ? "foto" : "photos"}
+                        </p>
+                      )}
+                    </div>
+                  </article>
+                </Reveal>
+              ))}
+            </ol>
+          ) : (
+            <EmptyState icon="plane" title={id ? "Belum ada catatan perjalanan." : "No mission trips recorded yet."} />
+          )}
         </div>
       </section>
     </>

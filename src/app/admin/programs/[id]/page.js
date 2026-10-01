@@ -1,27 +1,24 @@
-import prisma from '@/lib/prisma';
-import AdminForm from '@/components/AdminForm';
+import { notFound } from "next/navigation";
+import prisma from "@/lib/prisma";
+import { parseId } from "@/lib/api-auth";
+import ResourceForm from "@/components/admin/ResourceForm";
+import { AdminTitle } from "@/components/admin/ResourceList";
+import { RESOURCES } from "@/components/admin/resources";
 
-const fields = [
-  { name: 'titleEn', label: 'Title (EN) *', required: true }, 
-  { name: 'titleId', label: 'Title (ID)' },
-  { name: 'emoji', label: 'Emoji Icon' }, 
-  { name: 'sortOrder', label: 'Sort Order', type: 'number' },
-  { name: 'descriptionEn', label: 'Description (EN)', type: 'textarea' }, 
-  { name: 'descriptionId', label: 'Description (ID)', type: 'textarea' },
-  // Ubah field image untuk menangani multiple array ("images")
-  { name: 'images', label: 'Images (Pilih lebih dari 1)', type: 'file', multiple: true }, 
-  { name: 'isActive', label: 'Active', type: 'checkbox' },
-];
+export const metadata = { title: "Ubah" };
 
-export default async function EditProgram({ params }) {
-  const item = await prisma.program.findUnique({ where: { id: parseInt(params.id) } });
+export default async function Page({ params }) {
+  const id = parseId((await params).id);
+  if (!id) notFound();
+  const item = await prisma.program.findUnique({ where: { id } });
+  if (!item) notFound();
+  const cfg = RESOURCES.programs;
   return (
-    <AdminForm 
-      title="Edit Program" 
-      apiUrl="/api/programs" 
-      redirectUrl="/admin/programs" 
-      fields={fields} 
-      initialData={JSON.parse(JSON.stringify(item))} 
-    />
+    <>
+      <AdminTitle title={`Ubah ${cfg.singular}`} subtitle={cfg.primary(item)} back={{ href: cfg.base, label: cfg.title }} />
+      <div className="card p-4 sm:p-6">
+        <ResourceForm resource="programs" item={item} />
+      </div>
+    </>
   );
 }

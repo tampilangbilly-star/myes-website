@@ -1,35 +1,31 @@
-'use client';
-import { useState } from 'react';
-import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { Suspense } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import LoginForm from "./LoginForm";
+
+export const metadata = { title: "Login" };
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const router = useRouter();
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const res = await signIn('credentials', { email, password, redirect: false });
-    if (res?.error) { setError('Invalid credentials!'); }
-    else { router.push('/admin'); }
-  };
-
   return (
-    <div className="login-page">
-      <div className="login-box">
-        <div className="login-logo">
-          <div className="login-logo-icon">M-Y</div>
-          <h2>M-YES Admin</h2>
-          <p>Dashboard Management Panel</p>
+    <div className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-bg px-4 py-10">
+      <div aria-hidden className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-primary/15 blur-3xl" />
+      <div aria-hidden className="pointer-events-none absolute -bottom-24 -left-24 h-80 w-80 rounded-full bg-gold/15 blur-3xl" />
+      <div className="relative w-full max-w-sm">
+        <div className="mb-6 text-center">
+          <Image src="/logo-myes.png" alt="Logo M-YES" width={72} height={72} priority className="mx-auto h-16 w-16" />
+          <h1 className="mt-4 text-2xl font-extrabold">M-YES Admin</h1>
+          <p className="mt-1 text-sm text-ink-muted">Masuk untuk mengelola konten website</p>
         </div>
-        {error && <div className="login-error">{error}</div>}
-        <form onSubmit={handleSubmit}>
-          <div className="login-field"><label>Email</label><input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="admin@myes.com" required /></div>
-          <div className="login-field"><label>Password</label><input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter password" required /></div>
-          <button type="submit" className="login-btn">Sign In</button>
-        </form>
+        <div className="card p-5 sm:p-7">
+          <Suspense fallback={<div className="skeleton h-64" />}>
+            <LoginForm />
+          </Suspense>
+        </div>
+        <p className="mt-6 text-center text-sm">
+          <Link href="/" className="font-semibold text-ink-muted hover:text-primary">
+            ← Kembali ke website
+          </Link>
+        </p>
       </div>
     </div>
   );

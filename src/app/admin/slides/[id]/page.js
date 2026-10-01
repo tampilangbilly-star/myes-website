@@ -1,7 +1,24 @@
-import prisma from '@/lib/prisma';
-import SlideForm from '@/components/SlideForm';
-export default async function EditSlide({ params }) {
-  const slide = await prisma.slide.findUnique({ where: { id: parseInt(params.id) } });
-  if (!slide) return <p>Slide not found</p>;
-  return <><h2 style={{color:'#fff',marginBottom:'1rem'}}>Edit Slide</h2><SlideForm initialData={JSON.parse(JSON.stringify(slide))} /></>;
+import { notFound } from "next/navigation";
+import prisma from "@/lib/prisma";
+import { parseId } from "@/lib/api-auth";
+import ResourceForm from "@/components/admin/ResourceForm";
+import { AdminTitle } from "@/components/admin/ResourceList";
+import { RESOURCES } from "@/components/admin/resources";
+
+export const metadata = { title: "Ubah" };
+
+export default async function Page({ params }) {
+  const id = parseId((await params).id);
+  if (!id) notFound();
+  const item = await prisma.slide.findUnique({ where: { id } });
+  if (!item) notFound();
+  const cfg = RESOURCES.slides;
+  return (
+    <>
+      <AdminTitle title={`Ubah ${cfg.singular}`} subtitle={cfg.primary(item)} back={{ href: cfg.base, label: cfg.title }} />
+      <div className="card p-4 sm:p-6">
+        <ResourceForm resource="slides" item={item} />
+      </div>
+    </>
+  );
 }

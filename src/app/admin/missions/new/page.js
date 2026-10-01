@@ -1,9 +1,17 @@
-import AdminForm from '@/components/AdminForm';
-const fields = [
-  { name: 'titleEn', label: 'Title (EN) *', required: true }, { name: 'titleId', label: 'Title (ID)' },
-  { name: 'dateLabelEn', label: 'Date Label (EN)', placeholder: 'Upcoming' }, { name: 'dateLabelId', label: 'Date Label (ID)' },
-  { name: 'descriptionEn', label: 'Description (EN)', type: 'textarea' }, { name: 'descriptionId', label: 'Description (ID)', type: 'textarea' },
-  { name: 'sortOrder', label: 'Sort Order', type: 'number' },
-  { name: 'image', label: 'Image', type: 'file' }, { name: 'isActive', label: 'Active', type: 'checkbox' },
-];
-export default function NewMission() { return <AdminForm title="Add Mission" apiUrl="/api/missions" redirectUrl="/admin/missions" fields={fields} initialData={{isActive:true,sortOrder:0}} />; }
+import ResourceForm from "@/components/admin/ResourceForm";
+import { AdminTitle } from "@/components/admin/ResourceList";
+import { RESOURCES } from "@/components/admin/resources";
+
+export const metadata = { title: "Tambah" };
+
+export default function Page() {
+  const cfg = RESOURCES.missions;
+  return (
+    <>
+      <AdminTitle title={`Tambah ${cfg.singular}`} back={{ href: cfg.base, label: cfg.title }} />
+      <div className="card p-4 sm:p-6">
+        <ResourceForm resource="missions" />
+      </div>
+    </>
+  );
+}

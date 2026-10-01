@@ -1,13 +1,24 @@
-import prisma from '@/lib/prisma';
-import AdminForm from '@/components/AdminForm';
-const fields = [
-  { name: 'titleEn', label: 'Title (EN) *', required: true }, { name: 'titleId', label: 'Title (ID)' },
-  { name: 'dateLabelEn', label: 'Date Label (EN)' }, { name: 'dateLabelId', label: 'Date Label (ID)' },
-  { name: 'descriptionEn', label: 'Description (EN)', type: 'textarea' }, { name: 'descriptionId', label: 'Description (ID)', type: 'textarea' },
-  { name: 'sortOrder', label: 'Sort Order', type: 'number' },
-  { name: 'image', label: 'Image', type: 'file' }, { name: 'isActive', label: 'Active', type: 'checkbox' },
-];
-export default async function EditMission({ params }) {
-  const item = await prisma.mission.findUnique({ where: { id: parseInt(params.id) } });
-  return <AdminForm title="Edit Mission" apiUrl="/api/missions" redirectUrl="/admin/missions" fields={fields} initialData={JSON.parse(JSON.stringify(item))} />;
+import { notFound } from "next/navigation";
+import prisma from "@/lib/prisma";
+import { parseId } from "@/lib/api-auth";
+import ResourceForm from "@/components/admin/ResourceForm";
+import { AdminTitle } from "@/components/admin/ResourceList";
+import { RESOURCES } from "@/components/admin/resources";
+
+export const metadata = { title: "Ubah" };
+
+export default async function Page({ params }) {
+  const id = parseId((await params).id);
+  if (!id) notFound();
+  const item = await prisma.mission.findUnique({ where: { id } });
+  if (!item) notFound();
+  const cfg = RESOURCES.missions;
+  return (
+    <>
+      <AdminTitle title={`Ubah ${cfg.singular}`} subtitle={cfg.primary(item)} back={{ href: cfg.base, label: cfg.title }} />
+      <div className="card p-4 sm:p-6">
+        <ResourceForm resource="missions" item={item} />
+      </div>
+    </>
+  );
 }

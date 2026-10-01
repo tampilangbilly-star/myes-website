@@ -1,46 +1,24 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { apiError, requireAdmin } from "@/lib/api-auth";
+import { storeImage, validateImage } from "@/lib/storage";
 
-// Pastikan SUPABASE_SERVICE_ROLE_KEY sudah ditambahkan di Environment Variables Vercel/.env
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY,
-);
+export const runtime = "nodejs";
 
+/**
+ * Upload foto (khusus admin). Foto otomatis dikompres ke WebP & diperkecil maks 2000px
+ * sebelum disimpan ke Supabase Storage — hemat kuota free plan.
+ */
 export async function POST(req) {
+  const { error } = await requireAdmin();
+  if (error) return error;
   try {
     const formData = await req.formData();
     const file = formData.get("file");
-    const folder = formData.get("folder") || "uploads";
-
-    if (!file || typeof file === "string") {
-      return NextResponse.json(
-        { error: "Tidak ada file yang diunggah" },
-        { status: 400 },
-      );
-    }
-
-    const filename = `${folder}/${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
-
-    // Upload ke bucket 'uploads' di Supabase
-    const { data, error } = await supabase.storage
-      .from("uploads")
-      .upload(filename, file, { upsert: true });
-
-    if (error) throw error;
-
-    // Ambil URL publik untuk disimpan ke database
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from("uploads").getPublicUrl(filename);
-
-    // Kirim 'url' agar cocok dengan frontend (uploadData.url)
-    return NextResponse.json({ url: publicUrl, path: publicUrl });
-  } catch (error) {
-    console.error("Upload Error:", error);
-    return NextResponse.json(
-      { error: "Gagal mengunggah file ke cloud." },
-      { status: 500 },
-    );
+    const invalid = validateImage(file);
+    if (invalid) return NextResponse.json({ error: invalid }, { status: 400 });
+    const url = await storeImage(file, formData.get("folder") || "uploads");
+    return NextResponse.json({ url, path: url });
+  } catch (err) {
+    return apiError(err, "Gagal mengunggah foto. Pastikan file berupa gambar yang valid.");
   }
 }

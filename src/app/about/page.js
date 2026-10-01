@@ -1,507 +1,128 @@
-import prisma from "@/lib/prisma";
-import { cookies } from "next/headers";
+import { getLang } from "@/lib/helpers";
+import { getSite } from "@/lib/site";
+import { pageMeta } from "@/lib/seo";
+import PageHeader from "@/components/PageHeader";
+import SectionHeading from "@/components/SectionHeading";
+import Reveal from "@/components/Reveal";
+import Icon from "@/components/Icon";
+import SmartImage from "@/components/SmartImage";
+
+export const metadata = pageMeta("About Us", "Get to know M-YES — a Manado youth community growing in faith and English. Our story, vision, mission and core values.", "/about");
+
+const DEFAULTS = {
+  story: {
+    en: "Manado Youth English Service (M-YES) was born out of a desire to see a young generation that not only excels in global capacity through English proficiency but also has deep roots of faith in Christ.\n\nWe believe that learning together in a loving community creates a safe, supportive, and enjoyable environment for youth to grow holistically.",
+    id: "Manado Youth English Service (M-YES) lahir dari kerinduan untuk melihat generasi muda yang tidak hanya unggul dalam kapasitas global melalui penguasaan bahasa Inggris, tetapi juga memiliki akar iman yang kuat di dalam Kristus.\n\nKami percaya bahwa belajar bersama dalam komunitas yang penuh kasih akan menciptakan lingkungan yang aman, suportif, dan menyenangkan bagi pemuda untuk bertumbuh secara utuh.",
+  },
+  vision: {
+    en: "To become a youth community that grows in faith, serves with love, and develops English proficiency to make a positive impact on society.",
+    id: "Menjadi komunitas pemuda yang bertumbuh dalam iman, melayani dengan kasih, dan mengembangkan kemampuan bahasa Inggris untuk memberikan dampak positif bagi masyarakat.",
+  },
+  mission: {
+    en: "To deepen the spiritual life of members through fellowship, discipleship, prayer, and the study of God's Word.\nTo cultivate Christ-like character based on love, integrity, humility, and a heart for service.\nTo provide a supportive, enjoyable, and sustainable environment for learning English among young people.\nTo develop members' communication, leadership, and teamwork skills, preparing them to become influential individuals.",
+    id: "Memperdalam kehidupan spiritual anggota melalui persekutuan, pemuridan, doa, dan pendalaman firman Tuhan.\nMenumbuhkan karakter serupa Kristus yang berlandaskan cinta kasih, integritas, kerendahan hati, dan hati yang melayani.\nMenyediakan lingkungan yang suportif, menyenangkan, dan berkelanjutan untuk belajar bahasa Inggris di kalangan pemuda.\nMengembangkan keterampilan komunikasi, kepemimpinan, dan kerja sama anggota untuk mempersiapkan mereka menjadi individu yang berpengaruh.",
+  },
+};
+
+const VALUES = [
+  { icon: "book", en: ["Learn", "Developing our potential through continuous English learning."], id: ["Belajar", "Mengembangkan potensi diri melalui proses belajar bahasa Inggris secara berkelanjutan."] },
+  { icon: "sparkle", en: ["Grow", "Growing together in character, faith, and skills as the younger generation."], id: ["Bertumbuh", "Bertumbuh bersama dalam karakter, iman, dan kemampuan sebagai generasi muda."] },
+  { icon: "heart", en: ["Impact", "Making a positive influence and becoming a blessing to our community and surroundings."], id: ["Berdampak", "Memberikan pengaruh positif dan menjadi berkat bagi komunitas serta lingkungan sekitar."] },
+];
 
 export default async function AboutPage() {
-  const cookieStore = cookies();
-  const lang = cookieStore.get("lang")?.value || "en";
+  const lang = await getLang();
+  const id = lang === "id";
+  const site = await getSite(lang);
+  // Teks dari Admin → Pengaturan → Tentang; bila kosong memakai teks bawaan.
+  const story = site.get("about_description") || DEFAULTS.story[lang];
+  const vision = site.get("vision") || DEFAULTS.vision[lang];
+  const missions = (site.get("mission") || DEFAULTS.mission[lang])
+    .split("\n")
+    .map((s) => s.replace(/^\s*(?:[-•*]|\d+[.)])\s*/, "").trim())
+    .filter(Boolean);
+  const paragraphs = story.split(/\n+/).filter((p) => p.trim());
 
   return (
     <>
-
-      {/* CSS KHUSUS HALAMAN ABOUT — LAYOUT BARU */}
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-        /* Cerita Kami: panel editorial dengan aksen ayat samping */
-        .story-panel {
-          padding: clamp(2rem, 6vw, 3.5rem);
-          display: grid;
-          grid-template-columns: auto 1fr;
-          gap: clamp(1.5rem, 4vw, 3rem);
-          align-items: start;
-        }
-        .story-icon {
-          width: 64px;
-          height: 64px;
-          border-radius: 18px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 1.9rem;
-          background: rgba(59, 130, 246, 0.14);
-          border: 1px solid rgba(96, 165, 250, 0.3);
-          box-shadow: inset 0 0 14px rgba(22, 36, 58, 0.09);
-        }
-        .story-panel h2 {
-          font-size: clamp(1.7rem, 1.2rem + 2.4vw, 2.4rem);
-          color: var(--text-primary);
-          margin: 0 0 1.2rem;
-        }
-        .story-panel p {
-          color: var(--text-primary);
-          font-size: clamp(1rem, 0.95rem + 0.3vw, 1.1rem);
-          line-height: 1.85;
-          margin: 0;
-        }
-
-        /* Visi & Misi: dua panel dua nada (biru = visi, emas = misi) */
-        .vm-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
-          gap: clamp(1.25rem, 3vw, 2rem);
-          margin-top: clamp(1.25rem, 3vw, 2rem);
-        }
-        .vm-card {
-          padding: clamp(1.75rem, 5vw, 2.75rem);
-          overflow: hidden;
-        }
-        .vm-card::before {
-          content: '';
-          position: absolute;
-          top: 0; left: 0; right: 0;
-          height: 3px;
-          border-radius: 20px 20px 0 0;
-        }
-        .vm-card.blue::before {
-          background: linear-gradient(90deg, #1d4ed8, #60a5fa);
-        }
-        .vm-card.goldline::before {
-          background: linear-gradient(90deg, var(--gold), var(--gold-light));
-        }
-        .vm-icon {
-          width: 56px;
-          height: 56px;
-          border-radius: 16px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 1.7rem;
-          margin-bottom: 1.4rem;
-        }
-        .vm-card.blue .vm-icon {
-          background: rgba(59, 130, 246, 0.14);
-          border: 1px solid rgba(96, 165, 250, 0.3);
-        }
-        .vm-card.goldline .vm-icon {
-          background: rgba(232, 163, 61, 0.12);
-          border: 1px solid rgba(232, 163, 61, 0.35);
-        }
-        .vm-card h3 {
-          font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2rem);
-          color: var(--text-primary);
-          margin: 0 0 1.1rem;
-        }
-        .vm-card p, .vm-card li {
-          color: var(--text-primary);
-          line-height: 1.8;
-          font-size: 1.02rem;
-        }
-        .vm-card ul {
-          list-style: none;
-          padding: 0;
-          margin: 0;
-          display: flex;
-          flex-direction: column;
-          gap: 0.9rem;
-        }
-        .vm-card ul li {
-          position: relative;
-          padding-left: 1.6rem;
-        }
-        .vm-card ul li::before {
-          content: '';
-          position: absolute;
-          left: 0;
-          top: 0.7em;
-          width: 12px;
-          height: 2px;
-          border-radius: 99px;
-          background: linear-gradient(90deg, var(--gold), var(--gold-light));
-        }
-
-        /* Nilai Inti: strip horizontal dengan pemisah cahaya */
-        .value-strip {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
-          border: 1px solid var(--border-light);
-          border-radius: 20px;
-          overflow: hidden;
-          background: linear-gradient(180deg, var(--bg-surface), var(--bg-surface));
-        }
-        .value-cell {
-          text-align: center;
-          padding: clamp(2.25rem, 5vw, 3rem) 1.5rem;
-          position: relative;
-          transition: background 0.4s ease;
-        }
-        .value-cell + .value-cell::before {
-          content: '';
-          position: absolute;
-          left: 0;
-          top: 18%;
-          bottom: 18%;
-          width: 1px;
-          background: linear-gradient(180deg, transparent, rgba(148, 178, 224, 0.25), transparent);
-        }
-        .value-cell:hover {
-          background: rgba(232, 163, 61, 0.05);
-        }
-        .value-cell .v-emoji {
-          font-size: 2.8rem;
-          display: inline-block;
-          margin-bottom: 1.2rem;
-          transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-        .value-cell:hover .v-emoji {
-          transform: translateY(-6px) scale(1.12);
-        }
-        .value-cell h4 {
-          font-size: 1.5rem;
-          color: var(--text-primary);
-          margin: 0 0 0.7rem;
-        }
-        .value-cell p {
-          color: var(--text-secondary);
-          line-height: 1.7;
-          margin: 0;
-          font-size: 0.95rem;
-        }
-
-        /* ==================== RESPONSIVE KHUSUS ANDROID/MOBILE ==================== */
-        @media (max-width: 768px) {
-          .story-panel {
-            grid-template-columns: 1fr;
-            text-align: center;
-            padding: 1.5rem !important;
-          }
-          .story-icon { margin: 0 auto; width: 50px; height: 50px; font-size: 1.5rem; }
-          .vm-card { padding: 1.25rem !important; }
-          .vm-icon { width: 44px; height: 44px; font-size: 1.3rem; margin-bottom: 1rem; }
-          
-          /* Memaksa Core Values menjadi 2 kolom berdampingan di HP */
-          .value-strip {
-            grid-template-columns: repeat(2, 1fr) !important;
-          }
-          .value-cell {
-            padding: 1.25rem 0.75rem !important;
-          }
-          .value-cell .v-emoji {
-            font-size: 2rem !important;
-            margin-bottom: 0.5rem !important;
-          }
-          .value-cell h4 {
-            font-size: 1rem !important;
-            margin-bottom: 0.3rem !important;
-          }
-          .value-cell p {
-            font-size: 0.75rem !important;
-            line-height: 1.4 !important;
-          }
-          /* Ubah garis pemisah vertikal antar cell menjadi horizontal di HP */
-          .value-cell + .value-cell::before {
-            left: 10%; right: 10%; top: 0; bottom: auto;
-            width: auto; height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(148, 178, 224, 0.25), transparent);
-          }
-        }
-      `,
-        }}
+      <PageHeader
+        eyebrow={id ? "Kenali Kami Lebih Dekat" : "Get To Know Us"}
+        title={id ? "Tentang M-YES" : "About M-YES"}
+        subtitle={id ? "Komunitas pemuda Manado yang bertumbuh dalam iman dan bahasa Inggris." : "A Manado youth community growing in faith and English."}
       />
 
-      {/* 1. PAGE HEADER EDITORIAL BARU */}
-      <header className="ph2">
-        <div className="ph2-inner">
-          <span className="ph2-watermark" aria-hidden="true">
-            M-YES
-          </span>
-          <div className="ph2-overline">
-            <span className="live-dot" />
-            {lang === "id" ? "Kenali Kami Lebih Dekat" : "Get To Know Us"}
-          </div>
-          <h1 className="ph2-title">
-            About <em>M-YES</em>
-          </h1>
-          <p className="ph2-sub">
-            {lang === "id"
-              ? "Komunitas pemuda Manado yang bertumbuh dalam iman dan bahasa Inggris."
-              : "A Manado youth community growing in faith and English."}
-          </p>
-          <div className="ph2-rule">
-            <i />
-            <i />
-          </div>
-        </div>
-      </header>
-
-      {/* 2. MAIN CONTENT */}
-      <section
-        className="section"
-        style={{ position: "relative", overflow: "hidden" }}
-      >
-        {/* Background glow effects tipis di area konten */}
-        <div
-          style={{
-            position: "absolute",
-            top: "10%",
-            left: "-10%",
-            width: "40%",
-            height: "60%",
-            background:
-              "radial-gradient(circle, rgba(59,130,246,0.05) 0%, transparent 70%)",
-            zIndex: 0,
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            bottom: "10%",
-            right: "-10%",
-            width: "40%",
-            height: "60%",
-            background:
-              "radial-gradient(circle, rgba(234,179,8,0.03) 0%, transparent 70%)",
-            zIndex: 0,
-          }}
-        />
-
-        <div
-          className="container"
-          style={{ position: "relative", zIndex: 1, maxWidth: "1200px" }}
-        >
-          {/* Cerita Kami */}
-          <div className="panel story-panel" style={{ marginBottom: "3rem" }}>
-            <div
-              className="story-icon"
-              style={{ fontSize: "2.5rem", marginBottom: "0.5rem" }}
-            >
-              📖
+      {/* CERITA */}
+      <section className="section">
+        <div className="container-x grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+          <Reveal>
+            <span className="eyebrow">{id ? "Awal Mula" : "Where It Began"}</span>
+            <h2 className="mt-3 text-[1.75rem] font-extrabold sm:text-4xl">{id ? "Cerita Kami" : "Our Story"}</h2>
+            <div className="prose-lite mt-5 text-base sm:text-lg">
+              {paragraphs.map((p, i) => (
+                <p key={i}>{p}</p>
+              ))}
             </div>
-            <div>
-              <div
-                className="panel-kicker"
-                style={{
-                  color: "var(--accent-gold)",
-                  fontSize: "0.85rem",
-                  fontWeight: "700",
-                  textTransform: "uppercase",
-                  letterSpacing: "1px",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                {lang === "id" ? "Awal Mula" : "Where It Began"}
-              </div>
-              <h2
-                style={{
-                  color: "var(--text-primary)",
-                  marginBottom: "1.25rem",
-                  fontSize: "2rem",
-                }}
-              >
-                {lang === "id" ? "Cerita Kami" : "Our Story"}
-              </h2>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "1.2rem",
-                  color: "var(--text-primary)",
-                  lineHeight: "1.7",
-                  fontSize: "1.05rem",
-                }}
-              >
-                <p>
-                  {lang === "id"
-                    ? "Manado Youth English Service (M-YES) lahir dari kerinduan untuk melihat generasi muda yang tidak hanya unggul dalam kapasitas global melalui penguasaan bahasa Inggris, tetapi juga memiliki akar iman yang kuat di dalam Kristus."
-                    : "Manado Youth English Service (M-YES) was born out of a desire to see a young generation that not only excels in global capacity through English proficiency but also has deep roots of faith in Christ."}
-                </p>
-                <p>
-                  {lang === "id"
-                    ? "Kami percaya bahwa belajar bersama dalam komunitas yang penuh kasih akan menciptakan lingkungan yang aman, suportif, dan menyenangkan bagi pemuda untuk bertumbuh secara utuh."
-                    : "We believe that learning together in a loving community creates a safe, supportive, and enjoyable environment for youth to grow holistically."}
-                </p>
-              </div>
+          </Reveal>
+          <Reveal delay={120} className="relative">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-line shadow-lift">
+              <SmartImage src={site.mainBackground || "/sample/venue.webp"} alt={id ? "Kegiatan M-YES" : "M-YES gathering"} fill sizes="(min-width:1024px) 540px, 100vw" className="object-cover" />
             </div>
-          </div>
-
-          {/* Visi & Misi */}
-          <div
-            className="vm-grid"
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-              gap: "1.5rem",
-            }}
-          >
-            {/* VISI CARD */}
-            <div
-              className="panel vm-card blue"
-              style={{
-                background: "rgba(59, 130, 246, 0.05)",
-                border: "1px solid rgba(59, 130, 246, 0.2)",
-                borderRadius: "16px",
-                padding: "2rem",
-              }}
-            >
-              <div
-                className="vm-icon"
-                style={{ fontSize: "2.5rem", marginBottom: "1rem" }}
-              >
-                👁️
-              </div>
-              <div
-                className="panel-kicker"
-                style={{
-                  color: "var(--accent-gold)",
-                  fontSize: "0.8rem",
-                  fontWeight: "700",
-                  textTransform: "uppercase",
-                  letterSpacing: "1px",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                {lang === "id" ? "Arah Kami" : "Our Direction"}
-              </div>
-              <h3
-                style={{
-                  color: "var(--text-primary)",
-                  marginBottom: "1rem",
-                  fontSize: "1.5rem",
-                }}
-              >
-                {lang === "id" ? "Visi" : "Vision"}
-              </h3>
-              <p style={{ color: "var(--text-primary)", lineHeight: "1.7" }}>
-                {lang === "id"
-                  ? "Menjadi komunitas pemuda yang bertumbuh dalam iman, melayani dengan kasih, dan mengembangkan kemampuan bahasa Inggris untuk memberikan dampak positif bagi masyarakat."
-                  : "To become a youth community that grows in faith, serves with love, and develops English proficiency to make a positive impact on society."}
-              </p>
+            <div className="card absolute -bottom-5 left-4 flex items-center gap-3 px-4 py-3 sm:left-6">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-ink">
+                <Icon name="users" />
+              </span>
+              <span className="text-sm font-semibold leading-tight">
+                {id ? "Terbuka untuk" : "Open to"}
+                <br />
+                <span className="text-ink-muted">{id ? "semua anak muda" : "all young people"}</span>
+              </span>
             </div>
-
-            {/* MISI CARD */}
-            <div
-              className="panel panel--gold vm-card goldline"
-              style={{
-                background: "rgba(234, 179, 8, 0.05)",
-                border: "1px solid rgba(234, 179, 8, 0.2)",
-                borderRadius: "16px",
-                padding: "2rem",
-              }}
-            >
-              <div
-                className="vm-icon"
-                style={{ fontSize: "2.5rem", marginBottom: "1rem" }}
-              >
-                🎯
-              </div>
-              <div
-                className="panel-kicker gold"
-                style={{
-                  color: "var(--gold-ink)",
-                  fontSize: "0.8rem",
-                  fontWeight: "700",
-                  textTransform: "uppercase",
-                  letterSpacing: "1px",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                {lang === "id" ? "Langkah Kami" : "Our Steps"}
-              </div>
-              <h3
-                style={{
-                  color: "var(--text-primary)",
-                  marginBottom: "1rem",
-                  fontSize: "1.5rem",
-                }}
-              >
-                {lang === "id" ? "Misi" : "Mission"}
-              </h3>
-              <ul
-                style={{
-                  color: "var(--text-primary)",
-                  lineHeight: "1.6",
-                  paddingLeft: "1.2rem",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "0.75rem",
-                  margin: 0,
-                }}
-              >
-                <li>
-                  {lang === "id"
-                    ? "Memperdalam kehidupan spiritual anggota melalui persekutuan, pemuridan, doa, dan pendalaman firman Tuhan."
-                    : "To deepen the spiritual life of members through fellowship, discipleship, prayer, and the study of God's Word."}
-                </li>
-                <li>
-                  {lang === "id"
-                    ? "Menumbuhkan karakter serupa Kristus yang berlandaskan cinta kasih, integritas, kerendahan hati, dan hati yang melayani."
-                    : "To cultivate Christ-like character based on love, integrity, humility, and a heart for service."}
-                </li>
-                <li>
-                  {lang === "id"
-                    ? "Menyediakan lingkungan yang suportif, menyenangkan, dan berkelanjutan untuk belajar bahasa Inggris di kalangan pemuda."
-                    : "To provide a supportive, enjoyable, and sustainable environment for learning English among young people."}
-                </li>
-                <li>
-                  {lang === "id"
-                    ? "Mengembangkan keterampilan komunikasi, kepemimpinan, dan kerja sama anggota untuk mempersiapkan mereka menjadi individu yang berpengaruh."
-                    : "To develop members' communication, leadership, and teamwork skills, preparing them to become influential individuals."}
-                </li>
-              </ul>
-            </div>
-          </div>
+          </Reveal>
         </div>
       </section>
 
-      {/* 3. CORE VALUES SECTION */}
-      <section
-        className="section section-alt"
-        style={{ backgroundColor: "var(--bg-surface)" }}
-      >
-        <div className="container" style={{ maxWidth: "1200px" }}>
-          <div className="vh-heading">
-            <span className="bar" />
-            <div>
-              <span className="overline" style={{ color: "var(--gold-ink)" }}>
-                {lang === "id" ? "Prinsip Kami" : "Our Principles"}
-              </span>
-              <h2>{lang === "id" ? "Nilai-Nilai Inti" : "Core Values"}</h2>
-            </div>
-          </div>
+      {/* VISI & MISI */}
+      <section className="section border-y border-line bg-surface">
+        <div className="container-x grid gap-5 lg:grid-cols-[1fr_1.4fr]">
+          <Reveal className="relative overflow-hidden rounded-3xl bg-primary p-6 text-primary-ink sm:p-8">
+            <div aria-hidden className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10" />
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/80">{id ? "Arah Kami" : "Our Direction"}</p>
+            <h2 className="mt-2 text-3xl font-extrabold text-white">{id ? "Visi" : "Vision"}</h2>
+            <p className="relative mt-4 text-lg leading-relaxed text-white/95">{vision}</p>
+          </Reveal>
+          <Reveal delay={100} className="card p-6 sm:p-8">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary-strong">{id ? "Langkah Kami" : "Our Steps"}</p>
+            <h2 className="mt-2 text-3xl font-extrabold">{id ? "Misi" : "Mission"}</h2>
+            <ol className="mt-5 space-y-4">
+              {missions.map((m, i) => (
+                <li key={i} className="flex gap-4">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary-soft font-display text-sm font-bold text-primary-strong">{i + 1}</span>
+                  <p className="pt-1 leading-relaxed text-ink-muted">{m}</p>
+                </li>
+              ))}
+            </ol>
+          </Reveal>
+        </div>
+      </section>
 
-          <div className="value-strip">
-            {/* PRINSIP 1: BELAJAR */}
-            <div className="value-cell">
-              <span className="v-emoji">📚</span>
-              <h4>{lang === "id" ? "Belajar" : "Learn"}</h4>
-              <p>
-                {lang === "id"
-                  ? "Mengembangkan potensi diri melalui proses belajar bahasa Inggris secara berkelanjutan."
-                  : "Developing our potential through continuous English learning."}
-              </p>
-            </div>
-
-            {/* PRINSIP 2: BERTUMBUH */}
-            <div className="value-cell">
-              <span className="v-emoji">🌱</span>
-              <h4>{lang === "id" ? "Bertumbuh" : "Grow"}</h4>
-              <p>
-                {lang === "id"
-                  ? "Bertumbuh bersama dalam karakter, iman, dan kemampuan sebagai generasi muda."
-                  : "Growing together in character, faith, and skills as the younger generation."}
-              </p>
-            </div>
-
-            {/* PRINSIP 3: BERDAMPAK */}
-            <div className="value-cell">
-              <span className="v-emoji">🌟</span>
-              <h4>{lang === "id" ? "Berdampak" : "Impact"}</h4>
-              <p>
-                {lang === "id"
-                  ? "Memberikan pengaruh positif dan menjadi berkat bagi komunitas serta lingkungan sekitar."
-                  : "Making a positive influence and becoming a blessing to our community and surroundings."}
-              </p>
-            </div>
-          </div>
+      {/* NILAI INTI */}
+      <section className="section">
+        <div className="container-x">
+          <SectionHeading align="center" eyebrow={id ? "Prinsip Kami" : "Our Principles"} title={id ? "Nilai-Nilai Inti" : "Core Values"} />
+          <ul className="grid gap-4 sm:grid-cols-3">
+            {VALUES.map((v, i) => {
+              const [title, text] = v[lang];
+              return (
+                <Reveal as="li" key={title} delay={i * 90} className="card card-hover p-6 text-center">
+                  <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-soft text-primary">
+                    <Icon name={v.icon} size={26} />
+                  </span>
+                  <h3 className="mt-4 text-xl font-bold">{title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-ink-muted">{text}</p>
+                </Reveal>
+              );
+            })}
+          </ul>
         </div>
       </section>
     </>

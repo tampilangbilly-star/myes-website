@@ -1,29 +1,9 @@
-"use client";
-import AdminCrud from "@/components/AdminCrud";
-export default function AdminPrograms() {
-  return (
-    <AdminCrud
-      title="Programs"
-      apiUrl="/api/programs"
-      createUrl="/admin/programs/new"
-      columns={[
-        {
-          key: "emoji",
-          label: "Icon",
-          render: (i) => <span style={{ fontSize: "1.5rem" }}>{i.emoji}</span>,
-        },
-        {
-          key: "titleEn",
-          label: "Title (EN)",
-          render: (i) => <strong>{i.titleEn}</strong>,
-        },
-        {
-          key: "titleId",
-          label: "Title (ID)",
-          render: (i) => i.titleId || "-",
-        },
-        { key: "sortOrder", label: "Order" },
-      ]}
-    />
-  );
+import prisma from "@/lib/prisma";
+import ResourceList from "@/components/admin/ResourceList";
+
+export const metadata = { title: "programs" };
+
+export default async function Page() {
+  const rows = await prisma.program.findMany({ orderBy: [{ sortOrder: "asc" }, { id: "asc" }] });
+  return <ResourceList resource="programs" rows={rows} />;
 }

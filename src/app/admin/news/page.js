@@ -1,42 +1,9 @@
-"use client";
-import AdminCrud from "@/components/AdminCrud";
+import prisma from "@/lib/prisma";
+import ResourceList from "@/components/admin/ResourceList";
 
-export default function AdminNews() {
-  return (
-    <AdminCrud
-      title="News"
-      apiUrl="/api/news"
-      createUrl="/admin/news/new"
-      columns={[
-        {
-          key: "image",
-          label: "Img",
-          render: (i) => (
-            <div className="table-img">
-              {i.image ? (
-                <img
-                  src={i.image?.startsWith("/") ? i.image : `${i.image}`}
-                  alt=""
-                />
-              ) : (
-                "📰"
-              )}
-            </div>
-          ),
-        },
-        {
-          key: "titleEn",
-          label: "Title",
-          render: (i) => <strong>{i.titleEn?.substring(0, 40)}</strong>,
-        },
-        { key: "tagEn", label: "Tag" },
-        {
-          key: "publishedAt",
-          label: "Date",
-          render: (i) =>
-            i.publishedAt ? new Date(i.publishedAt).toLocaleDateString() : "-",
-        },
-      ]}
-    />
-  );
+export const metadata = { title: "news" };
+
+export default async function Page() {
+  const rows = await prisma.news.findMany({ orderBy: [{ publishedAt: { sort: "desc", nulls: "last" } }, { id: "desc" }] });
+  return <ResourceList resource="news" rows={rows} />;
 }

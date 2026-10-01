@@ -1,541 +1,156 @@
 import prisma from "@/lib/prisma";
-import { cookies } from "next/headers";
+import { getLang, t } from "@/lib/helpers";
+import { safe } from "@/lib/data";
+import { pageMeta } from "@/lib/seo";
+import PageHeader from "@/components/PageHeader";
+import Reveal from "@/components/Reveal";
+import SmartImage from "@/components/SmartImage";
+import EmptyState from "@/components/EmptyState";
+import Icon from "@/components/Icon";
 
-export const dynamic = "force-dynamic";
+export const metadata = pageMeta("Personnel", "The M-YES ministry structure — centered on Christ and driven by love.", "/personnel");
+
+const GROUP_TITLES = {
+  pembina: { id: "Dewan Pembina", en: "Board of Advisors" },
+  pengurus: { id: "Pengurus Inti", en: "Core Committee" },
+  bidang: { id: "Bidang-Bidang", en: "Divisions" },
+  lainnya: { id: "Lainnya", en: "Others" },
+};
 
 export default async function PersonnelPage() {
-  const cookieStore = cookies();
-  const lang = cookieStore.get("lang")?.value || "en";
+  const lang = await getLang();
+  const id = lang === "id";
+  const items = await safe(prisma.personnel.findMany({ where: { isActive: true }, orderBy: [{ sortOrder: "asc" }, { id: "asc" }] }));
 
-  // Mengambil data dari database
-  const items = await prisma.personnel.findMany({
-    where: { isActive: true },
-    orderBy: { sortOrder: "asc" },
-  });
-
-  const t = (item, f) =>
-    lang === "id" ? item[f + "Id"] || item[f + "En"] : item[f + "En"];
-
-  // ========================================================
-  // LOGIKA BARU: BERDASARKAN KATEGORI DROPDOWN ADMIN
-  // ========================================================
+  // Pengelompokan sama seperti sebelumnya (berdasarkan kategori di admin)
   const pembina = { leaders: [], members: [] };
-  const pengurus = []; // Pengurus digabung jadi 1 array agar semuanya kotak
-  const bidang = { members: [] };
+  const pengurus = [];
+  const bidang = [];
   const lainnya = [];
-
-  items.forEach((p) => {
-    const displayRole = t(p, "role") || "ANGGOTA";
-    const category = p.category || "Lainnya";
-    const memberData = { ...p, displayRole };
-
-    if (category === "Pembina") {
-      // Pembina HANYA menjadikan Ketua dan Sekretaris sebagai kotak (leaders)
-      const isPembinaLeader = /(ketua|sekretaris)/i.test(displayRole);
-      if (isPembinaLeader) pembina.leaders.push(memberData);
-      else pembina.members.push(memberData);
-    } else if (category === "Pengurus Inti") {
-      // Sesuai instruksi: Seluruh Pengurus Inti dijadikan kotak
-      pengurus.push(memberData);
-    } else if (category === "Bidang-Bidang") {
-      // Semua bidang masuk ke bulat
-      bidang.members.push(memberData);
-    } else {
-      lainnya.push(memberData);
-    }
-  });
+  for (const p of items) {
+    const m = { ...p, displayRole: t(p, "role", lang) || (id ? "Anggota" : "Member") };
+    const cat = p.category || "Lainnya";
+    if (cat === "Pembina") (/(ketua|sekretaris)/i.test(p.roleId || "") || /(ketua|sekretaris|chair|secretary)/i.test(p.roleEn) ? pembina.leaders : pembina.members).push(m);
+    else if (cat === "Pengurus Inti") pengurus.push(m);
+    else if (cat === "Bidang-Bidang") bidang.push(m);
+    else lainnya.push(m);
+  }
 
   return (
     <>
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-        /* ==================== KELOMPOK & JUDUL ==================== */
-        .group-section { margin-bottom: clamp(4rem, 9vw, 7rem); }
-        .group-title-wrapper {
-          display: flex;
-          align-items: center;
-          gap: 1.25rem;
-          margin-bottom: clamp(2.5rem, 6vw, 4rem);
-        }
-        .group-title-wrapper::before,
-        .group-title-wrapper::after {
-          content: '';
-          flex: 1;
-          height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(148, 178, 224, 0.3));
-        }
-        .group-title-wrapper::after {
-          background: linear-gradient(270deg, transparent, rgba(148, 178, 224, 0.3));
-        }
-        .group-title {
-          font-family: "Playfair Display", serif;
-          font-size: clamp(1.6rem, 1.2rem + 2vw, 2.2rem);
-          color: var(--text-primary);
-          font-weight: 800;
-          text-transform: uppercase;
-          letter-spacing: 3px;
-          margin: 0;
-          padding: 0.4rem 1.6rem;
-          border: 1px solid var(--border-light);
-          border-radius: 99px;
-          background: var(--bg-surface);
-          white-space: nowrap;
-        }
-        
-        /* ==================== LAYOUT HIERARKI (DESKTOP) ==================== */
-        .leaders-row {
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: center;
-          gap: clamp(1.5rem, 4vw, 3rem);
-          margin-bottom: clamp(2.5rem, 5vw, 4rem);
-        }
-        .members-row {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
-          gap: clamp(1.25rem, 3vw, 2.5rem);
-          max-width: 1100px;
-          margin: 0 auto;
-        }
-
-        /* ==================== KARTU PIMPINAN (PORTRAIT PREMIUM / KOTAK) ==================== */
-        .leader-card {
-          padding: clamp(2rem, 5vw, 3rem) clamp(1.5rem, 4vw, 2rem);
-          text-align: center;
-          width: 100%;
-          max-width: 360px;
-        }
-        .leader-card::before {
-          content: '';
-          position: absolute;
-          top: 0; left: 20%; right: 20%;
-          height: 3px;
-          border-radius: 0 0 6px 6px;
-          background: linear-gradient(90deg, #1d4ed8, #60a5fa);
-        }
-        .avatar-rect {
-          width: min(200px, 60vw);
-          height: min(260px, 78vw);
-          border-radius: 24px;
-          padding: 4px;
-          background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(232, 163, 61, 0.35));
-          box-shadow: 0 0 25px rgba(22, 36, 58, 0.09);
-          margin: 0 auto 1.5rem auto;
-          transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-        .leader-card:hover .avatar-rect {
-          box-shadow: 0 0 35px rgba(22, 36, 58, 0.09);
-          transform: scale(1.04);
-        }
-        .img-rect {
-          width: 100%; height: 100%;
-          border-radius: 20px;
-          object-fit: cover;
-          object-position: top;
-          border: 4px solid var(--border-light);
-          background-color: var(--bg-surface);
-        }
-
-        /* ==================== KARTU ANGGOTA (BULAT) ==================== */
-        .member-card {
-          padding: clamp(2rem, 5vw, 3rem) 1.5rem;
-          text-align: center;
-          background: linear-gradient(180deg, var(--bg-surface), var(--bg-surface));
-        }
-        .avatar-ring {
-          width: min(180px, 52vw);
-          height: min(180px, 52vw);
-          border-radius: 50%;
-          padding: 4px;
-          background: linear-gradient(135deg, rgba(148, 163, 184, 0.3), rgba(148, 163, 184, 0.05));
-          margin: 0 auto 1.5rem auto;
-          transition: all 0.4s ease;
-        }
-        .member-card:hover .avatar-ring {
-          background: linear-gradient(135deg, rgba(59, 130, 246, 0.6), rgba(232, 163, 61, 0.25));
-        }
-        .img-circle {
-          width: 100%; height: 100%;
-          border-radius: 50%;
-          object-fit: cover;
-          object-position: top;
-          border: 4px solid var(--border-light);
-          background-color: var(--bg-surface);
-        }
-
-        /* ==================== PUSAT PELAYANAN (YESUS) ==================== */
-        .jesus-card {
-          text-align: center;
-          margin: 0 auto clamp(3.5rem, 8vw, 6rem) auto;
-          position: relative;
-          padding: 2rem 0;
-        }
-        .jesus-card::before {
-          content: '';
-          position: absolute;
-          top: 50%; left: 50%;
-          transform: translate(-50%, -50%);
-          width: min(520px, 90vw);
-          height: min(520px, 90vw);
-          border-radius: 50%;
-          background: radial-gradient(circle, rgba(255, 215, 0, 0.12) 0%, transparent 65%);
-          pointer-events: none;
-        }
-        .jesus-ring {
-          position: relative;
-          z-index: 1;
-          width: min(260px, 68vw);
-          height: min(260px, 68vw);
-          border-radius: 50%;
-          padding: 5px;
-          background: linear-gradient(135deg, #FFD700, #FDB931);
-          box-shadow: 0 0 50px rgba(22, 36, 58, 0.09);
-          margin: 0 auto 1.5rem auto;
-        }
-        .jesus-img {
-          width: 100%; height: 100%;
-          border-radius: 50%;
-          object-fit: cover;
-          object-position: top;
-          border: 4px solid var(--border-light);
-        }
-        .jesus-card::after {
-          content: '';
-          position: absolute;
-          left: 50%;
-          bottom: calc(clamp(3.5rem, 8vw, 6rem) * -0.7);
-          transform: translateX(-50%);
-          width: 2px;
-          height: clamp(2rem, 5vw, 3.5rem);
-          background: linear-gradient(180deg, rgba(255, 215, 0, 0.5), transparent);
-        }
-
-        /* ==================== TYPOGRAPHY ==================== */
-        .p-name {
-          font-family: "Playfair Display", serif;
-          font-size: 1.4rem; color: var(--text-primary); font-weight: 700;
-          margin: 0 0 0.5rem 0;
-        }
-        .leader-name { font-size: 1.6rem; }
-        .p-role {
-          color: var(--accent-gold); font-size: 0.9rem; font-weight: 700;
-          text-transform: uppercase; letter-spacing: 1.5px; margin: 0;
-        }
-        .p-bio { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; margin: 1rem 0 0 0; }
-
-        /* ==================== RESPONSIVE KHUSUS ANDROID/MOBILE ==================== */
-        @media (max-width: 768px) {
-          .group-section { margin-bottom: 3.5rem; }
-          .group-title { font-size: 1.1rem; padding: 0.3rem 1.2rem; }
-          
-          /* Merubah flex/grid lama menjadi sistem Grid Mobile */
-          .leaders-row, .members-row {
-            display: grid !important;
-            gap: 0.5rem !important;
-            margin-bottom: 1.5rem !important;
-            padding: 0 0.25rem;
-          }
-
-          /* KELAS 2 KOLOM (Untuk Pimpinan & Pengurus) */
-          .grid-2-mobile { grid-template-columns: repeat(2, 1fr) !important; }
-          
-          /* KELAS 3 KOLOM (Untuk Anggota Pembina & Bidang) */
-          .grid-3-mobile { grid-template-columns: repeat(3, 1fr) !important; gap: 0.35rem !important; }
-
-          /* ------------------- STYLING KOTAK DI MOBILE (2 Kolom) ------------------- */
-          .grid-2-mobile .leader-card { padding: 0.75rem 0.25rem; }
-          .grid-2-mobile .avatar-rect {
-            width: 100%; max-width: 140px; height: 160px;
-            border-radius: 12px; margin-bottom: 0.75rem;
-          }
-          .grid-2-mobile .img-rect { border-width: 2px; border-radius: 10px; }
-          .grid-2-mobile .p-name { font-size: 0.85rem; line-height: 1.2; margin-bottom: 0.25rem; }
-          .grid-2-mobile .p-role { font-size: 0.6rem; letter-spacing: 0.5px; }
-
-          /* ------------------- STYLING BULAT DI MOBILE (3 Kolom) ------------------- */
-          .grid-3-mobile .member-card { padding: 0.5rem 0.15rem; }
-          .grid-3-mobile .avatar-ring {
-            width: clamp(50px, 25vw, 85px); height: clamp(50px, 25vw, 85px);
-            margin-bottom: 0.5rem; padding: 2px; border-radius: 50%;
-          }
-          .grid-3-mobile .img-circle { border-width: 2px; }
-          .grid-3-mobile .p-name { font-size: 0.65rem; line-height: 1.1; margin-bottom: 0.2rem; }
-          .grid-3-mobile .p-role { font-size: 0.5rem; letter-spacing: 0; }
-          
-          /* Sembunyikan biografi di layar kecil agar tidak memanjang */
-          .p-bio { display: none; }
-          
-          /* Kecilkan gambar Yesus */
-          .jesus-ring { width: 140px; height: 140px; }
-          .jesus-card h3 { font-size: 1.5rem !important; }
-        }
-      `,
-        }}
+      <PageHeader
+        eyebrow={id ? "Tim Kami" : "Our Team"}
+        title={id ? "Personalia Organisasi" : "Organization Personnel"}
+        subtitle={id ? "Struktur pelayanan kami yang berpusat pada Kristus dan digerakkan oleh kasih." : "Our ministry structure, centered on Christ and driven by love."}
       />
-      <header className="ph2">
-        <div className="ph2-inner">
-          <span className="ph2-watermark" aria-hidden="true">
-            Team
-          </span>
-          <div className="ph2-overline">
-            <span className="live-dot" />
-            {lang === "id" ? "Tim Kami" : "Our Team"}
-          </div>
-          <h1 className="ph2-title">
-            {lang === "id" ? (
-              <>
-                Personalia <em>Organisasi</em>
-              </>
-            ) : (
-              <>
-                Organization <em>Personnel</em>
-              </>
-            )}
-          </h1>
-          <p className="ph2-sub">
-            {lang === "id"
-              ? "Struktur pelayanan kami yang berpusat pada Kristus dan digerakkan oleh kasih."
-              : "Our ministry structure, centered on Christ and driven by love."}
-          </p>
-          <div className="ph2-rule">
-            <i />
-            <i />
-          </div>
-        </div>
-      </header>
-      <section
-        className="section"
-        style={{ minHeight: "60vh", overflow: "hidden" }}
-      >
-        <div className="container">
-          {/* 1. GAMBAR TUHAN YESUS (TOP CENTER) */}
-          <div className="jesus-card">
-            <div className="jesus-ring">
-              <img
-                src="jesus-christ.jpg"
-                alt="Jesus Christ"
-                className="jesus-img"
-              />
+
+      <section className="section">
+        <div className="container-x">
+          {/* 1. TUHAN YESUS — Kepala organisasi, selalu paling atas */}
+          <Reveal className="mx-auto max-w-2xl text-center">
+            <div className="relative mx-auto overflow-hidden rounded-3xl bg-ink shadow-lift ring-4 ring-gold/30">
+              <div className="relative aspect-[16/9]">
+                <SmartImage src="/jesus-christ.jpg" alt="Jesus Christ" fill priority sizes="(min-width:768px) 672px, 100vw" className="object-cover" />
+              </div>
             </div>
-            <h3
-              className="p-name leader-name"
-              style={{ fontSize: "clamp(1.8rem, 1.4rem + 2vw, 2.4rem)" }}
-            >
-              Jesus Christ
-            </h3>
-            <p
-              className="p-role"
-              style={{ color: "var(--gold-ink)", fontSize: "1.1rem" }}
-            >
-              {lang === "id"
-                ? "Kepala Gereja & Pusat Pelayanan"
-                : "Head of the Church & Center of Ministry"}
+            <p className="mt-5 inline-flex items-center gap-2 rounded-full bg-gold/15 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-warning">
+              <Icon name="sparkle" size={14} /> {id ? "Kepala" : "The Head"}
             </p>
-          </div>
+            <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl">Jesus Christ</h2>
+            <p className="mt-2 text-lg text-ink-muted">{id ? "Kepala Gereja & Pusat Pelayanan" : "Head of the Church & Center of Ministry"}</p>
+            <p className="mt-2 text-sm italic text-ink-soft">{id ? "“Dialah kepala tubuh, yaitu jemaat.” — Kolose 1:18" : "“And He is the head of the body, the church.” — Colossians 1:18"}</p>
+          </Reveal>
 
-          {/* 2. PEMBINA SECTION */}
+          <div aria-hidden className="mx-auto my-12 h-12 w-px bg-gradient-to-b from-gold/60 to-transparent sm:my-16" />
+
+          {!items.length && <EmptyState icon="users" title={id ? "Data personalia belum tersedia." : "No personnel yet."} />}
+
           {(pembina.leaders.length > 0 || pembina.members.length > 0) && (
-            <div className="group-section">
-              <div className="group-title-wrapper">
-                <h2 className="group-title">Dewan Pembina</h2>
-              </div>
-              {/* Baris Pimpinan Pembina (Kotak - 2 Kolom di Android) */}
-              {pembina.leaders.length > 0 && (
-                <div className="leaders-row grid-2-mobile">
-                  {pembina.leaders.map((p) => (
-                    <div key={p.id} className="panel leader-card">
-                      <div className="avatar-rect">
-                        {p.photo ? (
-                          <img
-                            src={`${p.photo}`}
-                            alt={p.fullName || p.name}
-                            className="img-rect"
-                          />
-                        ) : (
-                          <div
-                            className="img-rect"
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              fontSize: "4rem",
-                            }}
-                          >
-                            👤
-                          </div>
-                        )}
-                      </div>
-                      <h3 className="p-name leader-name">
-                        {p.fullName || p.name}
-                      </h3>
-                      <p className="p-role">{p.displayRole}</p>
-                      {t(p, "bio") && <p className="p-bio">{t(p, "bio")}</p>}
-                    </div>
-                  ))}
-                </div>
-              )}
-              {/* Baris Anggota Pembina (Bulat Besar - 3 Kolom di Android) */}
-              {pembina.members.length > 0 && (
-                <div className="members-row grid-3-mobile">
-                  {pembina.members.map((p) => (
-                    <div key={p.id} className="panel member-card">
-                      <div className="avatar-ring">
-                        {p.photo ? (
-                          <img
-                            src={`${p.photo}`}
-                            alt={p.fullName || p.name}
-                            className="img-circle"
-                          />
-                        ) : (
-                          <div
-                            className="img-circle"
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              fontSize: "3rem",
-                            }}
-                          >
-                            👤
-                          </div>
-                        )}
-                      </div>
-                      <h3 className="p-name">{p.fullName || p.name}</h3>
-                      <p className="p-role" style={{ color: "var(--text-secondary)" }}>
-                        {p.displayRole}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            <Group title={GROUP_TITLES.pembina[lang]}>
+              {pembina.leaders.length > 0 && <RectGrid people={pembina.leaders} lang={lang} />}
+              {pembina.members.length > 0 && <CircleGrid people={pembina.members} className={pembina.leaders.length ? "mt-8" : ""} />}
+            </Group>
           )}
-
-          {/* 3. PENGURUS INTI SECTION */}
           {pengurus.length > 0 && (
-            <div className="group-section">
-              <div className="group-title-wrapper">
-                <h2 className="group-title">Pengurus Inti</h2>
-              </div>
-              {/* Sesuai Request: Seluruh Pengurus Dibuat Kotak (2 Kolom di Android) */}
-              <div className="leaders-row grid-2-mobile">
-                {pengurus.map((p) => (
-                  <div key={p.id} className="panel leader-card">
-                    <div className="avatar-rect">
-                      {p.photo ? (
-                        <img
-                          src={`${p.photo}`}
-                          alt={p.fullName || p.name}
-                          className="img-rect"
-                        />
-                      ) : (
-                        <div
-                          className="img-rect"
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontSize: "4rem",
-                          }}
-                        >
-                          👤
-                        </div>
-                      )}
-                    </div>
-                    <h3 className="p-name leader-name">
-                      {p.fullName || p.name}
-                    </h3>
-                    <p className="p-role">{p.displayRole}</p>
-                    {t(p, "bio") && <p className="p-bio">{t(p, "bio")}</p>}
-                  </div>
-                ))}
-              </div>
-            </div>
+            <Group title={GROUP_TITLES.pengurus[lang]}>
+              <RectGrid people={pengurus} lang={lang} />
+            </Group>
           )}
-
-          {/* 4. BIDANG-BIDANG SECTION */}
-          {bidang.members.length > 0 && (
-            <div className="group-section">
-              <div className="group-title-wrapper">
-                <h2 className="group-title">Bidang-Bidang</h2>
-              </div>
-              {/* Bidang (Bulat - 3 Kolom di Android) */}
-              <div className="members-row grid-3-mobile">
-                {bidang.members.map((p) => (
-                  <div key={p.id} className="panel member-card">
-                    <div className="avatar-ring">
-                      {p.photo ? (
-                        <img
-                          src={`${p.photo}`}
-                          alt={p.fullName || p.name}
-                          className="img-circle"
-                        />
-                      ) : (
-                        <div
-                          className="img-circle"
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontSize: "3rem",
-                          }}
-                        >
-                          👤
-                        </div>
-                      )}
-                    </div>
-                    <h3 className="p-name">{p.fullName || p.name}</h3>
-                    <p className="p-role" style={{ color: "var(--text-secondary)" }}>
-                      {p.displayRole}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
+          {bidang.length > 0 && (
+            <Group title={GROUP_TITLES.bidang[lang]}>
+              <CircleGrid people={bidang} />
+            </Group>
           )}
-
-          {/* 5. LAINNYA (JIKA ADA) */}
           {lainnya.length > 0 && (
-            <div className="group-section">
-              <div className="group-title-wrapper">
-                <h2 className="group-title">Lainnya</h2>
-              </div>
-              <div className="members-row grid-3-mobile">
-                {lainnya.map((p) => (
-                  <div key={p.id} className="panel member-card">
-                    <div className="avatar-ring">
-                      {p.photo ? (
-                        <img
-                          src={`${p.photo}`}
-                          alt={p.fullName || p.name}
-                          className="img-circle"
-                        />
-                      ) : (
-                        <div
-                          className="img-circle"
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontSize: "3rem",
-                          }}
-                        >
-                          👤
-                        </div>
-                      )}
-                    </div>
-                    <h3 className="p-name">{p.fullName || p.name}</h3>
-                    <p className="p-role" style={{ color: "var(--text-secondary)" }}>
-                      {p.displayRole}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <Group title={GROUP_TITLES.lainnya[lang]}>
+              <CircleGrid people={lainnya} />
+            </Group>
           )}
         </div>
       </section>
     </>
+  );
+}
+
+function Group({ title, children }) {
+  return (
+    <section className="mb-14 last:mb-0 sm:mb-20">
+      <Reveal className="mb-6 flex items-center gap-4 sm:mb-8">
+        <span aria-hidden className="h-px flex-1 bg-gradient-to-r from-transparent to-line" />
+        <h2 className="rounded-full border border-line bg-surface px-5 py-2 text-center text-sm font-extrabold uppercase tracking-[0.16em] shadow-card sm:text-base">{title}</h2>
+        <span aria-hidden className="h-px flex-1 bg-gradient-to-l from-transparent to-line" />
+      </Reveal>
+      {children}
+    </section>
+  );
+}
+
+function Avatar({ person, sizes, className }) {
+  return person.photo ? (
+    <SmartImage src={person.photo} alt={person.name} fill sizes={sizes} className={className} />
+  ) : (
+    <span className="absolute inset-0 flex items-center justify-center bg-primary-soft text-primary">
+      <Icon name="user" size={40} />
+    </span>
+  );
+}
+
+/** Kartu persegi (pimpinan): 2 kolom di HP. */
+function RectGrid({ people, lang }) {
+  return (
+    <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4">
+      {people.map((p, i) => {
+        const bio = t(p, "bio", lang);
+        return (
+          <Reveal as="li" key={p.id} delay={(i % 4) * 70} className="card card-hover overflow-hidden">
+            <div className="relative aspect-[4/5] bg-line">
+              <Avatar person={p} sizes="(min-width:1024px) 270px, (min-width:640px) 33vw, 50vw" className="object-cover" />
+            </div>
+            <div className="p-3 sm:p-4">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-primary-strong sm:text-xs">{p.displayRole}</p>
+              <h3 className="mt-1 text-[0.95rem] font-bold leading-snug sm:text-lg">{p.name}</h3>
+              {bio && <p className="mt-1.5 line-clamp-3 hidden text-sm leading-relaxed text-ink-muted sm:block">{bio}</p>}
+            </div>
+          </Reveal>
+        );
+      })}
+    </ul>
+  );
+}
+
+/** Foto bulat (anggota): 3 kolom di HP. */
+function CircleGrid({ people, className = "" }) {
+  return (
+    <ul className={`grid grid-cols-3 gap-x-3 gap-y-6 sm:grid-cols-4 sm:gap-x-5 lg:grid-cols-6 ${className}`}>
+      {people.map((p, i) => (
+        <Reveal as="li" key={p.id} delay={(i % 6) * 50} className="text-center">
+          <div className="relative mx-auto aspect-square w-full max-w-[128px] overflow-hidden rounded-full bg-line ring-4 ring-surface shadow-card">
+            <Avatar person={p} sizes="128px" className="object-cover" />
+          </div>
+          <h3 className="mt-3 text-sm font-bold leading-snug sm:text-base">{p.name}</h3>
+          <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-wide text-primary-strong sm:text-xs">{p.displayRole}</p>
+        </Reveal>
+      ))}
+    </ul>
   );
 }

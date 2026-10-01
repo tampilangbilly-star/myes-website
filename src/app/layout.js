@@ -1,40 +1,44 @@
+import { Plus_Jakarta_Sans, Sora } from "next/font/google";
 import "./globals.css";
-import "./light-theme.css";
 import SiteShell from "@/components/SiteShell";
-import { getSocialLinks } from "@/lib/helpers";
-import { cookies } from "next/headers";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import SocialFloat from "@/components/SocialFloat";
+import { getLang } from "@/lib/helpers";
+import { getSite } from "@/lib/site";
+import { themeInitScript } from "@/lib/theme";
+import { defaultMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "M-YES | Manado Youth English Service",
-  description: "Community for Youth English Service in Manado",
-  icons: {
-    icon: "/icon.png", // Ini adalah baris baru untuk memanggil gambar logo
-  },
+const sans = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
+const display = Sora({ subsets: ["latin"], variable: "--font-display", display: "swap", weight: ["600", "700", "800"] });
+
+export const metadata = defaultMetadata;
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#F8FAFC",
 };
 
 export default async function RootLayout({ children }) {
-  // 1. Ambil preferensi bahasa dari sistem cookie Anda
-  const cookieStore = cookies();
-  const lang = cookieStore.get("lang")?.value || "en";
-
-  // 2. Ambil data link sosial dinamis langsung dari database
-  let socials = {};
-  try {
-    socials = await getSocialLinks();
-  } catch (e) {
-    // Fallback jika terjadi error pada database
-    console.error("Gagal mengambil data sosial:", e);
-    socials = {
-      instagram: "https://instagram.com",
-      facebook: "https://facebook.com",
-      whatsapp: "https://wa.me/6281234567890",
-    };
-  }
+  const lang = await getLang();
+  const site = await getSite(lang);
 
   return (
-    <html lang={lang}>
-      <body>
-        <SiteShell lang={lang} socials={socials}>{children}</SiteShell>
+    <html lang={lang} data-accent={site.accent} data-default-accent={site.accent} className={`${sans.variable} ${display.variable}`} suppressHydrationWarning>
+      <head>
+        {/* Terapkan warna pilihan pengunjung sebelum render pertama (tanpa kedipan) */}
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript() }} />
+      </head>
+      <body className="min-h-dvh">
+        <SiteShell
+          navbar={<Navbar lang={lang} info={{ schedule: site.contact.schedule, area: site.contact.area, socials: site.socials }} />}
+          footer={<Footer lang={lang} />}
+          floating={<SocialFloat phone={site.contact.phoneDigits} adminName={site.contact.adminName} lang={lang} />}
+        >
+          {children}
+        </SiteShell>
       </body>
     </html>
   );

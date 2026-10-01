@@ -1,292 +1,64 @@
+import Link from "next/link";
 import prisma from "@/lib/prisma";
-import { cookies } from "next/headers";
+import { getLang, t } from "@/lib/helpers";
+import { safe } from "@/lib/data";
+import { pageMeta } from "@/lib/seo";
+import PageHeader from "@/components/PageHeader";
+import Reveal from "@/components/Reveal";
 import ProgramCardSlider from "@/components/ProgramCardSlider";
+import EmptyState from "@/components/EmptyState";
+import Icon from "@/components/Icon";
+
+export const metadata = pageMeta("Programs", "English worship, English classes, public speaking and fellowship — discover the M-YES programs.", "/program");
 
 export default async function ProgramPage() {
-  const lang = cookies().get("lang")?.value || "en";
-  const items = await prisma.program.findMany({
-    where: { isActive: true },
-    orderBy: { sortOrder: "asc" },
-  });
-
-  const t = (item, f) =>
-    lang === "id" ? item[f + "Id"] || item[f + "En"] : item[f + "En"];
+  const lang = await getLang();
+  const id = lang === "id";
+  const items = await safe(prisma.program.findMany({ where: { isActive: true }, orderBy: [{ sortOrder: "asc" }, { id: "asc" }] }));
 
   return (
     <>
-
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-        .pg-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
-          gap: clamp(1.25rem, 3vw, 2.25rem);
-        }
-
-        .pg-card {
-          display: flex;
-          flex-direction: column;
-          overflow: hidden;
-        }
-
-        .pg-media {
-          position: relative;
-          aspect-ratio: 16 / 10;
-          background: var(--bg-surface);
-          overflow: hidden;
-        }
-        .pg-media img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-        .pg-card:hover .pg-media img {
-          transform: scale(1.06);
-        }
-        .pg-media .emoji-hero {
-          position: absolute;
-          inset: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 4rem;
-          background:
-            radial-gradient(circle at 30% 20%, rgba(59, 130, 246, 0.18), transparent 60%),
-            radial-gradient(circle at 75% 85%, rgba(232, 163, 61, 0.1), transparent 55%);
-          filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.5));
-        }
-        /* Nomor program besar di pojok media */
-        .pg-index {
-          position: absolute;
-          top: 12px;
-          left: 14px;
-          z-index: 2;
-          font-family: "Playfair Display", serif;
-          font-size: 1rem;
-          font-weight: 700;
-          color: var(--text-primary);
-          background: var(--bg-surface);
-          border: 1px solid var(--border-light);
-          padding: 4px 12px;
-          border-radius: 99px;
-          letter-spacing: 1px;
-        }
-        .pg-media::after {
-          content: '';
-          position: absolute;
-          inset: auto 0 0 0;
-          height: 60%;
-          background: linear-gradient(to top, var(--bg-surface), transparent);
-        }
-
-        .pg-body {
-          padding: 1.5rem 1.5rem 1.25rem;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-        }
-        .pg-body h3 {
-          font-size: 1.35rem;
-          color: var(--text-primary);
-          margin: 0 0 0.6rem;
-        }
-        .pg-body .pg-excerpt {
-          color: var(--text-secondary);
-          font-size: 0.95rem;
-          line-height: 1.7;
-          margin: 0;
-        }
-
-        /* ====== FOOTER AKSI KARTU ====== */
-        .program-overlay {
-          padding: 0 1.5rem 1.5rem;
-          display: flex;
-          flex-direction: column;
-          gap: 0.9rem;
-          text-align: left;
-        }
-        .program-overlay .full-desc {
-          color: var(--text-primary);
-          font-size: 0.92rem;
-          line-height: 1.7;
-          margin: 0;
-          border-top: 1px dashed var(--border-light);
-          padding-top: 0.9rem;
-        }
-
-        .join-btn {
-          align-self: flex-start;
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          min-height: 46px;
-          padding: 0.7rem 1.6rem;
-          background: linear-gradient(135deg, #1d4ed8, #3b82f6);
-          color: white;
-          border-radius: 50px;
-          text-decoration: none;
-          font-weight: bold;
-          font-size: 0.9rem;
-          box-shadow: 0 8px 22px rgba(22, 36, 58, 0.09);
-          transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-                      box-shadow 0.35s ease;
-        }
-        .join-btn::after {
-          content: '→';
-          transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-        .join-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 14px 32px rgba(22, 36, 58, 0.09);
-        }
-        .join-btn:hover::after {
-          transform: translateX(4px);
-        }
-
-        /* Di perangkat dengan hover (desktop) */
-        @media (hover: hover) and (pointer: fine) {
-          .program-overlay .full-desc {
-            max-height: 0;
-            opacity: 0;
-            overflow: hidden;
-            padding-top: 0;
-            border-top-color: transparent;
-            transition: max-height 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-                        opacity 0.4s ease,
-                        padding-top 0.4s ease;
-          }
-          .pg-card:hover .program-overlay .full-desc {
-            max-height: 300px;
-            opacity: 1;
-            padding-top: 0.9rem;
-            border-top-color: var(--border-light);
-          }
-        }
-
-        /* ==================== RESPONSIVE KHUSUS ANDROID/MOBILE ==================== */
-        @media (max-width: 768px) {
-          /* Memaksa grid program menjadi 2 kolom berdampingan di HP */
-          .pg-grid {
-            grid-template-columns: repeat(2, 1fr) !important;
-            gap: 0.6rem !important;
-            margin-top: 1rem !important;
-          }
-          .pg-card {
-            border-radius: 12px !important;
-          }
-          .pg-index {
-            top: 8px !important;
-            left: 8px !important;
-            font-size: 0.7rem !important;
-            padding: 2px 8px !important;
-          }
-          .pg-media .emoji-hero {
-            font-size: 2.5rem !important;
-          }
-          .pg-body {
-            padding: 0.75rem !important;
-          }
-          .pg-body h3 {
-            font-size: 0.95rem !important;
-            margin-bottom: 0.3rem !important;
-            line-height: 1.2 !important;
-          }
-          .pg-body .pg-excerpt {
-            font-size: 0.75rem !important;
-            line-height: 1.4 !important;
-          }
-          /* Di HP, teks lengkap di-hidden dan tombol diperkecil agar rapi */
-          .program-overlay {
-            padding: 0 0.75rem 0.75rem !important;
-            gap: 0.5rem !important;
-          }
-          .program-overlay .full-desc {
-            display: none !important;
-          }
-          .join-btn {
-            min-height: 36px !important;
-            padding: 0.4rem 1rem !important;
-            font-size: 0.75rem !important;
-            box-shadow: 0 4px 12px rgba(22, 36, 58, 0.09) !important;
-          }
-        }
-      `,
-        }}
+      <PageHeader
+        eyebrow={id ? "Apa Yang Kami Lakukan" : "What We Do"}
+        title={id ? "Program Kami" : "Our Programs"}
+        subtitle={id ? "Setiap program dirancang untuk menolong anak muda bertumbuh dalam iman, karakter, dan kemampuan bahasa Inggris." : "Every program is designed to help young people grow in faith, character, and English skills."}
       />
-
-      <header className="ph2">
-        <div className="ph2-inner">
-          <span className="ph2-watermark" aria-hidden="true">
-            Programs
-          </span>
-          <div className="ph2-overline">
-            <span className="live-dot" />
-            {lang === "id" ? "Apa Yang Kami Lakukan" : "What We Do"}
-          </div>
-          <h1 className="ph2-title">
-            {lang === "id" ? (
-              <>
-                Program <em>Kami</em>
-              </>
-            ) : (
-              <>
-                Our <em>Programs</em>
-              </>
-            )}
-          </h1>
-          <div className="ph2-rule">
-            <i />
-            <i />
-          </div>
-        </div>
-      </header>
-
       <section className="section">
-        <div className="container">
-          <div className="pg-grid">
-            {items.map((p, i) => (
-              <div key={p.id} className="panel pg-card">
-                {/* Media atas: foto full-bleed atau emoji hero */}
-                <div className="pg-media">
-                  <span className="pg-index">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  
-                  {/* Memanggil komponen Slider dengan fallback array untuk data lama */}
-                  <ProgramCardSlider 
-                    images={p.images?.length > 0 ? p.images : (p.image ? [p.image] : [])} 
-                    emoji={p.emoji} 
-                  />
-
-                </div>
-
-                {/* Judul + cuplikan singkat */}
-                <div className="pg-body">
-                  <h3>{t(p, "title")}</h3>
-                  <p className="pg-excerpt">
-                    {t(p, "description").substring(0, 80)}...
-                  </p>
-                </div>
-
-                {/* Deskripsi lengkap + tombol Join */}
-                <div className="program-overlay">
-                  <p className="full-desc">{t(p, "description")}</p>
-                  <a
-                    href="https://chat.whatsapp.com/Fialpt9jLrCL0oLagStRTc"
-                    className="join-btn"
-                  >
-                    {lang === "id" ? "Gabung Program" : "Join Program"}
-                  </a>
-                </div>
-              </div>
-            ))}
-          </div>
+        <div className="container-x">
+          {items.length ? (
+            <ul className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3">
+              {items.map((p, i) => {
+                const imgs = p.images?.length ? p.images : p.image ? [p.image] : [];
+                const desc = t(p, "description", lang);
+                return (
+                  <Reveal as="li" key={p.id} delay={(i % 3) * 80} className="card card-hover flex flex-col overflow-hidden">
+                    <ProgramCardSlider images={imgs} emoji={p.emoji} title={t(p, "title", lang)} />
+                    <div className="flex flex-1 flex-col p-3 sm:p-6">
+                      <h2 className="flex items-start gap-2 text-[0.95rem] font-bold leading-snug sm:text-xl">
+                        <span aria-hidden className="hidden sm:inline">{p.emoji}</span>
+                        {t(p, "title", lang)}
+                      </h2>
+                      {desc && (
+                        <details className="group mt-1.5 flex-1">
+                          <summary className="cursor-pointer list-none text-xs leading-relaxed text-ink-muted sm:text-sm [&::-webkit-details-marker]:hidden">
+                            <span className="line-clamp-3 group-open:line-clamp-none">{desc}</span>
+                            {desc.length > 90 && <span className="mt-1 inline-block font-semibold text-primary-strong group-open:hidden">{id ? "Selengkapnya" : "Read more"}</span>}
+                          </summary>
+                        </details>
+                      )}
+                      <Link href="/contact" className="btn-soft btn-sm mt-4 self-start">
+                        {id ? "Gabung Program" : "Join Program"} <Icon name="arrow-right" size={16} />
+                      </Link>
+                    </div>
+                  </Reveal>
+                );
+              })}
+            </ul>
+          ) : (
+            <EmptyState icon="book" title={id ? "Belum ada program." : "No programs yet."} />
+          )}
         </div>
       </section>
-      
-      {/* Jangan lupa untuk memasukkan Footer yang di-import di atas */}
     </>
   );
 }

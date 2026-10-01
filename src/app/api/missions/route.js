@@ -1,12 +1,4 @@
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-export async function GET() {
-  return NextResponse.json(
-    await prisma.mission.findMany({ orderBy: { sortOrder: "asc" } }),
-  );
-}
-export async function POST(req) {
-  return NextResponse.json(
-    await prisma.mission.create({ data: await req.json() }),
-  );
-}
+import { collectionHandlers } from "@/lib/crud";
+import { missionSchema } from "@/lib/validation";
+
+export const { GET, POST } = collectionHandlers("mission", missionSchema, { orderBy: { sortOrder: "asc" } });

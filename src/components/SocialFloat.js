@@ -1,89 +1,23 @@
 "use client";
+import { usePathname } from "next/navigation";
 
-export default function SocialFloat() {
-  // Nomor WA Anda (Format internasional tanpa tanda + atau spasi)
-  const waNumber = "6282290658336";
-  const waLink = `https://wa.me/${waNumber}?text=Halo%20kak%20Billy,%20saya%20ingin%20bertanya%20seputar%20komunitas%20M-YES!`;
-
+/** Tombol WhatsApp mengambang (kanan bawah), aman dari area gesture Android. */
+export default function SocialFloat({ phone, adminName = "Billy", lang = "en" }) {
+  const pathname = usePathname();
+  if (!phone || pathname === "/contact") return null;
+  const text = `Halo kak ${adminName}, saya ingin bertanya seputar komunitas M-YES!`;
+  const href = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
   return (
-    <>
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-        /* Animasi Denyut Cahaya (Pulse) */
-        @keyframes pulse-wa {
-          0% { box-shadow: 0 0 0 0 rgba(22, 36, 58, 0.09); }
-          70% { box-shadow: 0 0 0 15px rgba(22, 36, 58, 0); }
-          100% { box-shadow: 0 0 0 0 rgba(22, 36, 58, 0); }
-        }
-
-        .wa-float-btn {
-          position: fixed;
-          bottom: 30px;
-          right: 30px; /* Di pojok kanan, menyeimbangkan AI Greeter di kiri */
-          width: 60px;
-          height: 60px;
-          background-color: #25D366; /* Warna Hijau Khas WhatsApp */
-          color: white;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: 0 10px 25px rgba(22, 36, 58, 0.09);
-          z-index: 99;
-          transition: transform 0.3s ease, background-color 0.3s ease;
-          text-decoration: none;
-          animation: pulse-wa 2s infinite;
-        }
-
-        .wa-float-btn:hover {
-          transform: scale(1.1) translateY(-5px);
-          background-color: #20b858;
-          animation: none; /* Hentikan denyut saat di-hover */
-          box-shadow: 0 15px 35px rgba(22, 36, 58, 0.09);
-        }
-
-        /* Tooltip Teks (Muncul saat di-hover) */
-        .wa-tooltip {
-          position: absolute;
-          right: 75px;
-          background: var(--bg-surface);
-          color: var(--text-primary);
-          padding: 8px 14px;
-          border-radius: 8px;
-          font-size: 0.85rem;
-          font-weight: bold;
-          white-space: nowrap;
-          opacity: 0;
-          pointer-events: none;
-          transform: translateX(10px);
-          transition: all 0.3s ease;
-          border: 1px solid var(--border-light);
-        }
-
-        .wa-float-btn:hover .wa-tooltip {
-          opacity: 1;
-          transform: translateX(0);
-        }
-      `,
-        }}
-      />
-
-      <a
-        href={waLink}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="wa-float-btn"
-        aria-label="Chat WhatsApp M-YES"
-      >
-        {/* Teks penjelas saat kursor mendekat */}
-        <span className="wa-tooltip">Chat Admin (Billy)</span>
-
-        {/* Ikon WhatsApp SVG yang bersih */}
-        <svg width="35" height="35" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M12.031 0C5.385 0 .004 5.38.004 12.02c0 2.124.551 4.195 1.6 6.015L.031 24l6.11-1.603a12.001 12.001 0 005.89 1.542h.005c6.643 0 12.025-5.381 12.025-12.022A12.016 12.016 0 0020.536 3.51 11.966 11.966 0 0012.031 0zM12.03 21.942h-.003a9.98 9.98 0 01-5.076-1.39l-.364-.216-3.774.99.999-3.68-.237-.377a9.957 9.957 0 01-1.523-5.305c0-5.498 4.475-9.972 9.981-9.972 2.664 0 5.168 1.039 7.051 2.924a9.927 9.927 0 012.918 7.054c-.002 5.498-4.477 9.972-9.972 9.972zm5.474-7.464c-.3-.15-1.774-.877-2.049-.978-.275-.101-.476-.15-.676.15-.2.301-.775.978-.95 1.178-.175.2-.35.226-.65.076-.3-.15-1.266-.466-2.411-1.488-.891-.794-1.493-1.775-1.668-2.076-.175-.301-.019-.464.131-.614.135-.135.3-.35.45-.526.15-.175.2-.3.3-.5s.05-.376-.025-.526c-.075-.15-.676-1.627-.926-2.228-.243-.585-.49-.505-.676-.514-.175-.008-.376-.01-.576-.01-.2 0-.525.075-.8.376-.275.3-1.05 1.026-1.05 2.503s1.075 2.9 1.225 3.1c.15.2 2.115 3.228 5.123 4.529.717.31 1.275.494 1.71.633.72.23 1.375.197 1.892.12.585-.088 1.774-.726 2.024-1.428.25-.701.25-1.302.175-1.428-.075-.125-.275-.2-.575-.35z" />
-        </svg>
-      </a>
-    </>
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={lang === "id" ? "Chat WhatsApp M-YES" : "Chat with M-YES on WhatsApp"}
+      className="animate-fade-up fixed bottom-[max(16px,env(safe-area-inset-bottom))] right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[#1FAF38] text-white shadow-lift transition hover:scale-105 active:scale-95 sm:right-6"
+    >
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.46-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.7.63.71.22 1.36.19 1.87.12.57-.09 1.76-.72 2-1.41.25-.7.25-1.29.18-1.41-.08-.13-.27-.2-.57-.35M12.05 21.79h-.01a9.87 9.87 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.44 9.88-9.88 9.88m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.68 1.45h.01c6.55 0 11.89-5.34 11.89-11.89a11.82 11.82 0 0 0-3.48-8.41z" />
+      </svg>
+    </a>
   );
 }

@@ -1,65 +1,58 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { apiError, parseId, requireAdmin } from "@/lib/api-auth";
+import { clientIp, rateLimit } from "@/lib/rate-limit";
+import { contactSchema } from "@/lib/validation";
 
-// GET: Admin mengambil daftar pesan
+// GET: hanya admin (sebelumnya terbuka untuk publik dan membocorkan semua pesan)
 export async function GET() {
-  try {
-    const messages = await prisma.contactMessage.findMany({
-      orderBy: { createdAt: "desc" }, // Yang paling baru di atas
-    });
-    return NextResponse.json(messages);
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Gagal mengambil data" },
-      { status: 500 },
-    );
-  }
+  const { error } = await requireAdmin();
+  if (error) return error;
+  const messages = await prisma.contactMessage.findMany({ orderBy: { createdAt: "desc" } });
+  return NextResponse.json(messages);
 }
 
-// POST: Pengunjung mengirim pesan dari halaman depan
+// POST: pengunjung mengirim pesan (dibatasi 5 pesan / 10 menit per IP, ada honeypot anti-spam)
 export async function POST(request) {
+  if (!rateLimit(`contact:${clientIp(request)}`, 5, 10 * 60_000).ok) {
+    return NextResponse.json({ error: "Terlalu banyak pesan. Coba lagi beberapa menit lagi." }, { status: 429 });
+  }
   try {
     const body = await request.json();
-    const { name, email, message } = body;
-
-    if (!name || !email || !message) {
-      return NextResponse.json(
-        { error: "Semua kolom wajib diisi" },
-        { status: 400 },
-      );
-    }
-
-    const newMessage = await prisma.contactMessage.create({
-      data: { name, email, message },
-    });
-
-    return NextResponse.json({ success: true, data: newMessage });
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Gagal mengirim pesan" },
-      { status: 500 },
-    );
+    if (body?.website) return NextResponse.json({ success: true }); // honeypot bot
+    const data = contactSchema.parse(body);
+    await prisma.contactMessage.create({ data });
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    return apiError(err, "Gagal mengirim pesan.");
   }
 }
 
-// DELETE: Admin menghapus pesan
-export async function DELETE(request) {
+// PATCH: tandai sudah/belum dibaca
+export async function PATCH(request) {
+  const { error } = await requireAdmin();
+  if (error) return error;
   try {
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
-
-    if (!id)
-      return NextResponse.json({ error: "ID tidak valid" }, { status: 400 });
-
-    await prisma.contactMessage.delete({
-      where: { id: parseInt(id) },
-    });
-
+    const { id, isRead } = await request.json();
+    const pid = parseId(id);
+    if (!pid) return NextResponse.json({ error: "ID tidak valid" }, { status: 400 });
+    await prisma.contactMessage.update({ where: { id: pid }, data: { isRead: Boolean(isRead) } });
     return NextResponse.json({ success: true });
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Gagal menghapus pesan" },
-      { status: 500 },
-    );
+  } catch (err) {
+    return apiError(err);
+  }
+}
+
+// DELETE: hapus pesan (?id=)
+export async function DELETE(request) {
+  const { error } = await requireAdmin();
+  if (error) return error;
+  const id = parseId(new URL(request.url).searchParams.get("id"));
+  if (!id) return NextResponse.json({ error: "ID tidak valid" }, { status: 400 });
+  try {
+    await prisma.contactMessage.delete({ where: { id } });
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    return apiError(err, "Gagal menghapus pesan.");
   }
 }

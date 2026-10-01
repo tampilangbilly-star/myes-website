@@ -1,109 +1,29 @@
-"use client";
-import { usePathname } from "next/navigation";
-import Link from "next/link";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import prisma from "@/lib/prisma";
+import { safe } from "@/lib/data";
+import AdminShell from "@/components/admin/AdminShell";
 
-export default function AdminLayout({ children }) {
-  const pathname = usePathname();
-  if (pathname === "/admin/login") return children;
+export const metadata = { title: { default: "Admin", template: "%s · Admin M-YES" }, robots: { index: false, follow: false } };
 
-  const links = [
-    {
-      label: "Main",
-      items: [
-        { href: "/admin", icon: "📊", text: "Dashboard" },
-        { href: "/admin/slides", icon: "🖼️", text: "Homepage Slides" },
-        { href: "/admin/messages", icon: "📬", text: "Inbox Pesan" },
-      ],
-    },
-    {
-      label: "Content",
-      items: [
-        { href: "/admin/settings", icon: "📋", text: "About Us" },
-        { href: "/admin/personnel", icon: "👥", text: "Personnel" },
-        { href: "/admin/guest-speakers", icon: "🎤", text: "Guest Speakers" },
-        { href: "/admin/home-moments", icon: "🌟", text: "Momen Beranda" },
-        { href: "/admin/programs", icon: "📚", text: "Programs" },
-        { href: "/admin/activities", icon: "📅", text: "Activities" },
-        {
-          href: "/admin/weekly-activities",
-          icon: "📸",
-          text: "Weekly Gallery",
-        },
-        { href: "/admin/missions", icon: "✈️", text: "Mission Trip" },
-        // INI MENU M-YES CARE YANG BARU DITAMBAHKAN:
-        { href: "/admin/care", icon: "❤️", text: "M-YES Care" },
-        { href: "/admin/news", icon: "📰", text: "News" },
-      ],
-    },
-    {
-      label: "Settings",
-      items: [
-        {
-          href: "/admin/settings?tab=social",
-          icon: "🔗",
-          text: "Social Media",
-        },
-        {
-          href: "/admin/settings?tab=contact",
-          icon: "💬",
-          text: "Contact Info",
-        },
-      ],
-    },
-  ];
+/**
+ * Proteksi admin di SERVER (bukan hanya di browser):
+ * proxy.js sudah mengarahkan tamu ke /admin/login, dan layout ini memeriksa ulang sesi
+ * sebelum merender halaman admin apa pun. Semua API juga memeriksa sesi sendiri.
+ */
+export default async function AdminLayout({ children }) {
+  const pathname = (await headers()).get("x-pathname") || "";
+  if (pathname.startsWith("/admin/login")) return children;
 
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) redirect(`/admin/login?callbackUrl=${encodeURIComponent(pathname || "/admin")}`);
+
+  const unread = await safe(prisma.contactMessage.count({ where: { isRead: false } }), 0);
   return (
-    <div className="admin-layout">
-      <aside className="admin-sidebar">
-        <div className="admin-sidebar-header">
-          <div className="admin-sidebar-logo">M-Y</div>
-          <div className="admin-sidebar-text">
-            <h3>M-YES</h3>
-            <small>Admin Panel</small>
-          </div>
-        </div>
-        <nav className="admin-sidebar-nav">
-          {links.map((group) => (
-            <div key={group.label}>
-              <div className="admin-sidebar-label">{group.label}</div>
-              {group.items.map((l) => (
-                <Link
-                  key={l.href}
-                  href={l.href}
-                  className={`admin-sidebar-link ${pathname === l.href ? "active" : ""}`}
-                >
-                  <span className="icon">{l.icon}</span> {l.text}
-                </Link>
-              ))}
-            </div>
-          ))}
-        </nav>
-        <div className="admin-sidebar-footer">
-          <button
-            className="admin-logout"
-            onClick={() => {
-              document.cookie = "next-auth.session-token=;max-age=0;path=/";
-              window.location.href = "/admin/login";
-            }}
-          >
-            <span>🚪</span> Logout
-          </button>
-        </div>
-      </aside>
-      <div className="admin-main">
-        <div className="admin-topbar">
-          <h1>Admin Dashboard</h1>
-          <div className="admin-topbar-actions">
-            <div className="admin-badge">
-              <span className="dot" /> Online
-            </div>
-            <Link href="/" target="_blank" className="view-site-btn">
-              🌐 View Site
-            </Link>
-          </div>
-        </div>
-        <div className="admin-content">{children}</div>
-      </div>
-    </div>
+    <AdminShell user={{ name: session.user.name || "Admin", email: session.user.email }} unread={unread}>
+      {children}
+    </AdminShell>
   );
 }

@@ -1,111 +1,34 @@
-"use client";
+import Image from "next/image";
+import clsx from "clsx";
 
-export default function HolySpiritAmbient() {
+/**
+ * Merpati Roh Kudus — terbang masuk lalu melayang pelan. pointer-events: none (tidak menghalangi klik).
+ *
+ * variant="photo"  → DESKTOP saja: di pojok kanan atas foto hero (teks menumpuk di atas foto).
+ * variant="inline" → HP/tablet saja: di samping judul hitam di bawah foto.
+ */
+export default function HolySpiritAmbient({ variant = "photo" }) {
+  const inline = variant === "inline";
   return (
     <div
-      style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        pointerEvents: "none", // KUNCI: Agar tidak menghalangi saat user mengklik tombol
-        overflow: "hidden",
-        zIndex: 50, // Angka besar agar merpati terbang di DEPAN teks
-      }}
+      aria-hidden
+      className={clsx(
+        "pointer-events-none absolute z-[1]",
+        inline
+          ? "-top-3 right-0 w-[68px] xs:w-20 sm:w-24 lg:hidden"
+          : "hidden lg:block lg:right-[6%] lg:top-[8%] lg:w-[13%] lg:min-w-[90px] lg:max-w-[150px]",
+      )}
     >
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-        /* =========================================================================
-           1. PENGATURAN PC (DESKTOP) — Tetap Sama, Tidak Diubah
-           ========================================================================= */
-        @keyframes flyIn {
-          0% { 
-            transform: translate(-30vw, 40vh) scale(0.5) rotate(25deg); 
-            opacity: 0; 
-          }
-          100% { 
-            transform: translate(25vw, 25vh) rotate(-2deg); 
-            opacity: 1; 
-          }
-        }
-
-        @keyframes gentleHover {
-          0%, 100% { 
-            transform: translate(25vw, 25vh) rotate(-2deg); 
-          }
-          50% { 
-            transform: translate(26vw, 23vh) rotate(3deg); 
-          }
-        }
-
-        @keyframes bobbing {
-          0%, 100% { margin-top: 0px; }
-          50% { margin-top: -12px; }
-        }
-
-        @keyframes holyGlow {
-          0%, 100% { filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5)); }
-          50% { filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.9)) drop-shadow(0 0 40px rgba(59, 130, 246, 0.6)); }
-        }
-
-        .real-dove-container {
-          position: absolute;
-          /* TRIK ANIMASI BERANTAI: 
-             flyIn berjalan 2.5s lalu berhenti (forwards). 
-             gentleHover menunggu 2.5s baru mulai dan berulang (infinite). */
-          animation: 
-            flyIn 2.5s ease-out forwards,
-            gentleHover 8s ease-in-out 2.5s infinite; 
-        }
-
-        .real-dove-img {
-          width: 180px; 
-          height: auto;
-          animation: bobbing 3s ease-in-out infinite, holyGlow 5s ease-in-out infinite;
-        }
-        
-        /* =========================================================================
-           2. PENYESUAIAN KHUSUS LAYAR HP (MOBILE) — NAIK KE TULISAN PUTIH
-           ========================================================================= */
-        @media (max-width: 768px) {
-          /* Merpati kini mendarat menyentuh tulisan putih di atas tombol: */
-          @keyframes flyInMobile {
-            0% { 
-              transform: translate(-40vw, 15vh) scale(0.5) rotate(25deg); 
-              opacity: 0; 
-            }
-            100% { 
-              /* Diubah menjadi 48vh agar naik menyentuh teks */
-              transform: translate(62vw, 48vh) rotate(-4deg); 
-              opacity: 1; 
-            }
-          }
-
-          /* Sesuaikan juga gentleHover agar sinkron */
-          @keyframes gentleHoverMobile {
-            0%, 100% { transform: translate(62vw, 48vh) rotate(-4deg); }
-            /* Nilai 50% dikurangi 1.5vh (menjadi 46.5vh) untuk efek melayang (bobbing) */
-            50% { transform: translate(63vw, 46.5vh) rotate(2deg); }
-          }
-          
-          .real-dove-container {
-            animation: 
-              flyInMobile 2.8s ease-out forwards,
-              gentleHoverMobile 8s ease-in-out 2.8s infinite;
-          }
-
-          .real-dove-img {
-            width: 92px;  /* lebih mungil di zona teks agar elegan */
-          }
-        }
-      `,
-        }}
+      <div
+        className={clsx(
+          "ray-pulse absolute -inset-[35%] rounded-full",
+          inline
+            ? "bg-[radial-gradient(circle,rgb(var(--color-primary)/0.18)_0%,rgb(var(--color-primary)/0)_65%)]"
+            : "bg-[radial-gradient(circle,rgb(255_255_255/0.55)_0%,rgb(255_255_255/0)_65%)]",
+        )}
       />
-
-      <div className="real-dove-container">
-        <img src="dove.png" alt="Holy Spirit Dove" className="real-dove-img" />
+      <div className="dove-fly relative">
+        <Image src="/dove.webp" alt="" width={420} height={493} priority sizes="150px" className="dove-glow h-auto w-full" />
       </div>
     </div>
   );

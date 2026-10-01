@@ -1,25 +1,17 @@
-import AdminForm from '@/components/AdminForm';
+import ResourceForm from "@/components/admin/ResourceForm";
+import { AdminTitle } from "@/components/admin/ResourceList";
+import { RESOURCES } from "@/components/admin/resources";
 
-const fields = [
-  { name: 'titleEn', label: 'Title (EN) *', required: true }, 
-  { name: 'titleId', label: 'Title (ID)' },
-  { name: 'emoji', label: 'Emoji Icon', placeholder: '📖' }, 
-  { name: 'sortOrder', label: 'Sort Order', type: 'number' },
-  { name: 'descriptionEn', label: 'Description (EN)', type: 'textarea' }, 
-  { name: 'descriptionId', label: 'Description (ID)', type: 'textarea' },
-  // Ubah field image untuk menangani multiple array ("images")
-  { name: 'images', label: 'Images (Pilih lebih dari 1)', type: 'file', multiple: true }, 
-  { name: 'isActive', label: 'Active', type: 'checkbox' },
-];
+export const metadata = { title: "Tambah" };
 
-export default function NewProgram() { 
+export default function Page() {
+  const cfg = RESOURCES.programs;
   return (
-    <AdminForm 
-      title="Add Program" 
-      apiUrl="/api/programs" 
-      redirectUrl="/admin/programs" 
-      fields={fields} 
-      initialData={{isActive: true, sortOrder: 0, emoji: '📖'}} 
-    />
-  ); 
+    <>
+      <AdminTitle title={`Tambah ${cfg.singular}`} back={{ href: cfg.base, label: cfg.title }} />
+      <div className="card p-4 sm:p-6">
+        <ResourceForm resource="programs" />
+      </div>
+    </>
+  );
 }

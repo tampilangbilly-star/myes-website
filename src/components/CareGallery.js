@@ -1,163 +1,52 @@
-"use client";
-import { useState } from "react";
+import Icon from "./Icon";
+import Lightbox from "./Lightbox";
+import YouTubeLite from "./YouTubeLite";
+import EmptyState from "./EmptyState";
+import Reveal from "./Reveal";
+import { formatDate } from "@/lib/format";
 
+/** Galeri M-YES Care: judul, tanggal, deskripsi, foto (lightbox + unduh) dan video YouTube. */
 export default function CareGallery({ activities = [], lang = "en" }) {
-  const [selectedImage, setSelectedImage] = useState(null);
-
-  if (!activities || activities.length === 0) {
-    return (
-      <div style={{ textAlign: "center", padding: "4rem 0", color: "var(--text-secondary)" }}>
-        <p>{lang === "id" ? "Belum ada kegiatan M-YES Care." : "No M-YES Care activities yet."}</p>
-      </div>
-    );
-  }
+  const id = lang === "id";
+  if (!activities.length) return <EmptyState icon="heart" title={id ? "Belum ada kegiatan M-YES Care." : "No M-YES Care activities yet."} />;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
+    <div className="space-y-6 sm:space-y-8">
       {activities.map((item) => {
-        const images = item.media?.filter((m) => m.type === "IMAGE") || [];
-        const youtubeVideos = item.media?.filter((m) => m.type === "YOUTUBE") || [];
-
+        const title = (id && item.titleId) || item.titleEn;
+        const description = (id && item.descriptionId) || item.descriptionEn;
+        const images = (item.media || []).filter((m) => m.type === "IMAGE").map((m) => m.url);
+        const videos = (item.media || []).filter((m) => m.type === "YOUTUBE");
         return (
-          <div 
-            key={item.id} 
-            className="panel"
-            style={{
-              background: "var(--bg-surface)",
-              border: "1px solid var(--border-light)",
-              borderRadius: "20px",
-              padding: "clamp(1.5rem, 3vw, 2.5rem)",
-              boxShadow: "0 10px 30px rgba(22, 36, 58, 0.09)"
-            }}
-          >
-            {/* JUDUL & TANGGAL KEGIATAN */}
-            <div style={{ marginBottom: "1.5rem" }}>
-              <h3 style={{ fontSize: "1.5rem", color: "var(--text-primary)", marginBottom: "0.4rem", fontFamily: '"Playfair Display", serif' }}>
-                {lang === "id" ? item.titleId || item.titleEn : item.titleEn}
-              </h3>
-              
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "var(--accent-gold)", fontSize: "0.9rem", fontWeight: "500" }}>
-                <span>📅</span>
-                <span>
-                  {new Date(item.activityDate).toLocaleDateString(lang === "id" ? "id-ID" : "en-US", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })}
-                </span>
-              </div>
-            </div>
-
-            {/* DESKRIPSI (JIKA ADA) */}
-            {(item.descriptionEn || item.descriptionId) && (
-              <p style={{ color: "var(--text-primary)", lineHeight: "1.7", marginBottom: "1.5rem", fontSize: "0.98rem" }}>
-                {lang === "id" ? item.descriptionId || item.descriptionEn : item.descriptionEn}
-              </p>
-            )}
-
-            {/* GALERI FOTO DALAM GRID RAPI */}
+          <Reveal as="article" key={item.id} className="card p-4 sm:p-7">
+            <h3 className="text-xl font-bold leading-snug sm:text-2xl">{title}</h3>
+            <p className="mt-1.5 inline-flex items-center gap-1.5 text-sm font-medium text-primary-strong">
+              <Icon name="calendar" size={16} /> {formatDate(item.activityDate, lang)}
+            </p>
+            {description && <p className="mt-4 whitespace-pre-line leading-relaxed text-ink-muted">{description}</p>}
             {images.length > 0 && (
-              <div>
-                <div style={{ fontSize: "0.9rem", fontWeight: "bold", color: "var(--text-secondary)", marginBottom: "0.8rem", textTransform: "uppercase", letterSpacing: "1px" }}>
-                  {lang === "id" ? "Galeri Foto" : "Photo Gallery"}
-                </div>
-                <div className="gallery-grid">
-                  {images.map((media, idx) => (
-                    <div
-                      key={idx}
-                      className="gallery-img-wrapper"
-                      onClick={() => setSelectedImage(media.url)}
-                    >
-                      <img src={media.url} alt="Care Activity" loading="lazy" />
-                      <div className="zoom-overlay">
-                        <span>🔍</span>
-                      </div>
-                    </div>
+              <div className="mt-6">
+                <p className="mb-2 inline-flex items-center gap-2 text-sm font-semibold text-ink-muted">
+                  <Icon name="camera" size={16} /> {id ? "Galeri Foto" : "Photo Gallery"}
+                </p>
+                <Lightbox images={images} lang={lang} alt={title} limit={12} />
+              </div>
+            )}
+            {videos.length > 0 && (
+              <div className="mt-6">
+                <p className="mb-2 inline-flex items-center gap-2 text-sm font-semibold text-ink-muted">
+                  <Icon name="video" size={16} /> {id ? "Video Kegiatan" : "Activity Videos"}
+                </p>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {videos.map((v) => (
+                    <YouTubeLite key={v.id} url={v.url} title={title} />
                   ))}
                 </div>
               </div>
             )}
-
-            {/* VIDEO YOUTUBE (JIKA ADA) */}
-            {youtubeVideos.length > 0 && (
-              <div style={{ marginTop: "1.5rem" }}>
-                <div style={{ fontSize: "0.9rem", fontWeight: "bold", color: "var(--text-secondary)", marginBottom: "0.8rem", textTransform: "uppercase", letterSpacing: "1px" }}>
-                  {lang === "id" ? "Video Kegiatan" : "Activity Videos"}
-                </div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 300px), 1fr))", gap: "1rem" }}>
-                  {youtubeVideos.map((vid, idx) => (
-                    <div key={idx} style={{ position: "relative", aspectRatio: "16/9", borderRadius: "12px", overflow: "hidden", background: "var(--bg-surface)" }}>
-                      <iframe
-                        src={`https://www.youtube.com/embed/${vid.url}`}
-                        title="YouTube video player"
-                        style={{ width: "100%", height: "100%", border: "none" }}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+          </Reveal>
         );
       })}
-
-      {/* MODAL / LIGHTBOX KETIKA FOTO DIKLIK (BISA DILIHAT BESAR & DIUNDUH) */}
-      {selectedImage && (
-        <div
-          onClick={() => setSelectedImage(null)}
-          style={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 9999,
-            background: "rgba(3, 7, 18, 0.9)",
-            backdropFilter: "blur(8px)",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "1rem",
-          }}
-        >
-          <div
-            style={{ position: "relative", maxWidth: "90vw", maxHeight: "80vh" }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <img
-              src={selectedImage}
-              alt="Enlarged view"
-              style={{
-                maxWidth: "100%",
-                maxHeight: "75vh",
-                borderRadius: "12px",
-                objectFit: "contain",
-                boxShadow: "0 20px 40px rgba(22, 36, 58, 0.09)",
-              }}
-            />
-            
-            {/* TOMBOL AKSI DI DALAM MODAL */}
-            <div style={{ display: "flex", justifyContent: "center", gap: "1rem", marginTop: "1.2rem" }}>
-              <a
-                href={selectedImage}
-                target="_blank"
-                download
-                className="admin-btn primary"
-                style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "6px" }}
-              >
-                📥 {lang === "id" ? "Unduh Foto" : "Download Photo"}
-              </a>
-              <button
-                onClick={() => setSelectedImage(null)}
-                className="admin-btn secondary"
-                style={{ cursor: "pointer" }}
-              >
-                ✕ {lang === "id" ? "Tutup" : "Close"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
